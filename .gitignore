@@ -1,0 +1,23 @@
+# 竞品源码克隆（700MB，别人的仓库）
+# 需要时用 scripts/repos_clone.py 或 竞品仓库-本地索引.md 末尾的 clone 命令重建
+repos/
+
+# 本地 agent 状态与记忆（含本机路径、环境细节，不入库）
+.workbuddy/
+
+# 一次性脚本产出的临时文件
+_*.txt
+_*.json
+*.log
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+venv/
+
+# 编辑器 / 系统
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db

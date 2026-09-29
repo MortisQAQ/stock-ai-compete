@@ -1,0 +1,46 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 600" width="1000" height="600" font-family="Noto Sans SC, PingFang SC, sans-serif">
+  <text x="60" y="52" font-size="20" font-weight="500" fill="#2C2C2A">指标体系：四层，越往上越少人做</text>
+  <text x="60" y="78" font-size="13" fill="#888780">下面三层是入场券（竞品已做全），塔尖才是我们的位置</text>
+
+  <rect x="270" y="120" width="460" height="104" rx="12" fill="#EEEDFE" stroke="#534AB7" stroke-width="1"/>
+  <text x="294" y="146" font-size="15" font-weight="500" fill="#3C3489">第四层 · 统计有效性</text>
+  <text x="466" y="146" font-size="13" fill="#534AB7">几乎没人做，我们的位置</text>
+  <rect x="294" y="162" width="126" height="44" rx="8" fill="#CECBF6" stroke="#534AB7" stroke-width="0.5"/>
+  <text x="357" y="189" font-size="13" fill="#26215C" text-anchor="middle">样本内外分离</text>
+  <rect x="436" y="162" width="126" height="44" rx="8" fill="#CECBF6" stroke="#534AB7" stroke-width="0.5"/>
+  <text x="499" y="189" font-size="13" fill="#26215C" text-anchor="middle">Deflated Sharpe</text>
+  <rect x="578" y="162" width="126" height="44" rx="8" fill="#CECBF6" stroke="#534AB7" stroke-width="0.5"/>
+  <text x="641" y="189" font-size="13" fill="#26215C" text-anchor="middle">蒙特卡洛 · p 值</text>
+
+  <rect x="200" y="232" width="600" height="104" rx="12" fill="#E6F1FB" stroke="#378ADD" stroke-width="1"/>
+  <text x="224" y="258" font-size="15" font-weight="500" fill="#0C447C">第三层 · 风险调整与归因</text>
+  <text x="424" y="258" font-size="13" fill="#185FA5">竞品普遍有，但口径差异很大</text>
+  <rect x="224" y="274" width="268" height="44" rx="8" fill="#B5D4F4" stroke="#185FA5" stroke-width="0.5"/>
+  <text x="358" y="301" font-size="13" fill="#042C53" text-anchor="middle">夏普 · 索提诺 · 卡玛</text>
+  <rect x="508" y="274" width="268" height="44" rx="8" fill="#B5D4F4" stroke="#185FA5" stroke-width="0.5"/>
+  <text x="642" y="301" font-size="13" fill="#042C53" text-anchor="middle">信息比率 · α / β</text>
+
+  <rect x="130" y="344" width="740" height="104" rx="12" fill="#E6F1FB" stroke="#85B7EB" stroke-width="1"/>
+  <text x="154" y="370" font-size="15" font-weight="500" fill="#185FA5">第二层 · 风险类</text>
+  <text x="288" y="370" font-size="13" fill="#378ADD">标配，但决定你会不会出局</text>
+  <rect x="154" y="386" width="160" height="44" rx="8" fill="#B5D4F4" stroke="#185FA5" stroke-width="0.5"/>
+  <text x="234" y="413" font-size="13" fill="#042C53" text-anchor="middle">最大回撤</text>
+  <rect x="330" y="386" width="160" height="44" rx="8" fill="#B5D4F4" stroke="#185FA5" stroke-width="0.5"/>
+  <text x="410" y="413" font-size="13" fill="#042C53" text-anchor="middle">波动率</text>
+  <rect x="506" y="386" width="160" height="44" rx="8" fill="#B5D4F4" stroke="#185FA5" stroke-width="0.5"/>
+  <text x="586" y="413" font-size="13" fill="#042C53" text-anchor="middle">最大连亏天数</text>
+  <rect x="682" y="386" width="160" height="44" rx="8" fill="#B5D4F4" stroke="#185FA5" stroke-width="0.5"/>
+  <text x="762" y="413" font-size="13" fill="#042C53" text-anchor="middle">换手率 · 成交数</text>
+
+  <rect x="60" y="456" width="880" height="104" rx="12" fill="#E6F1FB" stroke="#B5D4F4" stroke-width="1"/>
+  <text x="84" y="482" font-size="15" font-weight="500" fill="#185FA5">第一层 · 收益类</text>
+  <text x="218" y="482" font-size="13" fill="#888780">人人都有 —— 只看这一层的榜单不配上桌</text>
+  <rect x="84" y="498" width="196" height="44" rx="8" fill="#B5D4F4" stroke="#185FA5" stroke-width="0.5"/>
+  <text x="182" y="525" font-size="13" fill="#042C53" text-anchor="middle">累计收益</text>
+  <rect x="296" y="498" width="196" height="44" rx="8" fill="#B5D4F4" stroke="#185FA5" stroke-width="0.5"/>
+  <text x="394" y="525" font-size="13" fill="#042C53" text-anchor="middle">年化收益</text>
+  <rect x="508" y="498" width="196" height="44" rx="8" fill="#B5D4F4" stroke="#185FA5" stroke-width="0.5"/>
+  <text x="606" y="525" font-size="13" fill="#042C53" text-anchor="middle">相对基准超额</text>
+  <rect x="720" y="498" width="196" height="44" rx="8" fill="#B5D4F4" stroke="#185FA5" stroke-width="0.5"/>
+  <text x="818" y="525" font-size="13" fill="#042C53" text-anchor="middle">买入持有对照</text>
+</svg>
