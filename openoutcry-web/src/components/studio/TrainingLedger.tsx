@@ -2,8 +2,10 @@ import { useNavigate } from 'react-router-dom'
 import { ArrowUpRight } from 'lucide-react'
 
 import { agentOf } from '../../data/agents'
-import { STATUS_TEXT, TRAINING_SEED } from '../../data/trainings'
-import type { TrainingRecord, TrainingStatus } from '../../data/trainings'
+import { TRAINING_SEED } from '../../data/trainings'
+import { TRAINING_STATUS_TEXT } from '../../store/selectors'
+import type { TrainingRecord } from '../../data/trainings'
+import type { TrainingStatus } from '../../types'
 import { cn } from '../../lib/utils'
 
 /** 团队徽记：两字代号，比取名字首字稳定 */
@@ -139,7 +141,7 @@ function TrainingRow({ training, onOpen }: { training: TrainingRecord; onOpen: (
             TONE[training.status],
           )}
         >
-          {STATUS_TEXT[training.status]}
+          {TRAINING_STATUS_TEXT[training.status]}
         </span>
 
         <ArrowUpRight

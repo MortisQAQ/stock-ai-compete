@@ -1,18 +1,24 @@
+import { APP_ROUTES } from './app/routes'
+
 export interface NavItem {
   to: string
   n: string
   label: string
   sub: string
+  short: string
 }
 
-export const NAV: NavItem[] = [
-  { to: '/studio', n: '01', label: '新建训练', sub: 'New Training' },
-  { to: '/training', n: '02', label: '训练场', sub: 'Training Ground' },
-  { to: '/review', n: '03', label: '结果与复盘', sub: 'Review' },
-  { to: '/connect', n: '04', label: '连接 Agent', sub: 'Connect' },
-  { to: '/protocol', n: '05', label: '协议与 Skill', sub: 'Protocol' },
-  { to: '/guide', n: '06', label: '产品说明', sub: 'Brief' },
-]
+/**
+ * 导航与路由同源：APP_ROUTES 是唯一声明，这里只做形状转换。
+ * 之前 NAV、路由表、移动端短标签各自维护一份，加一个页面要改三处。
+ */
+export const NAV: NavItem[] = APP_ROUTES.map(({ path, nav }) => ({
+  to: path,
+  n: nav.n,
+  label: nav.label,
+  sub: nav.sub,
+  short: nav.short,
+}))
 
 export const titleOf = (pathname: string): string =>
-  NAV.find((item) => pathname === item.to)?.label ?? '新建训练'
+  APP_ROUTES.find((route) => route.path === pathname)?.nav.label ?? APP_ROUTES[0].nav.label

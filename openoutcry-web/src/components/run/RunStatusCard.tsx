@@ -26,7 +26,7 @@ export function RunStatusCard() {
           <span>32k / 100k token</span>
         </div>
 
-        <div className="trust" style={{ marginTop: 8 }}>
+        <div className="trust mt-2">
           <div className="trust-row">
             <span className={'trust-dot' + (sealed ? '' : ' warn')} />
             <div>

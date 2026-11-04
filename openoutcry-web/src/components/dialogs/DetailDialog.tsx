@@ -1,6 +1,7 @@
 import { useRun } from '../../store/RunProvider'
 import { useDialog } from '../../store/DialogProvider'
 import { Modal } from '../ui/Modal'
+import { Prose } from '../ui/Prose'
 import { Button } from '../ui/Button'
 import { money, signed } from '../../lib/format'
 import { PROPOSAL_TEXT } from '../../store/derive'
@@ -43,9 +44,9 @@ export function DetailDialog({ open, id }: { open: boolean; id: string }) {
               <dd>ev_018 / ev_024</dd>
             </div>
           </dl>
-          <p style={{ fontSize: 'var(--fs-body)', lineHeight: 1.7, color: 'var(--ink-2)' }}>
+          <Prose>
             示例经营披露显示回款周期延长，Agent 因此提出减仓。平台只负责返回资料，不替 Agent 下投资结论。
-          </p>
+          </Prose>
           <div className="note">
             T+1：原仓位已过结算日，可卖 600 股。后续开盘价只在点击「演示开盘撮合」后由环境揭示；满足规则也不保证真实市场能成交。
           </div>
@@ -97,8 +98,8 @@ export function DetailDialog({ open, id }: { open: boolean; id: string }) {
               <dd>{trade.evidence}</dd>
             </div>
           </dl>
-          <h3 style={{ font: '700 13px/1.4 var(--serif)', margin: '10px 0 4px' }}>当时的结构化理由</h3>
-          <p style={{ fontSize: 'var(--fs-body)', lineHeight: 1.7, color: 'var(--ink-2)' }}>{trade.reason}</p>
+          <h3 className="mt-2.5 mb-1 font-serif text-note font-bold leading-snug">当时的结构化理由</h3>
+          <Prose>{trade.reason}</Prose>
           <div className="note">
             {trade.pnl === null
               ? '当前浮动盈亏请看持仓页，不能把浮盈计作这笔买入的已实现利润。'

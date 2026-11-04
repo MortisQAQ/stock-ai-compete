@@ -1,9 +1,10 @@
 import { Badge } from '../ui/Badge'
 import { cn } from '../../lib/utils'
-import { assigneeLabel, progressLabel, STATUS_TEXT } from '../../store/trainingTasks'
-import type { TrainingTask, TrainingTaskStatus } from '../../store/trainingTasks'
+import { assigneeLabel, progressLabel } from '../../store/trainingTasks'
+import { TRAINING_STATUS_TEXT } from '../../store/selectors'
+import type { TrainingStatus, TrainingTask } from '../../types'
 
-const BADGE: Record<TrainingTaskStatus, 'pine' | 'brass' | 'outline'> = {
+const BADGE: Record<TrainingStatus, 'pine' | 'brass' | 'outline'> = {
   running: 'pine',
   pending: 'brass',
   done: 'outline',
@@ -57,7 +58,7 @@ export function TaskSwitcher({ tasks, currentId, onSelect, className }: Props) {
                     {task.name}
                   </b>
                   <span className="shrink-0">
-                    <Badge variant={BADGE[task.status]}>{STATUS_TEXT[task.status]}</Badge>
+                    <Badge variant={BADGE[task.status]}>{TRAINING_STATUS_TEXT[task.status]}</Badge>
                   </span>
                 </span>
                 <span className="mt-1.5 block font-mono text-[length:var(--fs-micro)] tracking-[0.04em] text-[var(--ink-2)]">

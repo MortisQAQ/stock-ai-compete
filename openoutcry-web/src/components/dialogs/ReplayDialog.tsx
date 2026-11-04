@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { useRun } from '../../store/RunProvider'
 import { useDialog } from '../../store/DialogProvider'
 import { Modal } from '../ui/Modal'
+import { Prose } from '../ui/Prose'
 import { seq } from '../../lib/format'
 
 export function ReplayDialog({ open }: { open: boolean }) {
@@ -13,9 +14,9 @@ export function ReplayDialog({ open }: { open: boolean }) {
 
   return (
     <Modal open={open} kicker="Replay" title="原轨迹回放" onClose={close}>
-      <p style={{ fontSize: 'var(--fs-sm)', color: 'var(--ink-3)', marginBottom: 10 }}>
+      <Prose className="mb-2.5 text-note text-ink-3">
         按事件序号顺序回放，不重新调用模型，不改变账户。
-      </p>
+      </Prose>
       <div className="replay-list">
         {events.map((e, i) => (
           <button

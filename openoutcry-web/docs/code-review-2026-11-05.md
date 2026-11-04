@@ -333,3 +333,85 @@ src/
 - React 目录结构实践（feature folders）—— https://www.robinwieruch.de/react-folder-structure/
 
 > 说明：上述链接为本次检索命中的公开资料；受限环境无法逐页抓取正文，观点以官方文档通行结论与本仓实际代码证据为准。
+
+---
+
+## 7. 修复记录（2026-11-05）
+
+按第 5 节的顺序执行，**除「数据来源规范化」一类明确留到接后端的三项外，其余全部落地**。
+
+| 编号 | 问题 | 处理 | 证据 |
+|---|---|---|---|
+| P0-1 | 工程未入库 | 已提交：`chore(repo)` 清理根目录、`feat(web)` 首次入库 | `git log` |
+| P0-2 | 同一颜色两个值 | `tokens.css` 成唯一真源；`@theme inline` 全部改成 `var()` 映射；补 `--ver-deep`/`--bone-mute`/`--accent-tone` | `styles/index.css` |
+| P0-3 | reducer 写死成交数据 | **暂缓**：按约定与数据来源一起在后端阶段处理 | 报告 §8 |
+| P1-2.1 | 无路由拆分、无错误边界 | `createHashRouter` + 路由表 + `lazyPage` + `errorElement` + `HydrateFallback` + 切页进度条；主包 464→382 kB（gzip 146→124），页面各自成 chunk | `build` 输出 |
+| P1-2.2 | 死代码与双 `cn` | 删 `Composer`/`DecisionLedger`/`Separator`/`COMPARE_SERIES`；`cn` 统一到 `lib/utils` | 全仓 grep 为 0 |
+| P1-2.3 | 多余依赖 | 移除 3 个 `@radix-ui/react-*` 与 `cn` 包 | `package.json` |
+| P1-2.4 | 运行元数据抄写 | **暂缓**：同 P0-3 | 报告 §8 |
+| P1-2.5 | 手工 history 与路由冲突 | 助手页状态由 `history.state.ooAssistant` 单点决定，`popstate` 同步；不再自己维护 `pushed` 标志 | `TrainingPage.tsx` |
+| P1-2.6 | 类型断言逃逸 | `agentOf(id: AgentId)`、`createInitialRun(agent: AgentId)`、删 `as Trade`；新增 `isAgentId` / `isTabId` 守卫 | `agents.ts` / `run.ts` / `DetailTabs.tsx` |
+| P1-2.7 | 委托单与训练场不通 | **暂缓**：需要先定数据来源 | 报告 §8 |
+| P1-2.8 | 派生口径重复 | 新增 `store/selectors.ts`：账户表头、持仓行、训练状态文案；`BandItem`/`TrainingStatus` 收进 `types.ts` | `selectors.ts` |
+| P1-2.9 | Modal 渲染期写 ref | 焦点归还搬到 `DialogProvider.open()`（事件回调里记录触发元素），组件不再碰 DOM | `DialogProvider.tsx` |
+| P1-2.10 | 手写 focus trap | 助手页改用 Radix Dialog，与其余弹窗同一套无障碍实现 | `AssistantSheet.tsx` |
+| P2-3.1 | 内联样式 | 16 → 3（剩下的都是动态百分比宽度）；新增 `ui/Prose`、图表色板类 | 全仓 grep |
+| P2-3.2 | 写死 px | 控件高度改 `--control-h-*`；图表字号走 `--fs-micro`；README 写明规则边界 | `tokens.css` |
+| P2-3.3 | 零测试/零 lint/零 CI | vitest 18 用例；oxlint（75 文件 0 问题）；`.github/workflows/ci.yml` | 下方验证 |
+| P2-3.4 | 残留调试脚本 | 删除 `probe-check.mjs` | — |
+| P2-3.5 | 目录按类型分层 | **部分完成**：`app/`、`mocks/`、`store/selectors.ts`；`features/` 迁移仍待（改动面太大，单独一轮） | — |
+| P2-3.6 | 全局 CSS 无命名空间 | **未做**：2000 行类名重命名会淹没功能改动，留到稳定后 | — |
+
+### 顺带修掉的三个真实缺陷
+
+1. **移动端 Connect 页横向溢出 405px**：Agent 卡的双列网格在窄屏没有 `grid-cols-1` 约束，
+   `<pre>` 的 min-content 把整页撑到 795px；`.section-hd` 也不折行。修复后 `scrollWidth === 390`。
+2. **`round(1.005, 2)` 返回 1**：`Math.round(v * 100) / 100` 在二进制下少一分钱。
+   改成十进制字符串移位。单测抓到的，不是猜的。
+3. **图例与曲线不同色**：图例写 `#E8785F`、曲线画 `#F0917D`，同一个"Agent 净值"两种红。现已统一到 `--chart-*`。
+
+### 验证结果
+
+| 检查 | 结果 |
+|---|---|
+| `npm run typecheck` | 通过 |
+| `npm run lint`（oxlint） | 75 文件 / 114 规则，0 warning 0 error |
+| `npm run test:run` | 3 个文件 18 个用例全部通过 |
+| `npm run build` | 通过；6 个页面各自成 chunk，主包 gzip 124 kB |
+| `npm run check:type` | 无写死 px 字号；6 路由 × 5 视口全部 ≥13px，无横向溢出 |
+| `npm run audit:ui` | 对比度 0 违规、点按尺寸 0 违规、溢出 0、焦点契约通过 |
+| 浏览器冒烟 | 弹窗 ESC 关闭后焦点回到触发按钮；6 条路由懒加载正常；助手页 ESC/后退均可关闭；404 页有出口；控制台 0 报错 |
+
+### 仍待处理（报告 §8）
+
+见下方 §8：三项「数据来源」相关 + 两项结构性改动。
+
+---
+
+## 8. 仍待处理（已确认延后，不是遗漏）
+
+### 8.1 与「数据来源规范化」一起做（接后端阶段）
+
+| 项 | 现状 | 为什么现在不动 |
+|---|---|---|
+| 撮合数据写死（P0-3） | `RunProvider` 的 `fill` 分支里写死成交价 20.36、费用 7、标的 `公司-017`、成本 18.2 | 正确形态是 `{ type: 'fill', fill: { asset, quantity, price, fee, cost } }`，由环境回填；在数据契约定下来之前改，只会把硬编码从 reducer 挪到别处 |
+| 运行元数据分散（P1-2.4） | `run_demo_001`、资料时点、工具预算在 Tape / SnapshotDialog / WorkbenchPane / RunStatusCard 各一份 | 这些值将来来自 run 接口而不是常量表，先抽常量等于做两遍 |
+| 委托单未打通（P1-2.7） | `MandateTicket` 只做本地状态；`StudioPage` 读 `TRAINING_SEED`；`TrainingPage` 读运行派生任务 —— 三套数据源 | 需要先在 store 里定「训练」实体与 `createTraining` 契约，属于同一个数据来源议题 |
+
+**建议的下一步**：先写一页「运行/训练数据契约」（run、training、fill、events 四个实体的字段与来源），
+再按契约把这三项一次性改完，避免改两次。
+
+### 8.2 结构性改动（单独一轮）
+
+1. **目录迁移到 `features/`**：`features/{studio,training,review,connect,protocol}` + `entities/{run,agent,training}`。
+   现在 `components/run` 与 `components/training` 语义重叠，但迁移会改掉几乎每个文件的 import 路径，
+   与功能改动混在一起会让 review 失去意义。
+2. **全局 CSS 加命名空间**：`.index` / `.page` / `.note` / `.cols` / `.band` 等 1900 行裸类名，
+   建议加 `oo-` 前缀或迁到 CSS Modules。同样是"只改路径、不改行为"的批量改动，适合单独一轮 + 截图比对。
+
+### 8.3 关于 lint 工具的选择
+
+本机 `typescript-eslint@8.72` 不支持 `typescript@7.0`（会直接抛错退出），所以没有走 ESLint 路线，
+改用 `oxlint`：不依赖 TS 版本、无类型信息但足够覆盖 `react-hooks` 与常见正确性规则，
+75 个文件 100ms 跑完。等 typescript-eslint 支持 TS 7.1+ 后可以再评估是否补上类型感知规则
+（`no-floating-promises`、`no-misused-promises` 这类只有类型信息才能查的规则）。

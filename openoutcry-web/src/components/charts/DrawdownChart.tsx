@@ -12,8 +12,8 @@ export function DrawdownChart({ nav, height = 250 }: Props) {
   const P = { l: 56, r: 16, t: 16, b: 26 }
   const dd = drawdownSeries(nav)
   const worst = Math.min(...dd, -0.1)
-  const sc = { min: worst * 1.18, max: 0, span: 0 }
-  sc.span = sc.max - sc.min || 1
+  const min = worst * 1.18
+  const sc = { min, max: 0, span: -min }
   const pts = project(dd, W, H, P, sc)
   const baseY = P.t
   const deepest = dd.indexOf(worst)
@@ -25,54 +25,31 @@ export function DrawdownChart({ nav, height = 250 }: Props) {
         const value = sc.max - (sc.span * i) / 3
         return (
           <g key={i}>
-            <line
-              x1={P.l}
-              y1={y}
-              x2={W - P.r}
-              y2={y}
-              stroke="rgba(226,220,196,.11)"
-              strokeWidth="1"
-            />
-            <text
-              x={P.l - 7}
-              y={y + 3.5}
-              textAnchor="end"
-              fontFamily="Consolas,monospace"
-              fontSize="13"
-              fill="#93A790"
-            >
+            <line className="chart-grid-line" x1={P.l} y1={y} x2={W - P.r} y2={y} />
+            <text className="chart-axis-label" x={P.l - 7} y={y + 3.5} textAnchor="end">
               {value.toFixed(1)}%
             </text>
           </g>
         )
       })}
 
-      <path d={areaPath(pts, baseY)} fill="rgba(211,180,120,.16)" />
-      <path d={linePath(pts)} fill="none" stroke="#D3B478" strokeWidth="1.8" strokeLinejoin="round" />
-      <line x1={P.l} y1={baseY} x2={W - P.r} y2={baseY} stroke="rgba(226,220,196,.2)" strokeWidth="1" />
+      <path className="chart-drawdown-area" d={areaPath(pts, baseY)} />
+      <path className="chart-drawdown-line" d={linePath(pts)} />
+      <line className="chart-zero-line" x1={P.l} y1={baseY} x2={W - P.r} y2={baseY} />
       {deepest >= 0 && pts[deepest] ? (
         <g>
-          <circle cx={pts[deepest].x} cy={pts[deepest].y} r="2.6" fill="#D3B478" />
+          <circle className="chart-drawdown-dot" cx={pts[deepest].x} cy={pts[deepest].y} r="2.6" />
           <text
+            className="chart-drawdown-label"
             x={pts[deepest].x > W - 90 ? pts[deepest].x - 6 : pts[deepest].x + 6}
             y={pts[deepest].y - 5}
             textAnchor={pts[deepest].x > W - 90 ? 'end' : 'start'}
-            fontFamily="Consolas,monospace"
-            fontSize="13"
-            fill="#D3B478"
           >
             {worst.toFixed(2)}%
           </text>
         </g>
       ) : null}
-      <text
-        x={W - P.r}
-        y={H - 8}
-        textAnchor="end"
-        fontFamily="Consolas,monospace"
-        fontSize="13"
-        fill="#93A790"
-      >
+      <text className="chart-axis-label" x={W - P.r} y={H - 8} textAnchor="end">
         {nav.length} 交易日
       </text>
     </svg>

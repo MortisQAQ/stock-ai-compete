@@ -19,32 +19,18 @@ export function ToolUsageChart({ data }: Props) {
         const isRisk = d.label.includes('拒单')
         return (
           <g key={d.label}>
-            <text
-              x={P.l - 10}
-              y={y + 11}
-              textAnchor="end"
-              fontFamily="-apple-system,Segoe UI,Microsoft YaHei"
-              fontSize="13"
-              fill="#A6B7A9"
-            >
+            <text className="chart-tool-label" x={P.l - 10} y={y + 11} textAnchor="end">
               {d.label}
             </text>
-            <rect x={P.l} y={y} width={trackWidth} height="13" fill="rgba(226,220,196,.07)" />
+            <rect className="chart-tool-track" x={P.l} y={y} width={trackWidth} height="13" />
             <rect
+              className={'chart-tool-bar' + (isRisk ? ' is-risk' : '')}
               x={P.l}
               y={y}
               width={w}
               height="13"
-              fill={isRisk ? '#F0917D' : '#CBD5C4'}
-              opacity={isRisk ? 0.9 : 0.72}
             />
-            <text
-              x={W - P.r + 8}
-              y={y + 11}
-              fontFamily="Consolas,monospace"
-              fontSize="13"
-              fill="#EAE6D3"
-            >
+            <text className="chart-value-label" x={W - P.r + 8} y={y + 11}>
               {d.count}
             </text>
           </g>

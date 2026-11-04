@@ -1,5 +1,5 @@
 import type { ReactNode } from 'react'
-import { cn } from '../../lib/format'
+import { cn } from '@/lib/utils'
 
 interface Props {
   tone?: 'ver' | 'pine' | 'brass' | 'slate'

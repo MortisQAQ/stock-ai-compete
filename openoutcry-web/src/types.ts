@@ -116,5 +116,59 @@ export interface ToastMessage {
   text: string
 }
 
-/** 台账类型筛选 */
-export type LedgerFilter = 'all' | 'agent' | 'work' | 'user'
+/** 训练 / 训练任务状态（台账与任务切换器共用一套取值） */
+export type TrainingStatus = 'running' | 'pending' | 'done'
+
+/** 账户四格表头的一项 */
+export interface BandItem {
+  label: string
+  value: string
+  note: string
+  tone?: 'up' | 'dn' | ''
+}
+
+/* ---------------- 训练任务 ---------------- */
+
+export interface TrainingAssignee {
+  kind: 'agent' | 'team'
+  name: string
+  /** 团队任务才有的成员名单 */
+  members?: string[]
+}
+
+/** 冻结档案里的一条决策 —— 形状对齐 RunEvent，方便将来直接替换 */
+export interface TaskLogLine {
+  kind: EventKind
+  title: string
+  body: string
+  at: string
+}
+
+export interface TaskArchive {
+  /** 任务结束时的账户快照，只用于非当前任务的只读视图 */
+  equity: number
+  net: number
+  cash: number
+  market: number
+  decisions: number
+  fills: number
+  log: TaskLogLine[]
+  trades: string[]
+  note: string
+}
+
+export interface TrainingTask {
+  id: string
+  name: string
+  assignee: TrainingAssignee
+  startAt: string
+  endAt: string
+  /** 右栏直接展示的时间窗文案 */
+  windowLabel: string
+  status: TrainingStatus
+  /** true = 当前运行，数据来自 store；false = 冻结档案 */
+  live: boolean
+  decisions: number
+  fills: number
+  archive?: TaskArchive
+}

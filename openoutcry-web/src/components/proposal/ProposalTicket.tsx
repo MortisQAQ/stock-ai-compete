@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 
 import { useRun } from '../../store/RunProvider'
 import { useDialog } from '../../store/DialogProvider'
@@ -13,18 +13,6 @@ export function ProposalTicket() {
   const { open } = useDialog()
   const { proposal } = state
   const decidable = canDecide(state)
-  const [qty, setQty] = useState(proposal.quantity)
-
-  // 提案状态变化后重置草稿数量
-  useEffect(() => {
-    setQty(proposal.quantity)
-  }, [proposal.status, proposal.quantity])
-
-  const maxQty = 600
-  const step = (delta: number) => {
-    const next = Math.min(maxQty, Math.max(100, qty + delta))
-    setQty(next - (next % 100))
-  }
 
   return (
     <Card className="perf relative mt-3.5 border-ink shadow-plate">
@@ -61,37 +49,16 @@ export function ProposalTicket() {
 
         <div className="proposal-actions">
           {decidable ? (
-            <div className="stepper" role="group" aria-label="调整卖出数量">
-              <button type="button" onClick={() => step(-100)} aria-label="减少 100 股">
-                −
-              </button>
-              <span>{qty} 股</span>
-              <button type="button" onClick={() => step(100)} aria-label="增加 100 股">
-                +
-              </button>
-            </div>
-          ) : null}
-
-          {decidable ? (
-            <Button
-              variant="ver"
-              size="sm"
-              onClick={() => actions.approve(qty, qty === proposal.original ? '人工确认' : '人工修改后批准')}
-            >
-              批准
-            </Button>
-          ) : null}
-
-          {decidable ? (
-            <Button variant="ghost" size="sm" onClick={() => open({ kind: 'modify' })}>
-              精确改单
-            </Button>
-          ) : null}
-
-          {decidable ? (
-            <Button variant="ghost" size="sm" onClick={() => actions.reject()}>
-              拒绝
-            </Button>
+            <ApprovalControls
+              /* 提案变化时按新数量重挂载，草稿数量自然归位（不用 effect 里 setState） */
+              key={`${proposal.status}:${proposal.quantity}`}
+              initial={proposal.quantity}
+              onApprove={(qty) =>
+                actions.approve(qty, qty === proposal.original ? '人工确认' : '人工修改后批准')
+              }
+              onModify={() => open({ kind: 'modify' })}
+              onReject={() => actions.reject()}
+            />
           ) : null}
 
           {proposal.status === 'submitted' ? (
@@ -108,5 +75,47 @@ export function ProposalTicket() {
         <p className="proposal-note">{approvalNote(state)}</p>
       </CardContent>
     </Card>
+  )
+}
+interface ApprovalControlsProps {
+  initial: number
+  onApprove: (quantity: number) => void
+  onModify: () => void
+  onReject: () => void
+}
+
+/** 审批控件自带草稿数量：挂载时取提案数量，提案变化时由 key 触发重挂载 */
+function ApprovalControls({ initial, onApprove, onModify, onReject }: ApprovalControlsProps) {
+  const [qty, setQty] = useState(initial)
+  const maxQty = 600
+  const step = (delta: number) => {
+    const next = Math.min(maxQty, Math.max(100, qty + delta))
+    setQty(next - (next % 100))
+  }
+
+  return (
+    <>
+      <div className="stepper" role="group" aria-label="调整卖出数量">
+        <button type="button" onClick={() => step(-100)} aria-label="减少 100 股">
+          −
+        </button>
+        <span>{qty} 股</span>
+        <button type="button" onClick={() => step(100)} aria-label="增加 100 股">
+          +
+        </button>
+      </div>
+
+      <Button variant="ver" size="sm" onClick={() => onApprove(qty)}>
+        批准
+      </Button>
+
+      <Button variant="ghost" size="sm" onClick={onModify}>
+        精确改单
+      </Button>
+
+      <Button variant="ghost" size="sm" onClick={onReject}>
+        拒绝
+      </Button>
+    </>
   )
 }

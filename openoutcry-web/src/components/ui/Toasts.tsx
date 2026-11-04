@@ -1,7 +1,7 @@
-import { useRun } from '../../store/RunProvider'
+import { useToast } from '../../store/ToastProvider'
 
 export function Toasts() {
-  const { toasts, dismissToast } = useRun()
+  const { toasts, dismiss } = useToast()
   if (!toasts.length) return null
   return (
     <div className="toasts" role="status" aria-live="polite">
@@ -10,7 +10,7 @@ export function Toasts() {
           key={t.id}
           type="button"
           className={'toast ' + t.kind}
-          onClick={() => dismissToast(t.id)}
+          onClick={() => dismiss(t.id)}
           title="点击关闭"
         >
           {t.text}

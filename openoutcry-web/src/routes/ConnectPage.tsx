@@ -2,7 +2,8 @@ import { useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 
 import { useRun } from '../store/RunProvider'
-import { AGENTS, AGENT_ORDER, cardJsonOf, cardPathOf } from '../data/agents'
+import { useToast } from '../store/ToastProvider'
+import { AGENTS, AGENT_ORDER, agentOf, cardJsonOf, cardPathOf, isAgentId } from '../data/agents'
 import { TRAINING_SEED } from '../data/trainings'
 import { Badge } from '../components/ui/Badge'
 import { Button } from '../components/ui/Button'
@@ -22,7 +23,7 @@ function KV({ k, v, last = false }: { k: string; v: string; last?: boolean }) {
       }
     >
       <span className="text-note text-muted-foreground">{k}</span>
-      <b className="font-mono text-note font-semibold text-foreground" style={{ textAlign: 'right' }}>
+      <b className="text-right font-mono text-note font-semibold text-foreground">
         {v}
       </b>
     </div>
@@ -50,9 +51,9 @@ function AgentTile({
       aria-pressed={active}
       className={active ? 'border-ink/60 shadow-raise' : ''}
     >
-      <CardHeader>
+      <CardHeader className="flex-wrap">
         <span>{meta.id}</span>
-        <span className="flex items-center gap-1.5">
+        <span className="flex flex-wrap items-center gap-1.5">
           {inUse && <Badge variant="outline">当前使用</Badge>}
           <Badge variant={meta.cardOrigin === 'builtin' ? 'pine' : 'brass'}>{meta.tag}</Badge>
         </span>
@@ -88,7 +89,8 @@ function AgentTile({
 }
 
 export function ConnectPage() {
-  const { state, actions, notify } = useRun()
+  const { state, actions } = useRun()
+  const { notify } = useToast()
   const navigate = useNavigate()
   const intakeRef = useRef<HTMLDivElement>(null)
 
@@ -125,7 +127,7 @@ export function ConnectPage() {
     <>
       <div className="pagehead">
         <div>
-          <div style={{ display: 'flex', gap: 10, alignItems: 'center', flexWrap: 'wrap' }}>
+          <div className="flex flex-wrap items-center gap-2.5">
             <span className="label">№ 04 — Connect</span>
             <Stamp tone="brass">设计稿 · 未执行真实授权</Stamp>
           </div>
@@ -149,7 +151,7 @@ export function ConnectPage() {
         </div>
       </div>
 
-      <div className="grid gap-2.5 md:grid-cols-2">
+      <div className="grid grid-cols-1 gap-2.5 [&>*]:min-w-0 md:grid-cols-2">
         {AGENT_ORDER.map((id) => (
           <AgentTile
             key={id}
@@ -203,8 +205,8 @@ export function ConnectPage() {
             {card.cardOrigin === 'builtin' ? '内置 · 只读' : '本地 · 可覆盖'}
           </span>
         </CardHeader>
-        <CardContent className="grid gap-6 py-4 md:grid-cols-[minmax(0,1fr)_360px]">
-          <div>
+        <CardContent className="grid grid-cols-1 gap-6 py-4 md:grid-cols-[minmax(0,1fr)_360px]">
+          <div className="min-w-0">
             <KV k="来源" v={card.source + ' · ' + card.version} />
             <div className="border-b border-border py-1.5">
               <div className="text-note text-muted-foreground">人格 persona</div>
@@ -221,8 +223,8 @@ export function ConnectPage() {
             <KV k="工具白名单" v={card.tools === 0 ? '未声明（不可运行）' : card.tools + ' 个'} />
             <KV k="评测资格" v={card.qualification} last />
           </div>
-          <div>
-            <pre className="code">{cardJsonOf(card)}</pre>
+          <div className="min-w-0">
+            <pre className="code max-w-full">{cardJsonOf(card)}</pre>
             <p className="note mt-2">
               这就是平台看到的全部配置。研究工具、账户视图与下单入口都不在卡里，
               由训练场按当时的实验快照注入。
@@ -266,7 +268,12 @@ export function ConnectPage() {
             <span className="text-micro uppercase tracking-[0.14em] text-muted-foreground">
               卡的来源
             </span>
-            <Select value={source} onChange={(e) => setSource(e.target.value as AgentId)}>
+            <Select
+              value={source}
+              onChange={(e) => {
+                if (isAgentId(e.target.value)) setSource(e.target.value)
+              }}
+            >
               {AGENT_ORDER.map((id) => (
                 <option key={id} value={id}>
                   {AGENTS[id].name}
@@ -288,13 +295,14 @@ export function ConnectPage() {
             模拟连接
           </Button>
           <p
-            className="text-note leading-relaxed"
-            style={{ color: connected ? 'var(--pine)' : 'var(--ink-3)', minHeight: 34 }}
+            className={
+              'min-h-9 text-note leading-relaxed ' + (connected ? 'text-pine' : 'text-ink-3')
+            }
           >
             {message}
           </p>
           <Button variant="solid" wide onClick={enter} disabled={!connected}>
-            进入训练场 · {AGENTS[source].name}
+            进入训练场 · {agentOf(source).name}
           </Button>
         </Card>
       </div>

@@ -77,12 +77,23 @@
 /* ---------- 区块标题 ---------- */
 .section-hd {
   display: flex;
+  flex-wrap: wrap;
   align-items: baseline;
   justify-content: space-between;
-  gap: 14px;
+  gap: 8px 14px;
   margin: 34px 0 12px;
   padding-bottom: 9px;
   border-bottom: 1px solid var(--ink);
+}
+
+/* 右侧路径/计数在窄屏折行，别把整页撑宽 */
+.section-hd-side {
+  min-width: 0;
+  flex-wrap: wrap;
+}
+
+.section-hd-side .count {
+  overflow-wrap: anywhere;
 }
 
 .section-hd h2 {
@@ -130,4 +141,3 @@
   gap: 10px;
 }
 }
-

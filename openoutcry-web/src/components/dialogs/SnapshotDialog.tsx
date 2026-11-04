@@ -1,6 +1,7 @@
 import { useRun } from '../../store/RunProvider'
 import { useDialog } from '../../store/DialogProvider'
 import { Modal } from '../ui/Modal'
+import { Prose } from '../ui/Prose'
 import { Button } from '../ui/Button'
 import { agentOf } from '../../data/agents'
 
@@ -30,9 +31,9 @@ export function SnapshotDialog({ open }: { open: boolean }) {
       onClose={close}
       footer={<Button size="sm" variant="ghost" onClick={close}>关闭</Button>}
     >
-      <p style={{ fontSize: 'var(--fs-sm)', color: 'var(--ink-3)', marginBottom: 10 }}>
+      <Prose className="mb-2.5 text-note text-ink-3">
         以下参数在运行时不能修改；需要改参数请复制配置后重跑。
-      </p>
+      </Prose>
       <dl className="snapshot-list">
         {rows.map(([k, v]) => (
           <div key={k}>

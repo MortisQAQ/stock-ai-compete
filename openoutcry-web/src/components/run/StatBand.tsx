@@ -1,11 +1,6 @@
 import type { ReactNode } from 'react'
 
-export interface BandItem {
-  label: string
-  value: string
-  note: string
-  tone?: 'up' | 'dn' | ''
-}
+import type { BandItem } from '../../types'
 
 export function StatBand({ items, tags }: { items: BandItem[]; tags?: ReactNode }) {
   return (

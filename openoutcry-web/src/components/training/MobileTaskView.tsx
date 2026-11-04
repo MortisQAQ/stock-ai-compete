@@ -6,9 +6,10 @@ import { cn } from '../../lib/utils'
 import { Stamp } from '../ui/Stamp'
 import { StatBand } from '../run/StatBand'
 import { AssistantFab } from './AssistantSheet'
-import { WorkbenchActions, WorkbenchBody, bandItemsFor } from './WorkbenchPane'
-import { assigneeLabel, progressLabel, STATUS_TEXT } from '../../store/trainingTasks'
-import type { TrainingTask } from '../../store/trainingTasks'
+import { WorkbenchActions, WorkbenchBody } from './WorkbenchPane'
+import { assigneeLabel, progressLabel } from '../../store/trainingTasks'
+import { bandItemsFor, TRAINING_STATUS_TEXT } from '../../store/selectors'
+import type { TrainingTask } from '../../types'
 
 interface Props {
   task: TrainingTask
@@ -26,14 +27,7 @@ interface Props {
 export function MobileTaskView({ task, tasks, onSelect, assistantOpen, onOpenAssistant, fabRef }: Props) {
   const { state, totals } = useRun()
   const agent = agentOf(state.agent)
-  const band = bandItemsFor(task, {
-    equity: totals.equity,
-    net: totals.net,
-    cash: state.cash,
-    market: totals.market,
-    initial: state.initial,
-    holdings: state.holdings.length,
-  })
+  const band = bandItemsFor(task, state, totals)
 
   return (
     <div className="min-[1100px]:hidden pb-24 [&_[data-slot='button']]:min-h-11 [&_[role='tab']]:min-h-11 [&_.more-menu-list_button]:min-h-11 [&_.stepper_button]:min-h-11 [&_.stepper_button]:min-w-11">
@@ -42,7 +36,7 @@ export function MobileTaskView({ task, tasks, onSelect, assistantOpen, onOpenAss
           <div className="flex items-center gap-2">
             <span className="label">训练任务</span>
             <Stamp tone={task.status === 'done' ? 'brass' : task.status === 'pending' ? 'ver' : 'pine'} size="sm">
-              {STATUS_TEXT[task.status]}
+              {TRAINING_STATUS_TEXT[task.status]}
             </Stamp>
           </div>
           <h2 className="mt-1.5 font-serif text-[length:var(--fs-h2)] font-bold leading-snug tracking-[-0.01em] text-[var(--ink)]">
@@ -70,7 +64,7 @@ export function MobileTaskView({ task, tasks, onSelect, assistantOpen, onOpenAss
             >
               <span className="truncate text-[length:var(--fs-sm)] font-semibold text-[var(--ink)]">{item.name}</span>
               <span className="mt-0.5 truncate font-mono text-[length:var(--fs-micro)] tracking-[0.04em] text-[var(--ink-3)]">
-                {STATUS_TEXT[item.status]} · {progressLabel(item)}
+                {TRAINING_STATUS_TEXT[item.status]} · {progressLabel(item)}
               </span>
             </button>
           )

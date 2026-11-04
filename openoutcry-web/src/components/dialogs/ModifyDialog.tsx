@@ -12,9 +12,12 @@ export function ModifyDialog({ open }: { open: boolean }) {
   const [qty, setQty] = useState(state.proposal.quantity)
   const [error, setError] = useState('')
 
+  // 同上：打开时把草稿数量对齐到当前提案
   useEffect(() => {
     if (open) {
+      // eslint-disable-next-line react/set-state-in-effect
       setQty(state.proposal.quantity)
+      // eslint-disable-next-line react/set-state-in-effect
       setError('')
     }
   }, [open, state.proposal.quantity])

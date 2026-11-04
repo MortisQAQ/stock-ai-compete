@@ -103,7 +103,19 @@ export const AGENTS: Record<AgentId, AgentMeta> = {
 /** 列表顺序：内置在前 */
 export const AGENT_ORDER: AgentId[] = ['native', 'codex', 'kimi']
 
-export const agentOf = (id: string): AgentMeta => AGENTS[id as AgentId] ?? AGENTS.native
+/** 运行时校验：外部输入（表单、URL）进入领域层前先过这一关 */
+const AGENT_IDS = Object.keys(AGENTS) as AgentId[]
+export const isAgentId = (value: string): value is AgentId =>
+  (AGENT_IDS as readonly string[]).includes(value)
+
+/**
+ * 取 Agent 卡。
+ *
+ * 入参是 AgentId 而不是 string：未知 id 由调用方在边界处挡掉。
+ * 之前用 `AGENTS[id as AgentId] ?? AGENTS.native`，会把未知卡静默变成内置卡——
+ * 与「卡里没有的字段不会被猜出来」的产品口径正好相反。
+ */
+export const agentOf = (id: AgentId): AgentMeta => AGENTS[id]
 
 /** Agent 卡的存放位置，与 TraderHarness 的 ~/.traderharness/agents/<id>.json 对齐 */
 export const cardPathOf = (id: AgentId): string =>

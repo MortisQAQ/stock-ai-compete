@@ -2,6 +2,7 @@ import { useState } from 'react'
 
 import { useRun } from '../../store/RunProvider'
 import { useDialog } from '../../store/DialogProvider'
+import { openFeesOf, holdingRowsOf } from '../../store/selectors'
 import { Badge } from '../ui/Badge'
 import { Card, CardHeader } from '../ui/Card'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../ui/Tabs'
@@ -9,20 +10,23 @@ import { money, signed, tone } from '../../lib/format'
 import { PROPOSAL_TEXT } from '../../store/derive'
 import type { Trade } from '../../types'
 
-type TabId = 'holdings' | 'trades' | 'pnl'
-
-const TABS: Array<{ id: TabId; label: string }> = [
+const TABS = [
   { id: 'holdings', label: '持仓' },
   { id: 'trades', label: '成交' },
   { id: 'pnl', label: '盈亏' },
-]
+] as const
+
+type TabId = (typeof TABS)[number]['id']
+
+const isTabId = (value: string): value is TabId => TABS.some((tab) => tab.id === value)
 
 export function DetailTabs() {
   const { state, totals } = useRun()
   const { open } = useDialog()
   const [tab, setTab] = useState<TabId>('holdings')
-  const openFees = state.holdings.reduce((s, h) => s + h.entryFee, 0)
-  const openTrade = (t: Trade) => open({ kind: 'detail', id: t.id })
+  const rows = holdingRowsOf(state, totals)
+  const openFees = openFeesOf(state)
+  const openTrade = (trade: Trade) => open({ kind: 'detail', id: trade.id })
 
   return (
     <Card>
@@ -31,7 +35,13 @@ export function DetailTabs() {
         <Badge variant="outline">本次运行</Badge>
       </CardHeader>
 
-      <Tabs value={tab} onValueChange={(value) => setTab(value as TabId)} className="gap-0">
+      <Tabs
+        value={tab}
+        onValueChange={(value) => {
+          if (isTabId(value)) setTab(value)
+        }}
+        className="gap-0"
+      >
         <TabsList className="px-1">
           {TABS.map((item) => (
             <TabsTrigger key={item.id} value={item.id}>
@@ -41,22 +51,19 @@ export function DetailTabs() {
         </TabsList>
 
         <TabsContent value="holdings" className="tabpane">
-          {state.holdings.map((h) => {
-            const pnl = h.quantity * (h.price - h.cost)
-            return (
-              <div className="report-row" key={h.name}>
-                <span>
-                  {h.name}
-                  <br />
-                  <small className="dim font-mono text-[length:var(--fs-micro)]">
-                    {h.quantity} 股 · 可卖 {h.sellable}
-                  </small>
-                </span>
-                <span className="dots" />
-                <b className={tone(pnl)}>{signed(pnl)}</b>
-              </div>
-            )
-          })}
+          {rows.map((row) => (
+            <div className="report-row" key={row.name}>
+              <span>
+                {row.name}
+                <br />
+                <small className="dim font-mono text-[length:var(--fs-micro)]">
+                  {row.quantity} 股 · 可卖 {row.sellable}
+                </small>
+              </span>
+              <span className="dots" />
+              <b className={row.tone}>{signed(row.pnl)}</b>
+            </div>
+          ))}
         </TabsContent>
 
         <TabsContent value="trades" className="tabpane">
@@ -69,17 +76,19 @@ export function DetailTabs() {
             </span>
             <Badge variant="brass">查看</Badge>
           </button>
-          {[...state.trades].reverse().map((t) => (
-            <button className="rowlink" type="button" key={t.id} onClick={() => openTrade(t)}>
+          {[...state.trades].reverse().map((trade) => (
+            <button className="rowlink" type="button" key={trade.id} onClick={() => openTrade(trade)}>
               <span>
                 <b>
-                  {t.side} {t.name}
+                  {trade.side} {trade.name}
                 </b>
                 <small>
-                  {t.quantity} 股 · {t.time}
+                  {trade.quantity} 股 · {trade.time}
                 </small>
               </span>
-              <b className={t.pnl === null ? 'dim' : tone(t.pnl)}>{t.pnl === null ? '—' : signed(t.pnl)}</b>
+              <b className={trade.pnl === null ? 'dim' : tone(trade.pnl)}>
+                {trade.pnl === null ? '—' : signed(trade.pnl)}
+              </b>
             </button>
           ))}
         </TabsContent>

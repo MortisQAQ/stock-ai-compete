@@ -1,25 +1,21 @@
-import {
-  createContext,
-  useCallback,
-  useContext,
-  useMemo,
-  useReducer,
-  useRef,
-  useState,
-} from 'react'
+import { createContext, useContext, useMemo, useReducer } from 'react'
 import type { ReactNode } from 'react'
-import type {
-  AgentId,
-  EventKind,
-  RunEvent,
-  RunState,
-  ToastMessage,
-  Totals,
-} from '../types'
+
+import type { AgentId, EventKind, RunEvent, RunState, Totals } from '../types'
 import { createInitialRun, CLOCK_MATCHED } from '../data/run'
 import { totalsOf, runStatusLabel } from './derive'
 import { round } from '../lib/format'
+import { useToast } from './ToastProvider'
 
+/**
+ * 运行状态机。
+ *
+ * 唯一的业务状态入口：页面不直接改业务数据，只 dispatch。
+ * 提示（toast）不在这里——它归 ToastProvider，两者通过 useToast() 通信。
+ *
+ * 已知欠账（留到接后端时处理，见 docs/code-review-2026-11-05.md）：撮合价格、
+ * 费用与标的代码目前写在 `fill` 分支里，接真实环境时应改由 action 携带成交结果。
+ */
 type Action =
   | { type: 'switchAgent'; agent: AgentId }
   | { type: 'approve'; quantity: number; actor: '人工确认' | '人工修改后批准' | 'Agent 自主提交' }
@@ -172,7 +168,7 @@ function reducer(state: RunState, action: Action): RunState {
 
     case 'guidance': {
       if (state.status === 'aborted') return state
-      const next = withEvent(
+      return withEvent(
         { ...state, collaboration: '人机混合' },
         {
           kind: 'user',
@@ -181,7 +177,6 @@ function reducer(state: RunState, action: Action): RunState {
           meta: 'guidance · 人机协作',
         },
       )
-      return next
     }
 
     case 'goalMode': {
@@ -218,30 +213,16 @@ export interface RunContextValue {
   totals: Totals
   status: string
   actions: RunActions
-  toasts: ToastMessage[]
-  notify: (text: string, kind?: ToastMessage['kind']) => void
-  dismissToast: (id: number) => void
 }
 
 const RunContext = createContext<RunContextValue | null>(null)
 
+/** 初值在模块加载时算一次：reducer 不会原地修改它 */
+const INITIAL_RUN = createInitialRun('native')
+
 export function RunProvider({ children }: { children: ReactNode }) {
-  const [state, dispatch] = useReducer(reducer, 'native' as AgentId, createInitialRun)
-  const [toasts, setToasts] = useState<ToastMessage[]>([])
-  const seqRef = useRef(0)
-
-  const dismissToast = useCallback((id: number) => {
-    setToasts((list) => list.filter((t) => t.id !== id))
-  }, [])
-
-  const notify = useCallback(
-    (text: string, kind: ToastMessage['kind'] = 'info') => {
-      const id = ++seqRef.current
-      setToasts((list) => [...list.slice(-2), { id, kind, text }])
-      window.setTimeout(() => dismissToast(id), 3600)
-    },
-    [dismissToast],
-  )
+  const [state, dispatch] = useReducer(reducer, INITIAL_RUN)
+  const { notify } = useToast()
 
   const actions = useMemo<RunActions>(
     () => ({
@@ -263,7 +244,7 @@ export function RunProvider({ children }: { children: ReactNode }) {
         dispatch({ type: 'abort' })
         notify('运行已中止', 'warn')
       },
-      sendGuidance: (text) => {
+      sendGuidance: (text: string) => {
         dispatch({ type: 'guidance', text })
         notify('指导已追加', 'success')
       },
@@ -279,8 +260,8 @@ export function RunProvider({ children }: { children: ReactNode }) {
   const status = useMemo(() => runStatusLabel(state), [state])
 
   const value = useMemo<RunContextValue>(
-    () => ({ state, totals, status, actions, toasts, notify, dismissToast }),
-    [state, totals, status, actions, toasts, notify, dismissToast],
+    () => ({ state, totals, status, actions }),
+    [state, totals, status, actions],
   )
 
   return <RunContext.Provider value={value}>{children}</RunContext.Provider>

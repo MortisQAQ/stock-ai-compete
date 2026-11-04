@@ -46,7 +46,7 @@ export function ProtocolPage() {
         <pre className="code code-block">{JSON.stringify(sample.payload, null, 2)}</pre>
       </Card>
 
-      <div className="steps" style={{ marginTop: 16 }}>
+      <div className="steps mt-4">
         <Card className="step" key="obs">
           <div className="label">01 — Observation</div>
           <h3>环境只给观察</h3>

@@ -9,7 +9,7 @@ function Input({ className, type, ...props }: React.ComponentProps<'input'>) {
       type={type}
       data-slot="input"
       className={cn(
-        'flex h-[36px] w-full min-w-0 rounded-sm border border-input bg-white px-2.5 text-body text-foreground md:text-note',
+        'flex h-[var(--control-h-md)] w-full min-w-0 rounded-sm border border-input bg-white px-2.5 text-body text-foreground md:text-note',
         'shadow-[inset_0_1px_2px_rgba(18,26,21,0.06)] transition-colors duration-150',
         'hover:border-ink/40 placeholder:text-muted-foreground/80',
         'disabled:cursor-not-allowed disabled:opacity-50',

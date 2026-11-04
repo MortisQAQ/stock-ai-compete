@@ -3,13 +3,15 @@ import { ArrowUpRight } from 'lucide-react'
 
 import { useRun } from '../../store/RunProvider'
 import { useDialog } from '../../store/DialogProvider'
+import { useToast } from '../../store/ToastProvider'
 import { exportRun } from '../../lib/exportRun'
 import { titleOf } from '../../nav'
 import { Button } from '../ui/Button'
 
 export function Masthead() {
-  const { state, totals, notify } = useRun()
+  const { state, totals } = useRun()
   const { open } = useDialog()
+  const { notify } = useToast()
   const { pathname } = useLocation()
 
   return (

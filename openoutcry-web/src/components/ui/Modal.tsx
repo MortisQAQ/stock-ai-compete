@@ -1,8 +1,8 @@
-import { useEffect, useRef } from 'react'
 import type { ReactNode } from 'react'
 import { XIcon } from 'lucide-react'
 
 import { Dialog, DialogClose, DialogContent, DialogTitle } from '@/components/ui/Dialog'
+import { cn } from '@/lib/utils'
 
 interface Props {
   open: boolean
@@ -15,29 +15,13 @@ interface Props {
 }
 
 /**
- * 站内通用弹窗：在 shadcn Dialog 之上固定「墨线卡头 + 纸面正文 + 底部操作条」的版式，
- * 保留旧的 open / kicker / title / footer / width 调用方式。
- * ESC、点遮罩、焦点陷阱、滚动锁定由 Radix 提供；焦点归还由这里显式处理，
- * 因为弹窗是由外部状态（DialogProvider）唤起的，Radix 不知道「从哪个按钮打开」。
+ * 站内通用弹窗：在 shadcn Dialog 之上固定「墨线卡头 + 纸面正文 + 底部操作条」的版式。
+ *
+ * ESC、点遮罩、焦点陷阱、滚动锁定由 Radix 提供；
+ * 焦点归还由 DialogProvider 统一处理（它在 open() 的事件回调里记录了触发元素），
+ * 组件本身不再碰 DOM —— 之前在这里于渲染期读写 ref，属于 React 反模式。
  */
 export function Modal({ open, kicker, title, onClose, children, footer, width }: Props) {
-  const restoreRef = useRef<HTMLElement | null>(null)
-
-  // 渲染期捕获：此刻焦点还在触发按钮上，Radix 尚未把焦点搬进弹窗
-  if (open && restoreRef.current === null && typeof document !== 'undefined') {
-    restoreRef.current = document.activeElement as HTMLElement | null
-  }
-
-  useEffect(() => {
-    if (open) return
-    const target = restoreRef.current
-    if (!target) return
-    restoreRef.current = null
-    // 等 Radix 完成卸载与 aria-hidden 收尾后再归还焦点
-    const timer = window.setTimeout(() => target.focus?.(), 0)
-    return () => window.clearTimeout(timer)
-  }, [open])
-
   return (
     <Dialog open={open} onOpenChange={(next) => (!next ? onClose() : undefined)}>
       <DialogContent
@@ -63,7 +47,10 @@ export function Modal({ open, kicker, title, onClose, children, footer, width }:
           </div>
           <DialogClose
             aria-label="关闭"
-            className="grid size-7 shrink-0 place-items-center rounded-xs border border-primary-foreground/35 text-primary-foreground/80 transition-colors hover:border-ver hover:bg-ver hover:text-white"
+            className={cn(
+              'grid size-7 shrink-0 place-items-center rounded-xs border border-primary-foreground/35',
+              'text-primary-foreground/80 transition-colors hover:border-ver hover:bg-ver hover:text-white',
+            )}
           >
             <XIcon className="size-3.5" />
           </DialogClose>

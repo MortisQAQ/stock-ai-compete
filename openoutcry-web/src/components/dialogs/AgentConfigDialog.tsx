@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { useDialog } from '../../store/DialogProvider'
-import { useRun } from '../../store/RunProvider'
+import { useToast } from '../../store/ToastProvider'
 import { Modal } from '../ui/Modal'
 import { Button } from '../ui/Button'
 import { Input } from '../ui/Input'
@@ -13,16 +13,21 @@ const DEFAULT_PROMPT = '仅使用平台受控资料，优先检查现金流风�
 
 export function AgentConfigDialog({ open, agentId }: { open: boolean; agentId: AgentId }) {
   const { close } = useDialog()
-  const { notify } = useRun()
+  const { notify } = useToast()
   const agent = agentOf(agentId)
   const [name, setName] = useState(agent.name)
   const [prompt, setPrompt] = useState(DEFAULT_PROMPT)
   const [saved, setSaved] = useState('')
 
+  // Radix 在关闭动画期间仍保留内容，只有 open 变 true 才能重置表单；
+  // 这是"打开即重置"的既定语义，不是派生状态（所以不用 key 重挂载，避免破坏退出动画）。
   useEffect(() => {
     if (!open) return
+    // eslint-disable-next-line react/set-state-in-effect
     setName(agent.name)
+    // eslint-disable-next-line react/set-state-in-effect
     setPrompt(DEFAULT_PROMPT)
+    // eslint-disable-next-line react/set-state-in-effect
     setSaved('')
   }, [open, agent.name])
 

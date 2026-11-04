@@ -19,10 +19,3 @@ export const TOOL_USAGE: Array<{ label: string; count: number }> = [
   { label: '计划与自检', count: 6 },
   { label: '风控拒单', count: 3 },
 ]
-
-/** 对比页用的多运行序列 */
-export const COMPARE_SERIES = [
-  { id: 'run_demo_001', label: 'openOutcry · 研究员', color: '#E8785F', values: NAV_SERIES },
-  { id: 'run_demo_000', label: 'Codex · 价值研究', color: '#D6BE6E', values: [100000, 100120, 99940, 100360, 100220, 100640, 100880, 100520, 100960, 101240, 101020, 101380, 101120, 101440, 101720, 101480, 101860, 101640, 101980, 101240] },
-  { id: 'run_demo_002', label: 'Kimi · 研究助手', color: '#8FB3C9', values: [100000, 99760, 99580, 99820, 99640, 99380, 99620, 99410, 99220, 99540, 99680, 99420, 99180, 99460, 99240, 99020, 99340, 99160, 98980, 99120] },
-]

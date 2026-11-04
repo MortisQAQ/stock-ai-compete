@@ -5,34 +5,19 @@ import { Button } from '../components/ui/Button'
 import { Card } from '../components/ui/Card'
 import { Stamp } from '../components/ui/Stamp'
 import { StatBand } from '../components/run/StatBand'
-import type { BandItem } from '../components/run/StatBand'
 import { EquityChart } from '../components/charts/EquityChart'
 import { DrawdownChart } from '../components/charts/DrawdownChart'
 import { ToolUsageChart } from '../components/charts/ToolUsageChart'
 import { BENCH_SERIES, NAV_SERIES, TOOL_USAGE } from '../data/market'
 import { money, signed, tone } from '../lib/format'
 import { PROPOSAL_TEXT } from '../store/derive'
+import { accountBandItems } from '../store/selectors'
 
 export function ReviewPage() {
   const { state, totals } = useRun()
   const { open } = useDialog()
   const agent = agentOf(state.agent)
-
-  const band: BandItem[] = [
-    { label: '账户净值', value: money(totals.equity), note: '初始资金 ' + money(state.initial) },
-    {
-      label: '累计净收益',
-      value: signed(totals.net),
-      note: ((totals.net / state.initial) * 100).toFixed(2) + '% · 已扣费用',
-      tone: totals.net >= 0 ? 'up' : 'dn',
-    },
-    {
-      label: '可用现金',
-      value: money(state.cash),
-      note: '占总资产 ' + ((state.cash / totals.equity) * 100).toFixed(1) + '%',
-    },
-    { label: '持仓市值', value: money(totals.market), note: state.holdings.length + ' 个标的 · 当前估值' },
-  ]
+  const band = accountBandItems(state, totals)
 
   const facts: Array<[string, string]> = [
     ['已成交记录', state.trades.length + ' 笔（含开仓）'],
@@ -47,7 +32,7 @@ export function ReviewPage() {
     <>
       <div className="pagehead">
         <div>
-          <div style={{ display: 'flex', gap: 10, alignItems: 'center', flexWrap: 'wrap' }}>
+          <div className="flex flex-wrap items-center gap-2.5">
             <span className="label">№ 03 — Review</span>
             <Stamp tone="brass">样本不足 · 不排名</Stamp>
           </div>
@@ -98,15 +83,15 @@ export function ReviewPage() {
           </div>
           <div className="legend">
             <span>
-              <i style={{ background: '#E8785F' }} />
+              <i className="chart-swatch-agent" />
               Agent 净值
             </span>
             <span>
-              <i style={{ background: '#B9C7BD' }} />
+              <i className="chart-swatch-bench" />
               沪深 300
             </span>
             <span>
-              <i style={{ background: '#42584C' }} />
+              <i className="chart-swatch-zero" />
               零轴
             </span>
           </div>
@@ -122,7 +107,7 @@ export function ReviewPage() {
           </div>
           <div className="legend">
             <span>
-              <i style={{ background: '#D6BE6E' }} />
+              <i className="chart-swatch-drawdown" />
               回撤深度
             </span>
           </div>
@@ -173,14 +158,14 @@ export function ReviewPage() {
                 {tr.time} · {money(tr.price)} · 费用 {money(tr.fee)} · {tr.evidence}
               </small>
             </span>
-            <span style={{ fontFamily: 'var(--mono)', fontSize: 'var(--fs-data)' }} className={tr.pnl === null ? 'dim' : tone(tr.pnl)}>
+            <span className={'font-mono text-data ' + (tr.pnl === null ? 'dim' : tone(tr.pnl))}>
               {tr.pnl === null ? '建仓' : signed(tr.pnl)}
             </span>
           </button>
         ))}
       </Card>
 
-      <div className="note" style={{ marginTop: 16, maxWidth: '78ch' }}>
+      <div className="note mt-4 max-w-[78ch]">
         账户总资产 = 现金 + 持仓市值。净收益 = 已实现净盈亏 + 持仓浮盈 − 未平仓买入费用。浮盈不是已实现收益。样本不足 60
         个交易日时，平台不会给出排名或「DSR 显著」这类结论。
       </div>

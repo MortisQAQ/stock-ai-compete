@@ -1,4 +1,4 @@
-import type { Holding, RunState, Trade } from '../types'
+import type { AgentId, Holding, RunState, Trade } from '../types'
 
 const HOLDINGS: Holding[] = [
   { name: '公司-017', quantity: 600, sellable: 600, cost: 18.2, price: 20.3, entryFee: 20 },
@@ -10,7 +10,7 @@ const TRADES: Trade[] = [
   { id: 'buy17', name: '公司-017', side: '买入', quantity: 600, price: 18.2, fee: 20, time: '2024-04-18 开盘', pnl: null, reason: '以估值与现金流披露建立观察仓位。', evidence: 'ev_011', status: '已成交' },
   { id: 'buy42', name: '公司-042', side: '买入', quantity: 300, price: 31.6, fee: 20, time: '2024-04-19 开盘', pnl: null, reason: '分散持仓，跟踪经营现金回收。', evidence: 'ev_012', status: '已成交' },
   { id: 'buy08', name: '公司-008', side: '买入', quantity: 100, price: 46.8, fee: 20, time: '2024-04-22 开盘', pnl: null, reason: '小仓位观察经营修复，控制单一标的风险。', evidence: 'ev_015', status: '已成交' },
-  { id: 'closed', name: '公司-026', side: '卖出', quantity: 1000, price: 22.3086, fee: 140, time: '2024-04-22 开盘', pnl: 2168.6, cost: 20, reason: '达到原定退出条件后完成平仓。', evidence: 'ev_016', status: '已成交' } as Trade,
+  { id: 'closed', name: '公司-026', side: '卖出', quantity: 1000, price: 22.3086, fee: 140, time: '2024-04-22 开盘', pnl: 2168.6, reason: '达到原定退出条件后完成平仓。', evidence: 'ev_016', status: '已成交' },
 ]
 
 export const CLOCK_START = '2024-04-23 09:15'
@@ -23,9 +23,10 @@ const EVENTS = [
   { kind: 'order' as const, title: '提交卖出提案，等待确认', body: '公司-017 · 100 股 · 限价 ¥20.30。仅为提案，尚未成交，账户不变。', meta: 'order.proposed · 09:15', at: '09:15' },
 ]
 
-export function createInitialRun(agent = 'native'): RunState {
+/** 每次切 Agent 都从这里取一份全新的运行；持仓与成交按值复制，避免共享引用 */
+export function createInitialRun(agent: AgentId = 'native'): RunState {
   return {
-    agent: agent as RunState['agent'],
+    agent,
     initial: 100000,
     cash: 77028.6,
     realized: 2168.6,

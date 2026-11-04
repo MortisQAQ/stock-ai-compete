@@ -8,6 +8,9 @@ import { TaskSwitcher } from '../components/training/TaskSwitcher'
 import { MobileTaskView } from '../components/training/MobileTaskView'
 import { AssistantSheet } from '../components/training/AssistantSheet'
 
+const assistantInHistory = (): boolean =>
+  Boolean((window.history.state as Record<string, unknown> | null)?.ooAssistant)
+
 /**
  * 训练场 —— VSCode 式工作台。
  *
@@ -24,34 +27,31 @@ export function TrainingPage() {
   const [taskId, setTaskId] = useState(LIVE_TASK_ID)
   const current = tasks.find((task) => task.id === taskId) ?? tasks[0]
 
-  const [assistantOpen, setAssistantOpen] = useState(false)
+  // 刷新后如果 history 里还带着助手页标记，就直接恢复成打开态（惰性初值，不用 effect 补）
+  const [assistantOpen, setAssistantOpen] = useState(assistantInHistory)
   const fabRef = useRef<HTMLButtonElement>(null)
-  const pushedRef = useRef(false)
 
-  // 助手页是「页面」而不是弹窗：打开时压一条 history，浏览器后退即可关闭
+  /**
+   * 助手页是「页面」而不是弹窗：打开时压一条 history，浏览器后退即可关闭。
+   *
+   * 状态由 history 决定，而不是自己再记一个 pushed 标志：
+   * 用户可能按浏览器前进/后退，只有读 history.state 才不会和真实栈脱节。
+   */
   const openAssistant = useCallback(() => {
     setAssistantOpen(true)
-    if (!pushedRef.current) {
-      pushedRef.current = true
-      window.history.pushState({ ...window.history.state, ooAssistant: true }, '')
-    }
+    if (assistantInHistory()) return
+    window.history.pushState({ ...window.history.state, ooAssistant: true }, '')
   }, [])
 
   const closeAssistant = useCallback(() => {
     setAssistantOpen(false)
-    if (pushedRef.current) {
-      pushedRef.current = false
-      window.history.back()
-    }
+    if (assistantInHistory()) window.history.back()
   }, [])
 
   useEffect(() => {
-    const onPopState = () => {
-      pushedRef.current = false
-      setAssistantOpen(false)
-    }
-    window.addEventListener('popstate', onPopState)
-    return () => window.removeEventListener('popstate', onPopState)
+    const sync = () => setAssistantOpen(assistantInHistory())
+    window.addEventListener('popstate', sync)
+    return () => window.removeEventListener('popstate', sync)
   }, [])
 
   return (

@@ -1,12 +1,10 @@
-import type { AgentId } from '../types'
+import type { AgentId, TrainingStatus } from '../types'
 
 /**
  * 原型数据：训练（training）是委托单位，而不是 Agent。
  * 一次训练 = 时间段 × 标的池 × Agent 团队 × 规则。
  * 后端接入前，这里只服务新建训练页的设计稿演示。
  */
-
-export type TrainingStatus = 'running' | 'pending' | 'done'
 
 export interface TrainingRecord {
   id: string
@@ -23,12 +21,6 @@ export interface TrainingRecord {
   status: TrainingStatus
   /** 已结束训练的结果，做原型展示用 */
   result?: string
-}
-
-export const STATUS_TEXT: Record<TrainingStatus, string> = {
-  running: '进行中',
-  pending: '待确认',
-  done: '已结束',
 }
 
 export const TRAINING_SEED: TrainingRecord[] = [

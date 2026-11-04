@@ -45,10 +45,10 @@
   --secondary: var(--bone-lo);
   --secondary-foreground: var(--ink-2);
 
-  --muted: #e2dac7;
-  --muted-foreground: #5b665e;
+  --muted: var(--bone-mute);
+  --muted-foreground: var(--ink-3);
 
-  --accent: #ddd4c0;
+  --accent: var(--accent-tone);
   --accent-foreground: var(--ink);
 
   --destructive: var(--ver);
@@ -103,17 +103,18 @@
   --color-plate-faint: var(--plate-faint);
   --color-brass-hi: var(--brass-hi);
 
-  /* 品牌色：朱砂与墨绿也进语义层，避免组件里写死 hex */
-  --color-ver: #c2352a;
-  --color-ver-deep: #a82c23;
-  --color-pine: #1e3a2c;
-  --color-brass: #8a6a3b;
-  --color-ink: #121a15;
-  --color-ink-2: #3e4b43;
-  --color-ink-3: #7c877e;
-  --color-bone: #ede7da;
-  --color-bone-hi: #f7f3ea;
-  --color-bone-lo: #e3dccb;
+  /* 品牌色：只做映射，取值一律来自 tokens.css（唯一真源） */
+  --color-ver: var(--ver);
+  --color-ver-deep: var(--ver-deep);
+  --color-pine: var(--pine);
+  --color-brass: var(--brass);
+  --color-ink: var(--ink);
+  --color-ink-2: var(--ink-2);
+  --color-ink-3: var(--ink-3);
+  --color-bone: var(--bone);
+  --color-bone-hi: var(--bone-hi);
+  --color-bone-lo: var(--bone-lo);
+  --color-bone-mute: var(--bone-mute);
 
   --font-sans: var(--sans);
   --font-mono: var(--mono);
@@ -133,7 +134,7 @@
   --text-h1: var(--fs-h1);
   --text-display: var(--fs-display);
 
-  /* 纸面印刷的直角美学：圆角只为收边，不做胶囊 */
+  /* 纸面印刷的直角美学：圆角只为收边，不做胶囊（唯一定义处） */
   --radius-xs: 2px;
   --radius-sm: 3px;
   --radius-md: 4px;
@@ -145,6 +146,4 @@
   --shadow-raise: 0 2px 0 rgba(18, 26, 21, 0.14);
   --shadow-plate: 3px 3px 0 rgba(18, 26, 21, 0.08);
   --shadow-plate-lg: 5px 5px 0 rgba(18, 26, 21, 0.1);
-
-  --ease-out-quart: cubic-bezier(0.25, 1, 0.5, 1);
 }

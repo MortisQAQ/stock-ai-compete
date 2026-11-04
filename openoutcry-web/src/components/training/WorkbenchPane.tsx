@@ -4,17 +4,16 @@ import { Button, buttonVariants } from '../ui/Button'
 import { Badge } from '../ui/Badge'
 import { Card, CardContent, CardHeader } from '../ui/Card'
 import { cn } from '../../lib/utils'
-import { money, signed } from '../../lib/format'
 import { StatBand } from '../run/StatBand'
-import type { BandItem } from '../run/StatBand'
+import { bandItemsFor, TRAINING_STATUS_TEXT } from '../../store/selectors'
+import { useToast } from '../../store/ToastProvider'
+import type { TrainingTask } from '../../types'
 import { AccountLedger } from '../run/AccountLedger'
 import { HoldingsList } from '../run/HoldingsList'
 import { RunStatusCard } from '../run/RunStatusCard'
 import { DetailTabs } from '../run/DetailTabs'
 import { ProposalTicket } from '../proposal/ProposalTicket'
 import { agentOf } from '../../data/agents'
-import { STATUS_TEXT } from '../../store/trainingTasks'
-import type { TaskArchive, TrainingTask } from '../../store/trainingTasks'
 
 /** 训练场页头的两个动作（回放 / 更多），桌面放在中栏栏头，移动端放在任务视图里 */
 export function WorkbenchActions({ className }: { className?: string }) {
@@ -53,48 +52,9 @@ export function WorkbenchActions({ className }: { className?: string }) {
   )
 }
 
-function liveBandItems(equity: number, net: number, cash: number, market: number, initial: number, holdings: number): BandItem[] {
-  return [
-    { label: '账户净值', value: money(equity), note: '初始资金 ' + money(initial) },
-    { label: '累计净收益', value: signed(net), note: ((net / initial) * 100).toFixed(2) + '% · 已扣费用', tone: net >= 0 ? 'up' : 'dn' },
-    { label: '可用现金', value: money(cash), note: '占总资产 ' + ((cash / equity) * 100).toFixed(1) + '%' },
-    { label: '持仓市值', value: money(market), note: holdings + ' 个标的 · 当前估值' },
-  ]
-}
-
-export interface BandSnapshot {
-  equity: number
-  net: number
-  cash: number
-  market: number
-  initial: number
-  holdings: number
-}
-
-/** 当前任务取实时快照，非当前任务取冻结档案 */
-export function bandItemsFor(task: TrainingTask, snap: BandSnapshot): BandItem[] {
-  return task.live
-    ? liveBandItems(snap.equity, snap.net, snap.cash, snap.market, snap.initial, snap.holdings)
-    : archiveBandItems(task.archive as TaskArchive)
-}
-
-function archiveBandItems(archive: TaskArchive): BandItem[] {
-  return [
-    { label: '账户净值', value: money(archive.equity), note: '任务结束时冻结' },
-    {
-      label: '累计净收益',
-      value: signed(archive.net),
-      note: '已扣费用 · 含全部平仓',
-      tone: archive.net >= 0 ? 'up' : 'dn',
-    },
-    { label: '可用现金', value: money(archive.cash), note: '结束时快照' },
-    { label: '持仓市值', value: money(archive.market), note: archive.market === 0 ? '已全部平仓' : '结束时快照' },
-  ]
-}
-
 function ArchiveBody({ task }: { task: TrainingTask }) {
-  const { notify } = useRun()
   const { open } = useDialog()
+  const { notify } = useToast()
   const archive = task.archive
   if (!archive) return null
 
@@ -218,14 +178,7 @@ export function WorkbenchBody({ task }: { task: TrainingTask }) {
 export function WorkbenchPane({ task, className }: { task: TrainingTask; className?: string }) {
   const { state, totals } = useRun()
   const agent = agentOf(state.agent)
-  const band = bandItemsFor(task, {
-    equity: totals.equity,
-    net: totals.net,
-    cash: state.cash,
-    market: totals.market,
-    initial: state.initial,
-    holdings: state.holdings.length,
-  })
+  const band = bandItemsFor(task, state, totals)
 
   return (
     <section aria-label="训练任务工作台" className={cn('flex min-h-0 min-w-0 flex-col bg-[var(--bone)]', className)}>
@@ -236,7 +189,7 @@ export function WorkbenchPane({ task, className }: { task: TrainingTask; classNa
             {task.name}
           </h2>
           <span className="shrink-0 font-mono text-[length:var(--fs-micro)] tracking-[0.06em] text-[var(--ink-3)]">
-            {STATUS_TEXT[task.status]}
+            {TRAINING_STATUS_TEXT[task.status]}
           </span>
         </div>
         <WorkbenchActions />

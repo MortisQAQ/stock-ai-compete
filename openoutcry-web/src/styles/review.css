@@ -135,5 +135,48 @@
     grid-template-columns: 1fr;
   }
 }
+
+/* ---------- 图表 ----------
+   曲线、网格、刻度与图例统一走 tokens.css 的 --chart-*：
+   之前图例写 #E8785F、曲线写 #F0917D，同一个"Agent 净值"在两张图上不同色。 */
+.chart-swatch-agent { background: var(--chart-agent); }
+.chart-swatch-bench { background: var(--chart-bench); }
+.chart-swatch-zero { background: var(--chart-zero); }
+.chart-swatch-drawdown { background: var(--chart-drawdown); }
+
+.chart-grid-line { stroke: var(--chart-grid); stroke-width: 1; }
+.chart-zero-line { stroke: var(--chart-zero); stroke-width: 1; stroke-dasharray: 2 4; }
+
+.chart-axis-label,
+.chart-value-label,
+.chart-drawdown-label {
+  font-family: var(--mono);
+  font-size: var(--fs-micro);
+  font-variant-numeric: tabular-nums;
 }
 
+.chart-axis-label { fill: var(--chart-label); }
+.chart-value-label { fill: var(--chart-value); }
+
+.chart-agent-line { fill: none; stroke: var(--chart-agent); stroke-width: 2.2; stroke-linejoin: round; }
+.chart-agent-dot { fill: var(--chart-agent); }
+.chart-bench-line {
+  fill: none;
+  stroke: var(--chart-bench);
+  stroke-width: 1.4;
+  stroke-dasharray: 4 3;
+  stroke-opacity: 0.8;
+}
+.chart-area-top { stop-color: var(--chart-agent); stop-opacity: 0.3; }
+.chart-area-bottom { stop-color: var(--chart-agent); stop-opacity: 0; }
+
+.chart-drawdown-area { fill: var(--chart-drawdown); fill-opacity: 0.16; }
+.chart-drawdown-line { fill: none; stroke: var(--chart-drawdown); stroke-width: 1.8; stroke-linejoin: round; }
+.chart-drawdown-dot { fill: var(--chart-drawdown); }
+.chart-drawdown-label { fill: var(--chart-drawdown); }
+
+.chart-tool-label { fill: var(--chart-label); font-family: var(--sans); font-size: var(--fs-micro); }
+.chart-tool-track { fill: var(--chart-grid); }
+.chart-tool-bar { fill: var(--chart-tool); fill-opacity: 0.72; }
+.chart-tool-bar.is-risk { fill: var(--chart-agent); fill-opacity: 0.9; }
+}

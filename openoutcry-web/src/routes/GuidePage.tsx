@@ -13,7 +13,7 @@ export function GuidePage() {
         <Stamp tone="pine">Prototype</Stamp>
       </div>
 
-      <div className="steps" style={{ marginTop: 0 }}>
+      <div className="steps mt-0">
         <Card className="step">
           <div className="step-no" aria-hidden="true">01</div>
           <h3>准备 Agent</h3>
@@ -33,7 +33,7 @@ export function GuidePage() {
         </Card>
       </div>
 
-      <div className="cols" style={{ marginTop: 26 }}>
+      <div className="cols mt-6">
         <h3>为什么不是一个聊天框</h3>
         <p>
           聊天框能把一段分析讲得像模像样，但它无法回答三个问题：这个判断在当时的信息条件下是否成立？订单是否真的按 A
