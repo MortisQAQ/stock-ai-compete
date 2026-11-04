@@ -1,0 +1,400 @@
+@layer components {
+/* ============================================================
+   组件容器已迁到 src/components/ui（shadcn 源码，可直接改）。
+   这里只留跨页面复用的版式原子：印章、撕口、数字带、行、Toast。
+   ============================================================ */
+
+/* ---------- 印章 ---------- */
+.stamp {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 9px;
+  border: 2px solid currentColor;
+  color: var(--ver);
+  font: 700 var(--fs-micro) / 1 var(--mono);
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  transform: rotate(-2deg);
+  background: rgba(247, 243, 234, 0.6);
+  white-space: nowrap;
+}
+
+.stamp.pine {
+  color: var(--pine);
+}
+
+.stamp.brass {
+  color: var(--brass);
+}
+
+.stamp.slate {
+  color: var(--slate-dim);
+  border-color: var(--slate-line);
+  background: transparent;
+}
+
+.stamp.sm {
+  font-size: var(--fs-micro);
+  padding: 2px 6px;
+  letter-spacing: 0.12em;
+}
+
+/* ---------- 票据撕口：顶部一排半圆 ---------- */
+.perf::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: -5px;
+  height: 10px;
+  pointer-events: none;
+  background-image: radial-gradient(circle at 5px 5px, var(--bone) 0 2.6px, transparent 2.6px);
+  background-size: 20px 10px;
+}
+
+/* ---------- 深色数字带 ---------- */
+.band {
+  position: relative;
+  background: var(--bone);
+  color: var(--ink);
+  border: 0;
+  border-top: 3px solid var(--ink);
+  border-bottom: 1px solid var(--ink);
+  overflow: visible;
+}
+
+.band::before {
+  display: none;
+}
+
+.band-in {
+  position: relative;
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 1px;
+  background: rgba(22, 33, 28, 0.14);
+}
+
+.band-cell {
+  background: var(--bone);
+  padding: 14px 20px 15px;
+}
+
+.band-cell .label {
+  color: var(--brass);
+  display: block;
+  margin-bottom: 10px;
+}
+
+.band-cell b {
+  display: block;
+  font: 700 var(--fs-kpi)/1.05 var(--serif);
+  letter-spacing: -1.4px;
+  color: var(--ink);
+  font-variant-numeric: tabular-nums;
+}
+
+.band-cell b.up {
+  color: var(--ver);
+}
+
+.band-cell b.dn {
+  color: var(--down);
+}
+
+.band-cell small {
+  display: block;
+  margin-top: 6px;
+  font: 600 var(--fs-micro)/1.4 var(--mono);
+  letter-spacing: 0.05em;
+  color: var(--ink-3);
+}
+
+.band-tags {
+  position: relative;
+  display: flex;
+  gap: 20px;
+  flex-wrap: wrap;
+  padding: 9px 20px;
+  background: var(--plate-1);
+  border-top: 1px solid var(--ink);
+  font: 600 var(--fs-micro)/1.4 var(--mono);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--plate-dim);
+}
+
+.band-tags b {
+  color: var(--plate-ink);
+  font-weight: 600;
+}
+
+.band-tags s {
+  text-decoration: none;
+  color: var(--down-dark);
+}
+
+/* ---------- 计量条 ---------- */
+.meter {
+  height: 5px;
+  background: var(--bone-lo);
+  border: 1px solid var(--rule);
+  position: relative;
+  overflow: hidden;
+  margin: 9px 0 7px;
+}
+
+.meter i {
+  display: block;
+  height: 100%;
+  background: var(--pine);
+  transition: width 0.3s ease;
+}
+
+.meter.low i {
+  background: var(--ver);
+}
+
+.meter-note {
+  display: flex;
+  justify-content: space-between;
+  font: 600 var(--fs-micro)/1 var(--mono);
+  letter-spacing: 0.08em;
+  color: var(--ink-3);
+}
+
+/* ---------- 行 ---------- */
+.rowlink {
+  display: flex;
+  width: 100%;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 9px 0;
+  border-bottom: 1px solid var(--rule-soft);
+  text-align: left;
+  color: inherit;
+}
+
+.rowlink:last-child {
+  border-bottom: 0;
+}
+
+.rowlink:hover b {
+  color: var(--ver);
+}
+
+.rowlink b {
+  font-size: var(--fs-sm);
+  font-weight: 600;
+}
+
+.rowlink small {
+  display: block;
+  margin-top: 3px;
+  font: 600 var(--fs-micro)/1.4 var(--mono);
+  color: var(--ink-3);
+  letter-spacing: 0.02em;
+}
+
+.report-row {
+  display: flex;
+  align-items: baseline;
+  padding: 7px 0;
+  border-bottom: 1px dotted rgba(18, 26, 21, 0.2);
+  font-size: var(--fs-sm);
+}
+
+.report-row:last-child {
+  border-bottom: 0;
+}
+
+.report-row b {
+  font: 600 var(--fs-sm)/1 var(--mono);
+}
+
+.note {
+  margin-top: 10px;
+  padding: 9px 11px;
+  background: rgba(138, 106, 59, 0.07);
+  border-left: 2px solid var(--brass);
+  font-size: var(--fs-sm);
+  line-height: 1.65;
+  color: var(--ink-2);
+}
+
+.error-text {
+  color: var(--ver);
+  font-size: var(--fs-micro);
+  min-height: 16px;
+  font-family: var(--mono);
+}
+
+/* ---------- toast ---------- */
+.toasts {
+  position: fixed;
+  left: 50%;
+  bottom: 26px;
+  transform: translateX(-50%);
+  z-index: 9200;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  align-items: center;
+  pointer-events: none;
+}
+
+.toast {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 11px 16px;
+  background: var(--plate-2);
+  color: var(--plate-ink);
+  border: 1px solid var(--plate-0);
+  border-radius: 3px;
+  font: 600 var(--fs-micro)/1.2 var(--mono);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  box-shadow: 4px 4px 0 rgba(22, 33, 28, 0.3);
+  cursor: pointer;
+  animation: toast-in 0.18s cubic-bezier(0.25, 1, 0.5, 1);
+  pointer-events: auto;
+  transition: transform 0.14s ease, box-shadow 0.14s ease;
+}
+
+.toast:hover {
+  transform: translateY(-1px);
+  box-shadow: 5px 5px 0 rgba(194, 53, 42, 0.4);
+}
+
+.toast::before {
+  content: '';
+  width: 6px;
+  height: 6px;
+  flex: none;
+  background: var(--brass);
+}
+
+.toast.success::before {
+  background: var(--down-dark);
+}
+
+.toast.warn::before {
+  background: var(--ver);
+}
+
+@keyframes toast-in {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+}
+
+/* ---------- 弹窗内容块 ---------- */
+.snapshot-list {
+  display: flex;
+  flex-direction: column;
+  margin: 0 0 6px;
+}
+
+.snapshot-list > div {
+  display: grid;
+  grid-template-columns: 132px minmax(0, 1fr);
+  gap: 12px;
+  padding: 8px 0;
+  border-bottom: 1px dotted rgba(18, 26, 21, 0.22);
+}
+
+.snapshot-list dt {
+  font: 600 var(--fs-micro)/1.5 var(--mono);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+}
+
+.snapshot-list dd {
+  font-size: var(--fs-sm);
+  line-height: 1.5;
+  word-break: break-word;
+}
+
+.replay-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-bottom: 12px;
+  max-height: 260px;
+  overflow: auto;
+}
+
+.replay-item {
+  display: block;
+  width: 100%;
+  text-align: left;
+  padding: 9px 11px;
+  border: 1px solid var(--rule);
+  background: var(--bone-hi);
+  color: inherit;
+  transition: border-color 0.12s, background 0.12s;
+}
+
+.replay-item:hover {
+  border-color: var(--rule-strong, rgba(18, 26, 21, 0.32));
+}
+
+.replay-item[aria-pressed='true'] {
+  border-color: var(--ink);
+  background: var(--bone-lo);
+}
+
+.replay-item b {
+  display: block;
+  font-size: var(--fs-sm);
+  font-weight: 600;
+}
+
+.replay-item small {
+  display: block;
+  margin-top: 3px;
+  font: 600 var(--fs-micro)/1.4 var(--mono);
+  color: var(--ink-3);
+}
+
+.replay-detail {
+  padding: 12px;
+  background: var(--bone-hi);
+  border: 1px solid var(--rule);
+  font-size: var(--fs-sm);
+  line-height: 1.7;
+  color: var(--ink-2);
+  white-space: pre-wrap;
+}
+
+.audit {
+  margin-top: 12px;
+  border: 1px solid var(--rule);
+}
+
+.audit summary {
+  padding: 9px 12px;
+  cursor: pointer;
+  font: 600 var(--fs-micro)/1 var(--mono);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--ink-2);
+  background: var(--bone);
+}
+
+.audit pre {
+  margin: 0;
+  padding: 12px;
+  background: var(--slate);
+  color: #c6d8cb;
+  font-size: var(--fs-micro);
+  line-height: 1.7;
+  overflow: auto;
+}
+}
+

@@ -1,0 +1,150 @@
+/* ============================================================
+   openOutcry · 样式入口
+   分层顺序：theme（令牌）→ base（重置）→ components（既有版式）
+   → utilities（Tailwind 原子类）。
+   shadcn 组件全部落在 utilities 层，因此可以被 className 覆写；
+   旧的纸质版式样式落在 components 层，不会反压组件。
+   ============================================================ */
+@layer theme, base, components, utilities;
+
+/* Tailwind 只取 theme + utilities 两层：跳过 preflight，
+   避免重置本项目已有的纸质排版基础样式。 */
+@import 'tailwindcss/theme.css' layer(theme);
+@import 'tailwindcss/utilities.css' layer(utilities);
+@import 'tw-animate-css';
+
+@source '../';
+
+@import './tokens.css' layer(theme);
+@import './base.css' layer(base);
+@import './chrome.css' layer(components);
+@import './ui.css' layer(components);
+@import './studio.css' layer(components);
+@import './training.css' layer(components);
+@import './review.css' layer(components);
+@import './misc.css' layer(components);
+
+/* ============================================================
+   shadcn 语义层：把「纸质大厅」色板映射到 shadcn 的语义变量，
+   components/ui/* 里的 bg-card / text-muted-foreground /
+   border-input / ring 等因此自动继承我们的设计语言。
+   ============================================================ */
+:root {
+  --background: var(--bone);
+  --foreground: var(--ink);
+
+  --card: var(--bone-hi);
+  --card-foreground: var(--ink);
+
+  --popover: var(--bone-hi);
+  --popover-foreground: var(--ink);
+
+  --primary: var(--ink);
+  --primary-foreground: var(--bone-hi);
+
+  --secondary: var(--bone-lo);
+  --secondary-foreground: var(--ink-2);
+
+  --muted: #e2dac7;
+  --muted-foreground: #5b665e;
+
+  --accent: #ddd4c0;
+  --accent-foreground: var(--ink);
+
+  --destructive: var(--ver);
+  --destructive-foreground: #ffffff;
+
+  --border: var(--rule);
+  --border-strong: var(--rule-strong);
+  --input: rgba(22, 33, 28, 0.24);
+  --ring: var(--ver);
+
+  /* 深色仪器面：数字带、代码块、运行卡 */
+  --instrument: var(--plate-1);
+  --instrument-2: var(--plate-2);
+  --instrument-foreground: var(--plate-ink);
+  --instrument-muted: var(--plate-dim);
+  --instrument-border: var(--plate-line);
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-border-strong: var(--border-strong);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+
+  --color-instrument: var(--instrument);
+  --color-instrument-2: var(--instrument-2);
+  --color-instrument-foreground: var(--instrument-foreground);
+  --color-instrument-muted: var(--instrument-muted);
+  --color-instrument-border: var(--instrument-border);
+  --color-plate-0: var(--plate-0);
+  --color-plate-1: var(--plate-1);
+  --color-plate-2: var(--plate-2);
+  --color-plate-line: var(--plate-line);
+  --color-plate-ink: var(--plate-ink);
+  --color-plate-dim: var(--plate-dim);
+  --color-plate-faint: var(--plate-faint);
+  --color-brass-hi: var(--brass-hi);
+
+  /* 品牌色：朱砂与墨绿也进语义层，避免组件里写死 hex */
+  --color-ver: #c2352a;
+  --color-ver-deep: #a82c23;
+  --color-pine: #1e3a2c;
+  --color-brass: #8a6a3b;
+  --color-ink: #121a15;
+  --color-ink-2: #3e4b43;
+  --color-ink-3: #7c877e;
+  --color-bone: #ede7da;
+  --color-bone-hi: #f7f3ea;
+  --color-bone-lo: #e3dccb;
+
+  --font-sans: var(--sans);
+  --font-mono: var(--mono);
+  --font-serif: var(--serif);
+
+  /* 字号工具类：把流体标尺暴露成 text-micro / text-note / text-body /
+     text-row / text-h2 / text-kpi / text-h1 / text-display。
+     TSX 里一律用这些类，禁止再写死 px 字号 —— 硬编码会绕过
+     clamp 的下限，正是「字太小」的成因。检查见 scripts/check-type-floor.mjs。 */
+  --text-micro: var(--fs-micro);
+  --text-note: var(--fs-sm);
+  --text-data: var(--fs-data);
+  --text-body: var(--fs-body);
+  --text-row: var(--fs-row);
+  --text-h2: var(--fs-h2);
+  --text-kpi: var(--fs-kpi);
+  --text-h1: var(--fs-h1);
+  --text-display: var(--fs-display);
+
+  /* 纸面印刷的直角美学：圆角只为收边，不做胶囊 */
+  --radius-xs: 2px;
+  --radius-sm: 3px;
+  --radius-md: 4px;
+  --radius-lg: 6px;
+  --radius-xl: 9px;
+
+  /* 三级「硬投影」：静止压 1px、悬停抬 2px、票据压 3px */
+  --shadow-press: 0 1px 0 rgba(18, 26, 21, 0.1);
+  --shadow-raise: 0 2px 0 rgba(18, 26, 21, 0.14);
+  --shadow-plate: 3px 3px 0 rgba(18, 26, 21, 0.08);
+  --shadow-plate-lg: 5px 5px 0 rgba(18, 26, 21, 0.1);
+
+  --ease-out-quart: cubic-bezier(0.25, 1, 0.5, 1);
+}

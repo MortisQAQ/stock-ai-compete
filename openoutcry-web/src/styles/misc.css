@@ -1,0 +1,103 @@
+/* ---------- 接入 / 协议 / 说明 ---------- */
+.steps {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 16px;
+  margin-top: 22px;
+}
+
+.step {
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.step-no {
+  font: 700 var(--fs-display)/0.9 var(--serif);
+  letter-spacing: -2px;
+  color: var(--bone-lo);
+  -webkit-text-stroke: 1px rgba(18, 26, 21, 0.3);
+}
+
+.step h3 {
+  font: 700 var(--fs-body)/1.4 var(--serif);
+  letter-spacing: -0.3px;
+}
+
+.step p {
+  font-size: var(--fs-body);
+  line-height: 1.65;
+  color: var(--ink-2);
+}
+
+pre.code {
+  margin: 0;
+  padding: 14px 16px;
+  background: var(--plate-1);
+  color: var(--plate-dim);
+  font-size: var(--fs-micro);
+  line-height: 1.75;
+  overflow: auto;
+  border: 1px solid var(--plate-0);
+}
+
+pre.code .k {
+  color: var(--up-dark);
+}
+
+pre.code .s {
+  color: var(--brass-hi);
+}
+
+.code-block {
+  border: 0;
+}
+
+.cols {
+  columns: 2;
+  column-gap: 34px;
+  margin-top: 20px;
+  font-size: var(--fs-body);
+  line-height: 1.72;
+  color: var(--ink-2);
+}
+
+.cols h3 {
+  break-after: avoid;
+  margin: 0 0 6px;
+  font: 700 var(--fs-sm)/1.4 var(--mono);
+  letter-spacing: 0.06em;
+  color: var(--ink);
+}
+
+.cols p {
+  margin: 0 0 14px;
+}
+
+.boot {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 12px 13px;
+  border: 1px solid var(--rule);
+  background: var(--bone);
+  font: 600 var(--fs-micro)/1.5 var(--mono);
+  letter-spacing: 0.06em;
+  color: var(--ink-3);
+}
+
+.boot b {
+  color: var(--ink-2);
+}
+
+@media (max-width: 1080px) {
+  .steps {
+    grid-template-columns: 1fr;
+  }
+
+  .cols {
+    columns: 1;
+  }
+}
+

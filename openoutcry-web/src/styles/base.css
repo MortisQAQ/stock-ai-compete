@@ -1,0 +1,211 @@
+@layer base {
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  margin: 0;
+  color: var(--ink);
+  font: var(--fs-body)/1.62 var(--sans);
+  background-color: var(--bone);
+  background-image:
+    repeating-linear-gradient(90deg, rgba(18, 26, 21, 0.03) 0 1px, transparent 1px 104px),
+    radial-gradient(1100px 520px at 82% -8%, #f6f1e4 0%, transparent 62%);
+  -webkit-font-smoothing: antialiased;
+}
+
+/* 纸张颗粒：固定覆盖，不吃点击 */
+body::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: 9000;
+  pointer-events: none;
+  opacity: 0.16;
+  mix-blend-mode: multiply;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.82' numOctaves='3' stitchTiles='stitch'/><feColorMatrix type='saturate' values='0'/></filter><rect width='160' height='160' filter='url(%23n)' opacity='.5'/></svg>");
+}
+
+h1,
+h2,
+h3,
+h4,
+p,
+dl,
+dd,
+dt,
+figure {
+  margin: 0;
+}
+
+ul,
+ol {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+button,
+input,
+select,
+textarea {
+  font: inherit;
+  color: inherit;
+}
+
+button {
+  cursor: pointer;
+  background: none;
+  border: 0;
+}
+
+button:disabled {
+  opacity: 0.42;
+  cursor: not-allowed;
+}
+
+a {
+  color: var(--ver);
+  text-decoration: none;
+  border-bottom: 1px solid rgba(194, 53, 42, 0.35);
+}
+
+code,
+pre {
+  font-family: var(--mono);
+}
+
+::selection {
+  background: rgba(194, 53, 42, 0.18);
+}
+
+:focus-visible {
+  outline: 2px solid var(--ver);
+  outline-offset: 3px;
+}
+
+/* ---------- 通用原子 ---------- */
+.mono {
+  font-family: var(--mono);
+}
+
+.label {
+  font: 600 var(--fs-micro)/1 var(--mono);
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--brass);
+}
+
+.dim {
+  color: var(--ink-3);
+}
+
+.pos {
+  color: var(--up);
+}
+
+.neg {
+  color: var(--down);
+}
+
+.flat {
+  color: var(--ink-2);
+}
+
+.dots {
+  flex: 1;
+  margin: 0 8px;
+  border-bottom: 1px dotted rgba(18, 26, 21, 0.3);
+  transform: translateY(-4px);
+}
+
+/* 跳转到主内容（键盘可见） */
+.skip-link {
+  position: fixed;
+  left: 12px;
+  top: -60px;
+  z-index: 9500;
+  padding: 10px 16px;
+  background: var(--ink);
+  color: var(--bone-hi);
+  font: 600 var(--fs-micro)/1 var(--mono);
+  letter-spacing: 0.14em;
+  border: 0;
+  transition: top 0.16s ease;
+}
+
+.skip-link:focus {
+  top: 12px;
+}
+
+/* ---------- 光标语义 ----------
+   跳过 preflight 后，原生 <button> 不会自动带 pointer 光标；
+   这里补回来，并让禁用态统一给出 not-allowed。 */
+button:not(:disabled),
+[role='button']:not([aria-disabled='true']),
+summary,
+label[for] {
+  cursor: pointer;
+}
+
+button:disabled,
+[aria-disabled='true'] {
+  cursor: not-allowed;
+}
+
+/* ---------- 触屏：最小点按尺寸 ----------
+   指针粗糙（手机/平板）时，任何可交互控件都不低于 36px 高；
+   桌面保持紧凑密度，不为此牺牲信息量。 */
+@media (pointer: coarse) {
+  [data-slot='button'],
+  .stepper button,
+  .ledger-filters button,
+  .mnav a,
+  .replay-item,
+  .agent-add {
+    min-height: 36px;
+  }
+
+  .rowlink {
+    padding-top: 12px;
+    padding-bottom: 12px;
+  }
+}
+
+/* 滚动条 */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(18, 26, 21, 0.28) transparent;
+}
+
+*::-webkit-scrollbar {
+  width: 9px;
+  height: 9px;
+}
+
+*::-webkit-scrollbar-thumb {
+  background: rgba(18, 26, 21, 0.22);
+}
+
+*::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+}
+
