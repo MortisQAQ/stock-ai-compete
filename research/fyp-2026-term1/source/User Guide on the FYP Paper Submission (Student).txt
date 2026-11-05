@@ -1,0 +1,34 @@
+User Guide on the Final Year Project Paper
+Submission (For regular FYP)
+ 1. Students can login and see the project folder from the link below.
+    https://mycuhk.sharepoint.com/sites/Faculty.ERG/FYP/2026-27/CSE/Shared%20Documents/
+
+     *You can only see your own project folder, e.g. ABC2302
+
+
+
+
+ 2. The format of the link is as follows.
+    https://mycuhk.sharepoint.com/sites/Faculty.ERG/FYP/2026-27/CSE/Shared%20Documents/
+    [Project Code]
+
+ 3. Click on the link and it will redirect to CUHK Office 365 LOGIN page.
+   4. Before the deadline, the student is required to upload the reports to corresponding
+      “Documents” folder. e.g. ABC2302 > Term1 > Planning
+
+[Important Note]
+
+       SharePoint is designated exclusively for uploading your reports.
+
+       DO NOT upload unrelated files to SharePoint, such as datasets or AI models.
+
+       Unrelated files will be deleted to maintain system efficiency and accessibility.
+
+
+
+
+   5. The name convention of the reports is as follows.
+          a. [Project Code]_[SID]_planning_report.pdf
+          b. [Project Code]_ [SID]_progress_report.pdf
+          c. [Project Code]_ [SID]_final_report.pdf
+

@@ -1,0 +1,1757 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>openOutcry · 交易智能体评测设施</title>
+<style>
+/* ============================================================
+   openOutcry — 纸质大厅 / Trading Floor Ledger
+   骨白纸面 + 墨绿黑 + 朱砂红 + 黄铜标签
+   ============================================================ */
+:root{
+  --bone:#EDE7DA;
+  --bone-hi:#F7F3EA;
+  --bone-lo:#E3DCCB;
+  --ink:#121A15;
+  --ink-2:#3E4B43;
+  --ink-3:#7C877E;
+  --rule:rgba(18,26,21,.16);
+  --rule-soft:rgba(18,26,21,.09);
+  --ver:#C2352A;
+  --ver-soft:rgba(194,53,42,.09);
+  --pine:#1E3A2C;
+  --brass:#8A6A3B;
+  --slate:#0E1613;
+  --slate-2:#16211B;
+  --slate-line:rgba(201,214,203,.14);
+  --slate-ink:#D3E0D6;
+  --slate-dim:#7E9386;
+  --up:#C2352A;
+  --down:#1E7A4B;
+  --serif:Georgia,"Times New Roman","Songti SC","SimSun",serif;
+  --sans:-apple-system,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif;
+  --mono:"JetBrains Mono","Cascadia Mono",Consolas,"Courier New",monospace;
+  --hard:3px 3px 0 rgba(18,26,21,.07);
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{
+  margin:0;color:var(--ink);font:14.5px/1.62 var(--sans);
+  background-color:var(--bone);
+  background-image:
+    repeating-linear-gradient(90deg,rgba(18,26,21,.03) 0 1px,transparent 1px 104px),
+    radial-gradient(1100px 520px at 82% -8%,#F6F1E4 0%,transparent 62%);
+  -webkit-font-smoothing:antialiased;
+}
+body::after{
+  content:"";position:fixed;inset:0;z-index:9000;pointer-events:none;opacity:.16;mix-blend-mode:multiply;
+  background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.82' numOctaves='3' stitchTiles='stitch'/><feColorMatrix type='saturate' values='0'/></filter><rect width='160' height='160' filter='url(%23n)' opacity='.5'/></svg>");
+}
+h1,h2,h3,h4,p,dl,dd,dt,ul,ol{margin:0}
+ul,ol{padding:0;list-style:none}
+button,input,select,textarea{font:inherit;color:inherit}
+button{cursor:pointer;background:none;border:0}
+button:disabled{opacity:.42;cursor:not-allowed}
+:focus-visible{outline:2px solid var(--ver);outline-offset:3px}
+[hidden]{display:none!important}
+a{color:var(--ver);text-decoration:none;border-bottom:1px solid rgba(194,53,42,.35)}
+code,pre{font-family:var(--mono)}
+::selection{background:rgba(194,53,42,.18)}
+
+/* ---------- 通用原子 ---------- */
+.mono{font-family:var(--mono)}
+.label{font:600 9.5px/1 var(--mono);letter-spacing:.22em;text-transform:uppercase;color:var(--brass)}
+.dim{color:var(--ink-3)}
+.num{font-family:var(--serif);font-variant-numeric:tabular-nums;letter-spacing:-1px}
+.pos{color:var(--up)}
+.neg{color:var(--down)}
+.rule{border-top:1px solid var(--rule)}
+.rule-double{border-top:1px solid var(--ink);border-bottom:1px solid var(--ink);height:3px}
+.dots{flex:1;margin:0 8px;border-bottom:1px dotted rgba(18,26,21,.3);transform:translateY(-4px)}
+
+/* ---------- 顶部走带 ---------- */
+.tape{background:var(--slate);color:var(--slate-dim);overflow:hidden;height:28px;display:flex;align-items:center;border-bottom:1px solid #000}
+.tape-in{display:flex;gap:0;white-space:nowrap;animation:slide 46s linear infinite;will-change:transform}
+.tape-in span{font:600 10px/1 var(--mono);letter-spacing:.16em;padding:0 22px;text-transform:uppercase;border-right:1px solid rgba(201,214,203,.16)}
+.tape-in span b{color:var(--slate-ink);font-weight:600}
+.tape-in span i{color:#D9755F;font-style:normal}
+@keyframes slide{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+@media (prefers-reduced-motion:reduce){.tape-in{animation:none}}
+
+/* ---------- 报头 ---------- */
+.masthead{
+  position:sticky;top:0;z-index:60;display:flex;align-items:center;gap:22px;
+  padding:14px 30px;background:rgba(237,231,218,.94);backdrop-filter:blur(8px);
+  border-bottom:1px solid var(--ink);
+}
+.mast-brand{display:flex;align-items:baseline;gap:9px}
+.mast-brand b{font:700 21px/1 var(--serif);letter-spacing:-.9px}
+.mast-brand s{width:6px;height:6px;border-radius:50%;background:var(--ver);display:block;transform:translateY(-2px)}
+.mast-brand em{font:600 8.5px/1 var(--mono);letter-spacing:.2em;color:var(--ink-3);font-style:normal;text-transform:uppercase}
+.mast-crumb{display:flex;align-items:center;gap:8px;font:600 10px/1 var(--mono);letter-spacing:.15em;text-transform:uppercase;color:var(--ink-3)}
+.mast-crumb b{color:var(--ink);font-weight:600}
+.mast-right{margin-left:auto;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+
+/* ---------- 按钮 ---------- */
+.btn{
+  display:inline-flex;align-items:center;gap:7px;height:34px;padding:0 13px;
+  border:1px solid var(--ink);background:var(--bone-hi);color:var(--ink);
+  font:600 11px/1 var(--mono);letter-spacing:.1em;text-transform:uppercase;
+  transition:background .12s,color .12s,transform .06s;
+}
+.btn:hover{background:var(--ink);color:var(--bone-hi)}
+.btn:active{transform:translateY(1px)}
+.btn.solid{background:var(--ink);color:var(--bone-hi)}
+.btn.solid:hover{background:var(--ver);border-color:var(--ver);color:#fff}
+.btn.ver{background:var(--ver);border-color:var(--ver);color:#fff}
+.btn.ver:hover{background:var(--ink);border-color:var(--ink)}
+.btn.ghost{border-color:var(--rule);color:var(--ink-2)}
+.btn.ghost:hover{background:var(--ink-2);border-color:var(--ink-2);color:var(--bone-hi)}
+.btn.sm{height:28px;padding:0 10px;font-size:10px}
+.btn[disabled]{opacity:.4}
+.btn.wide{width:100%;justify-content:center}
+
+/* ---------- 骨架 ---------- */
+.shell{display:grid;grid-template-columns:224px minmax(0,1fr);align-items:start}
+.index{position:sticky;top:63px;height:calc(100dvh - 63px);border-right:1px solid var(--rule);
+  padding:26px 0 20px;display:flex;flex-direction:column;background:rgba(247,243,234,.5)}
+.index-hd{padding:0 22px 18px}
+.index-hd .label{display:block;margin-bottom:10px}
+.index-hd p{font:600 11px/1.5 var(--mono);letter-spacing:.02em;color:var(--ink-3)}
+.index nav{display:flex;flex-direction:column}
+.index nav button{
+  position:relative;display:grid;grid-template-columns:26px minmax(0,1fr);align-items:baseline;gap:10px;
+  padding:12px 22px;text-align:left;border-top:1px solid var(--rule-soft);
+}
+.index nav button:last-child{border-bottom:1px solid var(--rule-soft)}
+.index nav button i{font:600 9.5px/1 var(--mono);letter-spacing:.08em;color:var(--ink-3);font-style:normal;transition:color .12s}
+.index nav button span{font-size:13px;color:var(--ink-2);transition:color .12s}
+.index nav button em{display:block;font:600 8.5px/1 var(--mono);letter-spacing:.18em;text-transform:uppercase;color:transparent;margin-top:4px;transition:color .12s}
+.index nav button:hover span{color:var(--ink)}
+.index nav button[aria-current]{background:var(--bone-hi)}
+.index nav button[aria-current]::before{content:"";position:absolute;left:0;top:-1px;bottom:-1px;width:3px;background:var(--ver)}
+.index nav button[aria-current] i{color:var(--ver)}
+.index nav button[aria-current] span{color:var(--ink);font-weight:600}
+.index nav button[aria-current] em{color:var(--brass)}
+.index-foot{margin-top:auto;padding:18px 22px 0;border-top:1px solid var(--rule-soft);font-size:10.5px;line-height:1.7;color:var(--ink-3);font-family:var(--mono)}
+.index-foot b{display:block;color:var(--ink-2);font-weight:600;letter-spacing:.06em;margin-bottom:5px}
+.page{padding:34px 38px 90px;max-width:1320px;width:100%}
+.hero-grid{display:grid;grid-template-columns:minmax(0,1fr) 296px;gap:36px;align-items:start}
+.hero-stamps{display:flex;gap:10px;margin-top:18px;flex-wrap:wrap}
+.run-card{background:var(--slate);color:var(--slate-ink);border:1px solid #000;box-shadow:5px 5px 0 rgba(18,26,21,.12)}
+.run-card-hd{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:10px 13px;border-bottom:1px solid var(--slate-line)}
+.run-card-hd .label{color:var(--slate-dim)}
+.run-card-hd .tag{color:var(--slate-dim);border-color:var(--slate-line);font-family:var(--mono);letter-spacing:.04em;text-transform:none}
+.run-card-bd{padding:12px 13px}
+.run-line{display:flex;align-items:baseline;justify-content:space-between;gap:10px;padding:7px 0;border-bottom:1px solid rgba(201,214,203,.1)}
+.run-line:last-of-type{border-bottom:0;padding-bottom:2px}
+.run-line span{color:var(--slate-dim);font-size:10.5px;letter-spacing:.04em}
+.run-line b{font:600 11.5px/1 var(--mono);color:#EAF2EC;font-variant-numeric:tabular-nums}
+.run-line b.acc{font-family:var(--serif);font-size:16px;letter-spacing:-.4px}
+.run-line b.pos{color:#EF8E7E}
+.run-foot{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-top:11px;padding-top:10px;border-top:1px solid var(--slate-line)}
+.run-foot .mono{font-size:9px;letter-spacing:.12em;color:var(--slate-dim);text-transform:uppercase}
+@media (max-width:1080px){.hero-grid{grid-template-columns:1fr}}
+
+/* ---------- 页头 ---------- */
+.hero{padding-bottom:22px;margin-bottom:26px;border-bottom:1px solid var(--ink)}
+.hero-top{display:flex;align-items:center;justify-content:space-between;gap:20px;margin-bottom:16px;flex-wrap:wrap}
+.hero h1{font:700 40px/1.12 var(--serif);letter-spacing:-1.6px}
+.hero .deck{margin-top:12px;max-width:62ch;font-size:14.5px;color:var(--ink-2)}
+.hero-side{display:flex;gap:10px;flex-wrap:wrap;align-items:flex-start}
+.pagehead{display:flex;justify-content:space-between;align-items:flex-start;gap:24px;margin-bottom:20px;flex-wrap:wrap}
+.pagehead h1{font:700 28px/1.2 var(--serif);letter-spacing:-1px;margin-top:8px}
+.pagehead .deck{margin-top:9px;max-width:64ch;font-size:13.5px;color:var(--ink-2)}
+
+/* ---------- 印章 ---------- */
+.stamp{
+  display:inline-flex;align-items:center;gap:6px;padding:4px 9px;
+  border:2px solid currentColor;color:var(--ver);
+  font:700 9.5px/1 var(--mono);letter-spacing:.18em;text-transform:uppercase;
+  transform:rotate(-2.6deg);background:rgba(247,243,234,.6);
+}
+.stamp.pine{color:var(--pine)}
+.stamp.brass{color:var(--brass)}
+.stamp.slate{color:var(--slate-dim);border-color:var(--slate-line);background:transparent}
+
+/* ---------- 票据卡 ---------- */
+.ticket{position:relative;background:var(--bone-hi);border:1px solid var(--rule);box-shadow:var(--hard)}
+.ticket-hd{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:13px 16px;border-bottom:1px solid var(--ink)}
+.ticket-hd .label{color:var(--ink-2)}
+.ticket-no{font:600 10px/1 var(--mono);letter-spacing:.1em;color:var(--ink-3)}
+.ticket-bd{padding:16px}
+.perf{position:relative}
+.perf::before{
+  content:"";position:absolute;left:0;right:0;top:-5px;height:10px;
+  background-image:radial-gradient(circle at 5px 5px,var(--bone) 0 2.6px,transparent 2.6px);
+  background-size:20px 10px;pointer-events:none;
+}
+
+/* ---------- 数字条（深色仪器带） ---------- */
+.band{position:relative;background:var(--slate);color:var(--slate-ink);border:1px solid #000;box-shadow:5px 5px 0 rgba(18,26,21,.1);overflow:hidden}
+.band::before{
+  content:"";position:absolute;inset:0;pointer-events:none;opacity:.5;
+  background-image:linear-gradient(90deg,rgba(201,214,203,.07) 1px,transparent 1px);
+  background-size:44px 100%;
+}
+.band-in{position:relative;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:1px;background:var(--slate-line)}
+.band-cell{background:var(--slate);padding:12px 18px 13px}
+.band-cell .label{color:var(--slate-dim);display:block;margin-bottom:9px}
+.band-cell b{display:block;font:600 25px/1.1 var(--serif);letter-spacing:-1px;color:#fff;font-variant-numeric:tabular-nums}
+.band-cell b.up{color:#EF8E7E}
+.band-cell b.dn{color:#6FCF9B}
+.band-cell small{display:block;margin-top:6px;font:600 9.5px/1.4 var(--mono);letter-spacing:.05em;color:var(--slate-dim)}
+.band-tags{position:relative;display:flex;gap:20px;flex-wrap:wrap;padding:9px 18px;border-top:1px solid var(--slate-line);font:600 9.5px/1 var(--mono);letter-spacing:.12em;text-transform:uppercase;color:var(--slate-dim)}
+.band-tags b{color:var(--slate-ink);font-weight:600}
+.band-tags s{text-decoration:none;color:#6FCF9B}
+
+/* ---------- 工作台三栏 ---------- */
+.bench{display:grid;grid-template-columns:262px minmax(0,1fr) 318px;gap:16px;align-items:start;margin-top:18px}
+@media (max-width:1240px){.bench{grid-template-columns:minmax(0,1fr)}.band-in{grid-template-columns:1fr 1fr}}
+
+/* 台账 */
+.ledger{background:var(--slate);border:1px solid #000;box-shadow:5px 5px 0 rgba(18,26,21,.1);display:flex;flex-direction:column}
+.ledger-hd{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 15px;border-bottom:1px solid var(--slate-line)}
+.ledger-hd .label{color:var(--slate-dim)}
+.ledger-hd b{font:600 10px/1 var(--mono);letter-spacing:.12em;color:var(--slate-ink)}
+.ledger-body{height:clamp(264px,calc(100vh - 676px),468px);overflow:auto;padding:2px 0;scrollbar-width:thin}
+.ledger-body::-webkit-scrollbar{width:8px}
+.ledger-body::-webkit-scrollbar-thumb{background:#2B3A32}
+.ev{display:grid;grid-template-columns:52px minmax(0,1fr);gap:12px;padding:13px 15px;border-bottom:1px solid rgba(201,214,203,.08)}
+.ev-seq{font:600 9.5px/1.5 var(--mono);letter-spacing:.06em;color:#5E7268;text-align:right}
+.ev-seq b{display:block;color:#8FA89A;font-weight:600}
+.ev-body{min-width:0}
+.ev-meta{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:6px}
+.chip{font:600 8.5px/1 var(--mono);letter-spacing:.14em;text-transform:uppercase;padding:3px 6px;border:1px solid rgba(201,214,203,.24);color:#9DB4A7}
+.chip.agent{border-color:rgba(111,207,155,.4);color:#6FCF9B}
+.chip.tool{border-color:rgba(239,142,126,.4);color:#EF8E7E}
+.chip.order{border-color:rgba(214,190,110,.45);color:#D6BE6E}
+.chip.user{border-color:rgba(160,190,220,.4);color:#A0BEDC}
+.ev-time{font:600 9px/1 var(--mono);letter-spacing:.1em;color:#5E7268}
+.ev-title{font-size:13px;color:#EAF2EC;font-weight:600;line-height:1.45}
+.ev-text{margin-top:5px;font-size:12.5px;line-height:1.62;color:#9DB4A7;white-space:pre-wrap}
+.ev-link{margin-top:7px;display:inline-block;font:600 9.5px/1 var(--mono);letter-spacing:.12em;text-transform:uppercase;color:#6FCF9B;border-bottom:1px solid rgba(111,207,155,.4);padding-bottom:2px}
+.ledger-foot{border-top:1px solid var(--slate-line);padding:11px 15px;display:flex;justify-content:space-between;gap:10px;align-items:center;font:600 9.5px/1 var(--mono);letter-spacing:.1em;color:#5E7268;text-transform:uppercase}
+
+/* 审批票 */
+.proposal{margin-top:14px;position:relative;background:var(--bone-hi);border:1px solid var(--ink);box-shadow:var(--hard)}
+.proposal-hd{display:flex;align-items:flex-start;justify-content:space-between;gap:14px;padding:14px 16px 12px;border-bottom:1px dashed var(--rule)}
+.proposal-hd h3{font:700 16px/1.35 var(--serif);letter-spacing:-.4px;margin-top:6px}
+.proposal-bd{padding:13px 16px}
+.proposal-facts{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;padding:11px 0 13px;border-bottom:1px solid var(--rule-soft)}
+.proposal-facts dt{font:600 9px/1 var(--mono);letter-spacing:.16em;text-transform:uppercase;color:var(--ink-3);margin-bottom:5px}
+.proposal-facts dd{font:600 14px/1.2 var(--serif);font-variant-numeric:tabular-nums;letter-spacing:-.3px}
+.proposal-note{margin-top:11px;font-size:11.5px;line-height:1.6;color:var(--ink-3)}
+.proposal-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:13px}
+
+/* 输入区 */
+.composer{margin-top:14px;background:var(--bone-hi);border:1px solid var(--rule);box-shadow:var(--hard)}
+.composer-top{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:10px 13px;border-bottom:1px solid var(--rule-soft)}
+.composer-top span{font:600 9.5px/1 var(--mono);letter-spacing:.12em;text-transform:uppercase;color:var(--ink-3)}
+.composer-row{display:flex;gap:9px;padding:11px 12px;align-items:flex-end}
+.composer textarea{flex:1;min-height:56px;max-height:140px;resize:vertical;border:1px solid var(--rule);background:#fff;padding:9px 11px;font-size:13px;line-height:1.55;border-radius:0}
+.composer textarea::placeholder{color:var(--ink-3)}
+
+/* 侧栏卡 */
+.stack{display:flex;flex-direction:column;gap:14px}
+.mini{background:var(--bone-hi);border:1px solid var(--rule)}
+.mini-hd{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:10px 13px;border-bottom:1px solid var(--rule);
+  font:600 9.5px/1 var(--mono);letter-spacing:.16em;text-transform:uppercase;color:var(--ink-3)}
+.mini-bd{padding:13px}
+.big-clock{font:700 30px/1 var(--serif);letter-spacing:-1.2px;font-variant-numeric:tabular-nums}
+.clock-sub{margin-top:8px;font:600 9.5px/1.5 var(--mono);letter-spacing:.06em;color:var(--ink-3);text-transform:uppercase}
+.kv{display:flex;align-items:baseline;padding:8px 0;border-bottom:1px dotted rgba(18,26,21,.22);font-size:12.5px}
+.kv:last-child{border-bottom:0}
+.kv span{color:var(--ink-3);font-size:12px}
+.kv b{font:600 12.5px/1 var(--mono);font-variant-numeric:tabular-nums}
+.kv .num-b{font-family:var(--serif);font-size:15px;letter-spacing:-.3px}
+.holding{padding:10px 0;border-bottom:1px solid var(--rule-soft)}
+.holding:last-child{border-bottom:0;padding-bottom:0}
+.holding-top{display:flex;align-items:baseline;justify-content:space-between;gap:8px}
+.holding-top b{font:600 12.5px/1 var(--mono);letter-spacing:.03em}
+.holding-top em{font:600 12.5px/1 var(--mono);font-style:normal;font-variant-numeric:tabular-nums}
+.holding-sub{display:flex;justify-content:space-between;gap:8px;margin-top:6px;font:600 9.5px/1.4 var(--mono);color:var(--ink-3);letter-spacing:.03em}
+.tag{display:inline-block;padding:2px 5px;border:1px solid var(--rule);font:600 8.5px/1 var(--mono);letter-spacing:.08em;color:var(--ink-3);text-transform:uppercase}
+.tag.lock{border-color:rgba(194,53,42,.4);color:var(--ver)}
+
+/* 进度 */
+.meter{height:5px;background:var(--bone-lo);border:1px solid var(--rule);position:relative;overflow:hidden;margin:9px 0 7px}
+.meter i{display:block;height:100%;background:var(--pine)}
+.meter.low i{background:var(--ver)}
+.meter-note{display:flex;justify-content:space-between;font:600 9.5px/1 var(--mono);letter-spacing:.08em;color:var(--ink-3)}
+
+/* 可信度 */
+.trust{display:flex;flex-direction:column}
+.trust-row{display:grid;grid-template-columns:14px minmax(0,1fr);gap:9px;padding:9px 0;border-bottom:1px solid var(--rule-soft);align-items:start}
+.trust-row:last-child{border-bottom:0}
+.trust-dot{width:7px;height:7px;margin-top:5px;background:var(--pine);border-radius:50%}
+.trust-dot.warn{background:var(--brass)}
+.trust-dot.bad{background:var(--ver)}
+.trust-row b{display:block;font-size:12px;font-weight:600}
+.trust-row small{display:block;margin-top:3px;font:600 9.5px/1.5 var(--mono);color:var(--ink-3);letter-spacing:.03em}
+
+/* 页签 */
+.tabs{display:flex;border-bottom:1px solid var(--rule)}
+.tabs button{position:relative;padding:9px 12px;font:600 9.5px/1 var(--mono);letter-spacing:.14em;text-transform:uppercase;color:var(--ink-3)}
+.tabs button[aria-selected="true"]{color:var(--ink)}
+.tabs button[aria-selected="true"]::after{content:"";position:absolute;left:0;right:0;bottom:-1px;height:2px;background:var(--ver)}
+.tabpane{padding:12px 13px;max-height:290px;overflow:auto}
+.rowlink{display:flex;width:100%;align-items:baseline;justify-content:space-between;gap:10px;padding:9px 0;border-bottom:1px solid var(--rule-soft);text-align:left}
+.rowlink:last-child{border-bottom:0}
+.rowlink:hover b{color:var(--ver)}
+.rowlink b{font-size:12.5px;font-weight:600}
+.rowlink small{display:block;margin-top:3px;font:600 9.5px/1.4 var(--mono);color:var(--ink-3);letter-spacing:.02em}
+.report-row{display:flex;align-items:baseline;padding:7px 0;border-bottom:1px dotted rgba(18,26,21,.2);font-size:12.5px}
+.report-row:last-child{border-bottom:0}
+.report-row b{font:600 12px/1 var(--mono)}
+.note{margin-top:10px;padding:9px 11px;background:rgba(138,106,59,.07);border-left:2px solid var(--brass);font-size:11px;line-height:1.65;color:var(--ink-2)}
+
+/* ---------- 工作室 ---------- */
+.agents{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px;margin-top:22px}
+@media (max-width:1080px){.agents{grid-template-columns:1fr}}
+.agent{padding:0;display:flex;flex-direction:column;transition:box-shadow .14s,transform .14s}
+.agent:hover{transform:translate(-1px,-1px);box-shadow:5px 5px 0 rgba(18,26,21,.1)}
+.agent-hd{display:flex;align-items:center;gap:11px;padding:11px 14px;border-bottom:1px solid var(--ink)}
+.agent-hd .label{flex:1;color:var(--ink-2);letter-spacing:.18em}
+.agent-mark{width:38px;height:38px;display:grid;place-items:center;border:1px solid var(--ink);font:700 18px/1 var(--serif);background:var(--bone)}
+.agent-mark.local{background:var(--ink);color:var(--bone-hi)}
+.agent-bd{padding:15px;display:flex;flex-direction:column;gap:13px;flex:1}
+.agent-name{font:700 17px/1.3 var(--serif);letter-spacing:-.4px}
+.agent-desc{margin-top:6px;font-size:12.5px;line-height:1.6;color:var(--ink-2)}
+.agent-facts{display:grid;grid-template-columns:1fr 1fr;gap:9px 14px;padding:12px 0;border-top:1px solid var(--rule-soft);border-bottom:1px solid var(--rule-soft)}
+.agent-facts dt{font:600 8.5px/1 var(--mono);letter-spacing:.16em;text-transform:uppercase;color:var(--ink-3);margin-bottom:4px}
+.agent-facts dd{font:600 11.5px/1.3 var(--mono);letter-spacing:.01em}
+.agent-ft{margin-top:auto;display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+
+/* ---------- 复盘 ---------- */
+.charts{display:grid;grid-template-columns:1.55fr 1fr;gap:16px;margin-top:16px}
+@media (max-width:1080px){.charts{grid-template-columns:1fr}}
+.chart-card{background:var(--slate);border:1px solid #000;box-shadow:5px 5px 0 rgba(18,26,21,.1);color:var(--slate-ink)}
+.chart-card .report-row{border-bottom-color:rgba(201,214,203,.14)}
+.chart-card .report-row b{color:#EAF2EC}
+.chart-card .dots{border-bottom-color:rgba(201,214,203,.28)}
+.chart-card .dim{color:var(--slate-dim)}
+.chart-hd{display:flex;align-items:baseline;justify-content:space-between;gap:12px;padding:12px 15px;border-bottom:1px solid var(--slate-line)}
+.chart-hd b{font:600 11px/1 var(--mono);letter-spacing:.14em;text-transform:uppercase;color:var(--slate-ink)}
+.chart-hd span{font:600 9px/1 var(--mono);letter-spacing:.1em;color:var(--slate-dim)}
+.chart-bd{padding:12px 6px 6px}
+.chart-bd svg{display:block;width:100%;height:auto}
+.legend{display:flex;gap:16px;padding:0 15px 12px;font:600 9.5px/1 var(--mono);letter-spacing:.08em;color:var(--slate-dim);flex-wrap:wrap}
+.legend i{display:inline-block;width:14px;height:2px;margin-right:6px;vertical-align:middle}
+
+/* ---------- 接入 ---------- */
+.steps{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px;margin-top:22px}
+@media (max-width:1080px){.steps{grid-template-columns:1fr}}
+.step{padding:16px;display:flex;flex-direction:column;gap:12px}
+.step-no{font:700 44px/0.9 var(--serif);letter-spacing:-2px;color:var(--bone-lo);-webkit-text-stroke:1px rgba(18,26,21,.3)}
+.step h3{font:700 15px/1.4 var(--serif);letter-spacing:-.3px}
+.step p{font-size:12.5px;line-height:1.65;color:var(--ink-2)}
+.field{display:flex;flex-direction:column;gap:6px}
+.field label{font:600 9px/1 var(--mono);letter-spacing:.18em;text-transform:uppercase;color:var(--ink-3)}
+select,input[type=text],input[type=number]{height:34px;border:1px solid var(--rule);border-radius:0;background:#fff;padding:0 9px;font-size:12.5px;width:100%}
+pre.code{margin:0;padding:14px 16px;background:var(--slate);color:#C6D8CB;font-size:11.5px;line-height:1.75;overflow:auto;border:1px solid #000}
+pre.code .k{color:#EF8E7E}
+pre.code .s{color:#D6BE6E}
+
+/* ---------- 说明 ---------- */
+.cols{columns:2;column-gap:34px;margin-top:20px;font-size:13px;line-height:1.72;color:var(--ink-2)}
+.cols h3{break-after:avoid;margin:0 0 6px;font:700 13px/1.4 var(--mono);letter-spacing:.06em;color:var(--ink);text-transform:uppercase}
+.cols p{margin:0 0 14px}
+@media (max-width:900px){.cols{columns:1}}
+
+/* ---------- 弹窗 ---------- */
+dialog{
+  width:min(600px,calc(100% - 26px));border:1px solid var(--ink);padding:0;
+  background:var(--bone-hi);box-shadow:8px 8px 0 rgba(18,26,21,.22);color:var(--ink);border-radius:0;
+}
+dialog::backdrop{background:rgba(14,22,19,.55);backdrop-filter:blur(2px)}
+.dlg-hd{display:flex;align-items:center;justify-content:space-between;gap:14px;padding:13px 16px;background:var(--ink);color:var(--bone-hi)}
+.dlg-hd h2{font:700 15px/1.3 var(--serif);letter-spacing:-.2px}
+.dlg-hd .label{color:rgba(247,243,234,.55)}
+.dlg-close{width:26px;height:26px;border:1px solid rgba(247,243,234,.4);color:var(--bone-hi);font:600 12px/1 var(--mono);display:grid;place-items:center}
+.dlg-close:hover{background:var(--ver);border-color:var(--ver)}
+.dlg-bd{padding:16px;max-height:70dvh;overflow:auto}
+.dlg-ft{padding:12px 16px;border-top:1px solid var(--rule);display:flex;gap:8px;justify-content:flex-end;flex-wrap:wrap}
+dl.snapshot{display:flex;flex-direction:column;gap:0;margin:0 0 6px}
+dl.snapshot div{display:grid;grid-template-columns:132px minmax(0,1fr);gap:12px;padding:8px 0;border-bottom:1px dotted rgba(18,26,21,.22)}
+dl.snapshot dt{font:600 9.5px/1.5 var(--mono);letter-spacing:.12em;text-transform:uppercase;color:var(--ink-3)}
+dl.snapshot dd{font-size:12.5px;line-height:1.5;word-break:break-word}
+details.audit{margin-top:12px;border:1px solid var(--rule)}
+details.audit summary{padding:9px 12px;cursor:pointer;font:600 9.5px/1 var(--mono);letter-spacing:.14em;text-transform:uppercase;color:var(--ink-2);background:var(--bone)}
+details.audit pre{margin:0;padding:12px;background:var(--slate);color:#C6D8CB;font-size:11px;line-height:1.7;overflow:auto}
+.replay-list{display:flex;flex-direction:column;gap:6px;margin-bottom:12px;max-height:280px;overflow:auto}
+.replay-item{display:block;width:100%;text-align:left;padding:9px 11px;border:1px solid var(--rule);background:#fff}
+.replay-item[aria-pressed="true"]{border-color:var(--ink);background:var(--bone)}
+.replay-item b{font-size:12px;font-weight:600;display:block}
+.replay-item small{display:block;margin-top:3px;font:600 9px/1.4 var(--mono);color:var(--ink-3)}
+.replay-detail{font-size:12.5px;line-height:1.7;color:var(--ink-2);padding:12px;background:#fff;border:1px solid var(--rule)}
+.error-text{color:var(--ver);font-size:11.5px;min-height:16px;font-family:var(--mono)}
+
+/* ---------- toast ---------- */
+.toast{position:fixed;left:50%;bottom:26px;transform:translate(-50%,14px);z-index:9200;
+  background:var(--ink);color:var(--bone-hi);padding:11px 18px;font:600 11px/1 var(--mono);
+  letter-spacing:.12em;text-transform:uppercase;opacity:0;pointer-events:none;transition:opacity .16s,transform .16s;box-shadow:4px 4px 0 rgba(194,53,42,.5)}
+.toast.show{opacity:1;transform:translate(-50%,0)}
+
+/* ---------- 页脚 ---------- */
+.foot{display:flex;justify-content:space-between;gap:18px;flex-wrap:wrap;margin-top:44px;padding-top:16px;
+  border-top:1px solid var(--ink);font:600 9.5px/1.7 var(--mono);letter-spacing:.1em;text-transform:uppercase;color:var(--ink-3)}
+.foot b{color:var(--ink-2)}
+
+/* ---------- 矮屏（投影 / 笔记本）压缩纵向 ---------- */
+@media (max-height:1120px){
+  .page{padding-top:20px}
+  .pagehead{margin-bottom:12px}
+  .pagehead .deck{font-size:12px;margin-top:6px;max-width:74ch}
+  .pagehead h1{font-size:26px;margin-top:6px}
+  .band-cell{padding:10px 16px 11px}
+  .band-cell b{font-size:22px}
+  .band-cell small{margin-top:4px;font-size:9px}
+  .band-tags{padding:7px 16px;gap:14px}
+  .band-tags span{font-size:8.6px}
+  .bench{gap:13px;margin-top:14px}
+  .ledger-body{height:clamp(200px,calc(100vh - 700px),420px)}
+  .proposal-hd{padding:10px 14px 9px}
+  .proposal-hd h3{font-size:15px;margin-top:4px}
+  .proposal-bd{padding:10px 14px 12px}
+  .proposal-facts{padding:8px 0 9px;gap:8px}
+  .proposal-facts dd{font-size:13px}
+  .proposal-note{margin-top:7px;font-size:10.8px}
+  #approvalNote{display:none}
+  .proposal-bd{padding:8px 14px 10px}
+  .proposal-actions{margin-top:9px}
+  .composer-row{padding:9px 11px}
+  .composer textarea{min-height:44px}
+}
+
+@media (max-height:760px){
+  /* 极矮屏优先保证审批卡在首屏；可信度信息保留在右栏 Trust Markers */
+  .band-tags{display:none}
+  .ledger-body{height:clamp(140px,calc(100vh - 632px),240px)}
+}
+@media (max-height:820px){
+  .ledger-body{height:clamp(150px,calc(100vh - 700px),260px)}
+  .pagehead .deck{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}
+  .pagehead h1{font-size:24px}
+  .band-cell b{font-size:20px}
+  .proposal-facts dd{font-size:12.5px}
+}
+
+/* ---------- 移动 ---------- */
+.mnav{display:none}
+@media (max-width:900px){
+  .shell{grid-template-columns:minmax(0,1fr)}
+  .index{display:none}
+  .masthead{padding:9px 14px;gap:10px;flex-wrap:nowrap}
+  .mast-brand em{display:none}
+  .mast-brand b{font-size:18px}
+  .mast-crumb{display:none}
+  .mast-right{gap:6px;margin-left:auto}
+  .mast-right .btn{height:30px;padding:0 9px;font-size:9.5px;letter-spacing:.08em}
+  #templateBtn,#exportBtn{display:none}
+  .hero h1{font-size:27px}
+  .run-card{margin-top:4px}
+  .hero-grid{gap:20px}
+  .mnav{display:flex;gap:5px;overflow:auto;padding:9px 16px;background:var(--bone-hi);border-bottom:1px solid var(--rule)}
+  .mnav button{flex:0 0 auto;padding:7px 11px;border:1px solid var(--rule);font:600 10px/1 var(--mono);letter-spacing:.08em}
+  .mnav button[aria-current]{background:var(--ink);color:var(--bone-hi);border-color:var(--ink)}
+  .page{padding:22px 16px 70px}
+  .hero h1{font-size:29px}
+  .masthead{padding:11px 16px;gap:12px}
+  .mast-crumb{display:none}
+  .band-in{grid-template-columns:1fr 1fr}
+  .proposal-facts{grid-template-columns:1fr 1fr}
+}
+</style>
+</head>
+<body>
+
+<div class="tape" aria-hidden="true">
+  <div class="tape-in">
+    <span>run <b>run_demo_001</b></span>
+    <span>clock <b>2024-04-23 09:15</b></span>
+    <span>status <i>待人工确认</i></span>
+    <span>data cutoff <b>2024-04-22 23:59:58</b></span>
+    <span>evidence <b>ev_018 · ev_024</b></span>
+    <span>sample <b>20 / 60 交易日</b></span>
+    <span>mode <b>逐单确认</b></span>
+    <span>run <b>run_demo_001</b></span>
+    <span>clock <b>2024-04-23 09:15</b></span>
+    <span>status <i>待人工确认</i></span>
+    <span>data cutoff <b>2024-04-22 23:59:58</b></span>
+    <span>evidence <b>ev_018 · ev_024</b></span>
+    <span>sample <b>20 / 60 交易日</b></span>
+    <span>mode <b>逐单确认</b></span>
+  </div>
+</div>
+
+<header class="masthead">
+  <div class="mast-brand">
+    <b>openOutcry</b><s></s><em>交易智能体评测设施</em>
+  </div>
+  <div class="mast-crumb">工作空间 <span>/</span> <b id="crumb">Agent 工作室</b></div>
+  <div class="mast-right">
+    <button class="btn ghost sm" id="templateBtn">运行快照</button>
+    <button class="btn ghost sm" id="exportBtn">导出 JSON</button>
+    <button class="btn solid sm" data-open-agent="native">进入训练场 ↗</button>
+  </div>
+</header>
+
+<div class="mnav" role="tablist" aria-label="移动导航">
+  <button data-view="studio" aria-current="page">工作室</button>
+  <button data-view="training">训练场</button>
+  <button data-view="review">复盘</button>
+  <button data-view="connect">接入</button>
+  <button data-view="protocol">协议</button>
+  <button data-view="guide">说明</button>
+</div>
+
+<div class="shell">
+  <aside class="index">
+    <div class="index-hd">
+      <span class="label">Index</span>
+      <p>受控历史市场 · 可审计运行</p>
+    </div>
+    <nav aria-label="主导航">
+      <button data-view="studio" aria-current="page"><i>01</i><span>Agent 工作室<em>Studio</em></span></button>
+      <button data-view="training"><i>02</i><span>训练场<em>Training Ground</em></span></button>
+      <button data-view="review"><i>03</i><span>结果与复盘<em>Review</em></span></button>
+      <button data-view="connect"><i>04</i><span>连接 Agent<em>Connect</em></span></button>
+      <button data-view="protocol"><i>05</i><span>协议与 Skill<em>Protocol</em></span></button>
+      <button data-view="guide"><i>06</i><span>产品说明<em>Brief</em></span></button>
+    </nav>
+    <div class="index-foot">
+      <b>全部为虚构演示</b>
+      非真实绩效，不构成投资建议。
+    </div>
+  </aside>
+
+  <main class="page">
+
+<!-- ============ 01 STUDIO ============ -->
+<section id="studio" class="view">
+  <header class="hero">
+    <div class="hero-grid">
+      <div>
+        <span class="label">№ 01 — Agent Studio</span>
+        <h1 style="margin-top:14px">从一个 Agent 开始。</h1>
+        <p class="deck">准备好你的投资方法，接下来的研究、交易和复盘都在同一个训练场里完成。所有对话、工具调用与订单都会留下可回放的轨迹，而不是只留下一个收益率。</p>
+        <div class="hero-stamps">
+          <span class="stamp pine">受控模板</span>
+          <span class="stamp brass">本地 Runner</span>
+        </div>
+      </div>
+      <div class="run-card">
+        <div class="run-card-hd"><span class="label">Live Run</span><span class="tag">run_demo_001</span></div>
+        <div class="run-card-bd">
+          <div class="run-line"><span>训练窗口</span><b>04-01 → 04-30</b></div>
+          <div class="run-line"><span>模拟时钟</span><b>04-23 09:15</b></div>
+          <div class="run-line"><span>账户净值</span><b class="acc">¥103,762.60</b></div>
+          <div class="run-line"><span>累计净收益</span><b class="pos">+3.76%</b></div>
+          <div class="run-foot"><span class="stamp slate">待确认 1 单</span><span class="mono">20 / 60 日</span></div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <div class="agents">
+    <article class="ticket agent">
+      <div class="agent-hd">
+        <div class="agent-mark local">C</div>
+        <span class="label">Local Runner</span>
+        <span class="ticket-no">№ A-031</span>
+      </div>
+      <div class="agent-bd">
+        <div>
+          <h2 class="agent-name">Codex · 价值研究</h2>
+          <p class="agent-desc">通过本地 Runner 接入，凭据不出本机。适合已经在自己的环境里跑通的 Agent。</p>
+        </div>
+        <dl class="agent-facts">
+          <div><dt>版本</dt><dd>v0.3</dd></div>
+          <div><dt>最近会话</dt><dd>7 天前</dd></div>
+          <div><dt>资格</dt><dd>探索运行</dd></div>
+          <div><dt>调用预算</dt><dd>12 / 20</dd></div>
+        </dl>
+        <div class="agent-ft">
+          <button class="btn solid sm" data-open-agent="codex">进入训练场</button>
+          <button class="btn ghost sm" data-config-agent="codex">配置</button>
+        </div>
+      </div>
+    </article>
+
+    <article class="ticket agent">
+      <div class="agent-hd">
+        <div class="agent-mark">O</div>
+        <span class="label">Built-in Template</span>
+        <span class="ticket-no">№ A-008</span>
+      </div>
+      <div class="agent-bd">
+        <div>
+          <h2 class="agent-name">openOutcry · 研究员</h2>
+          <p class="agent-desc">开箱即用的单 Agent 模板，提示词、工具与风控已按受控评测预设，可直接开跑。</p>
+        </div>
+        <dl class="agent-facts">
+          <div><dt>版本</dt><dd>v0.8</dd></div>
+          <div><dt>最近会话</dt><dd>今天</dd></div>
+          <div><dt>资格</dt><dd>受控模板</dd></div>
+          <div><dt>调用预算</dt><dd>12 / 20</dd></div>
+        </dl>
+        <div class="agent-ft">
+          <button class="btn solid sm" data-open-agent="native">进入训练场</button>
+          <button class="btn ghost sm" data-config-agent="native">配置</button>
+        </div>
+      </div>
+    </article>
+
+    <article class="ticket agent" style="background:transparent;border-style:dashed;box-shadow:none">
+      <div class="agent-hd" style="border-bottom-style:dashed">
+        <div class="agent-mark">＋</div>
+        <span class="label">Bring your own</span>
+        <span class="ticket-no">№ NEW</span>
+      </div>
+      <div class="agent-bd">
+        <div>
+          <h2 class="agent-name">带上自己的 Agent</h2>
+          <p class="agent-desc">从 Skill 和本地 Runner 开始接入。平台只暴露受控研究工具与下单意图，不导出长期密钥。</p>
+        </div>
+        <div class="note">复杂协议放在后面说明，不必先了解全部细节。接入完成后同样进入训练场，并标注为探索运行。</div>
+        <div class="agent-ft"><button class="btn sm" data-view="connect">打开接入向导 ↗</button></div>
+      </div>
+    </article>
+  </div>
+
+  <div style="display:flex;align-items:baseline;justify-content:space-between;gap:14px;margin:34px 0 12px;border-bottom:1px solid var(--ink);padding-bottom:9px">
+    <h2 style="font:700 18px/1.3 var(--serif);letter-spacing:-.4px">继续上次的研究</h2>
+    <span class="label">Recent Runs</span>
+  </div>
+
+  <div class="ticket" style="padding:0 16px">
+    <button class="rowlink" data-open-agent="native" style="padding:14px 0">
+      <span>
+        <b>openOutcry · 研究员 — 低估值机会研究</b>
+        <small>run_demo_001 · 2024-04-23 09:15 · 待确认 · <span id="recentStatus">待确认</span></small>
+      </span>
+      <span style="text-align:right"><b style="font-family:var(--mono);font-size:11px">+3.76%</b><small>当前快照</small></span>
+    </button>
+    <button class="rowlink" data-open-agent="codex" style="padding:14px 0">
+      <span>
+        <b>Codex · 价值研究 — 现金流压力测试</b>
+        <small>run_demo_000 · 2024-04-18 15:00 · 已归档 · 探索运行</small>
+      </span>
+      <span style="text-align:right"><b style="font-family:var(--mono);font-size:11px">+1.24%</b><small>已归档</small></span>
+    </button>
+    <div class="rowlink" style="border-bottom:0">
+      <span><b>上一轮：2024-03 震荡窗口</b><small>样本 21 / 60 交易日 · 未达排名门槛</small></span>
+      <span class="stamp brass">样本不足</span>
+    </div>
+  </div>
+
+  <div class="foot">
+    <span><b>openOutcry</b> — 受控历史市场 / 确定性回放 / 人机协同审批</span>
+    <span>Prototype · 2026-10</span>
+  </div>
+</section>
+
+<!-- ============ 02 TRAINING ============ -->
+<section id="training" class="view" hidden>
+  <div class="pagehead">
+    <div>
+      <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">
+        <span class="label">№ 02 — Training Ground</span>
+        <span class="stamp" id="runStatusStamp">待确认</span>
+      </div>
+      <h1 id="trainingTitle">openOutcry · 研究员</h1>
+      <p class="deck" id="clockLabel">2024-04-23 09:15 · 盘前研究</p>
+    </div>
+    <div class="actions" style="display:flex;gap:8px;flex-wrap:wrap">
+      <button class="btn ghost sm" id="snapshotBtn">运行快照</button>
+      <button class="btn ghost sm" id="replayBtn">回放轨迹</button>
+      <button class="btn ghost sm" id="pauseBtn">暂停</button>
+      <button class="btn ghost sm" id="abortBtn">中止</button>
+    </div>
+  </div>
+
+  <div class="band">
+    <div class="band-in" id="accountSummary"></div>
+    <div class="band-tags">
+      <span>资料时点 <b>2024-04-22 23:59:58</b></span>
+      <span>研究出口 <b>受控</b></span>
+      <span>轨迹完整性 <s>100%</s></span>
+      <span>评测资格 <b id="eligibility">受控模板</b></span>
+      <span>协作方式 <b id="collaboration">人工确认</b></span>
+    </div>
+  </div>
+
+  <div class="bench">
+    <!-- 左栏 -->
+    <div class="stack">
+      <div class="mini">
+        <div class="mini-hd"><span>Sim Clock</span><span class="tag">D-1 资料</span></div>
+        <div class="mini-bd">
+          <div class="big-clock">09:15</div>
+          <div class="clock-sub">2024-04-23 周二 · 盘前<br>行情与资料截至上一交易日</div>
+        </div>
+      </div>
+
+      <div class="mini">
+        <div class="mini-hd"><span>Account</span><span class="tag">平台记账</span></div>
+        <div class="mini-bd" id="accountRows"></div>
+      </div>
+
+      <div class="mini">
+        <div class="mini-hd"><span>Holdings</span><span class="tag" id="holdingCount">3 标的</span></div>
+        <div class="mini-bd" id="holdingsList"></div>
+      </div>
+    </div>
+
+    <!-- 中栏 -->
+    <div>
+      <div class="ledger">
+        <div class="ledger-hd">
+          <span class="label">Decision Ledger</span>
+          <b id="eventCount">4 条事件</b>
+        </div>
+        <div class="ledger-body" id="timeline"></div>
+        <div class="ledger-foot">
+          <span>逐条编号 · 不可改写</span>
+          <span id="connectionState">● 连接正常</span>
+        </div>
+      </div>
+
+      <div class="proposal perf" id="proposalCard">
+        <div class="proposal-hd">
+          <div>
+            <div class="label">Order Proposal</div>
+            <h3>卖出 公司-017 · <span id="proposalQty">100</span> 股</h3>
+          </div>
+          <span class="stamp" id="proposalStamp">待确认</span>
+        </div>
+        <div class="proposal-bd">
+          <dl class="proposal-facts">
+            <div><dt>限价</dt><dd>¥20.30</dd></div>
+            <div><dt>原始提案</dt><dd>100 股</dd></div>
+            <div><dt>状态</dt><dd id="proposalStatus" style="font-size:12px;font-family:var(--mono);letter-spacing:.02em">等待确认</dd></div>
+          </dl>
+          <p class="proposal-note" id="proposalText">参考估值下毛收益约 +¥210.00，实际结果取决于后续撮合与费用。</p>
+          <div class="proposal-actions">
+            <button class="btn ver sm" id="approveBtn">批准</button>
+            <button class="btn ghost sm" id="modifyBtn">修改</button>
+            <button class="btn ghost sm" id="rejectBtn">拒绝</button>
+            <button class="btn solid sm" id="matchBtn" hidden>演示开盘撮合</button>
+            <button class="btn ghost sm" id="proposalDetail">详情</button>
+          </div>
+          <p class="proposal-note" id="approvalNote">批准仅提交订单，不等于成交；预计盈亏不计入已实现收益。</p>
+        </div>
+      </div>
+
+      <div class="composer">
+        <div class="composer-top">
+          <span>Human-in-the-loop</span>
+          <span id="composerMode">追加指导将标记为人机协作</span>
+        </div>
+        <div class="composer-row">
+          <textarea id="messageInput" placeholder="追加指导，例如：把减仓幅度降到 50 股，并说明依据。"></textarea>
+          <button class="btn solid sm" id="sendBtn" style="height:34px">发送</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- 右栏 -->
+    <div class="stack">
+      <div class="mini">
+        <div class="mini-hd"><span>Research Budget</span><span class="tag" id="modeLabel">逐单确认</span></div>
+        <div class="mini-bd">
+          <div class="meter"><i style="width:60%"></i></div>
+          <div class="meter-note"><span>工具调用</span><span>12 / 20</span></div>
+          <div class="meter" style="margin-top:12px"><i style="width:32%"></i></div>
+          <div class="meter-note"><span>Token 额度</span><span>32k / 100k</span></div>
+        </div>
+      </div>
+
+      <div class="mini">
+        <div class="mini-hd"><span>Trust Markers</span><span class="tag">只读</span></div>
+        <div class="mini-bd trust">
+          <div class="trust-row"><span class="trust-dot"></span><div><b>资料时点已冻结</b><small>CUTOFF 2024-04-22 23:59:58</small></div></div>
+          <div class="trust-row"><span class="trust-dot"></span><div><b>研究出口受控</b><small>1 个出口 · 无通用搜索</small></div></div>
+          <div class="trust-row"><span class="trust-dot warn"></span><div><b>轨迹待审计</b><small>未执行真实隔离验证</small></div></div>
+        </div>
+      </div>
+
+      <div class="mini">
+        <div class="mini-hd"><span>Detail</span><span class="tag">本次运行</span></div>
+        <div class="tabs" role="tablist">
+          <button data-tab="holdings" aria-selected="true">持仓</button>
+          <button data-tab="trades" aria-selected="false">成交</button>
+          <button data-tab="pnl" aria-selected="false">盈亏</button>
+        </div>
+        <div class="tabpane" id="holdings" role="tabpanel"></div>
+        <div class="tabpane" id="trades" role="tabpanel" hidden></div>
+        <div class="tabpane" id="pnl" role="tabpanel" hidden></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="foot">
+    <span><b>run_demo_001</b> · sess_demo_001 · agent: <span id="currentAgent">openOutcry · 研究员 · 内置模板</span></span>
+    <span>全部数据虚构</span>
+  </div>
+</section>
+
+<!-- ============ 03 REVIEW ============ -->
+<section id="review" class="view" hidden>
+  <div class="pagehead">
+    <div>
+      <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">
+        <span class="label">№ 03 — Review</span>
+        <span class="stamp brass">样本不足 · 不排名</span>
+      </div>
+      <h1>看结果，也看过程。</h1>
+      <p class="deck" id="reviewSubtitle">当前运行尚未完成，以下只统计已经发生的账户与事件。</p>
+    </div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap">
+      <button class="btn ghost sm" id="reviewReplay">回放轨迹</button>
+      <button class="btn ghost sm" id="copyConfigBtn">复制配置重跑</button>
+    </div>
+  </div>
+
+  <div class="band">
+    <div class="band-in" id="reviewMetrics"></div>
+    <div class="band-tags">
+      <span>基准 <b>沪深 300 · 同期</b></span>
+      <span>样本 <b>20 交易日</b></span>
+      <span>门槛 <b>60 交易日</b></span>
+      <span>Deflated Sharpe <b>未评估</b></span>
+    </div>
+  </div>
+
+  <div class="charts">
+    <div class="chart-card">
+      <div class="chart-hd"><b>Equity vs Benchmark</b><span>净值 · 基准 = 100,000</span></div>
+      <div class="chart-bd"><svg id="equityChart" viewBox="0 0 720 250" role="img" aria-label="净值与基准对比曲线"></svg></div>
+      <div class="legend">
+        <span><i style="background:#E8785F"></i>Agent 净值</span>
+        <span><i style="background:#B9C7BD"></i>沪深 300</span>
+        <span><i style="background:#42584C"></i>零轴</span>
+      </div>
+    </div>
+    <div class="chart-card">
+      <div class="chart-hd"><b>Underwater</b><span>距峰值回撤</span></div>
+      <div class="chart-bd"><svg id="drawdownChart" viewBox="0 0 420 250" role="img" aria-label="水下回撤图"></svg></div>
+      <div class="legend"><span><i style="background:#D6BE6E"></i>回撤深度</span></div>
+    </div>
+  </div>
+
+  <div class="charts" style="grid-template-columns:1fr 1.55fr">
+    <div class="chart-card">
+      <div class="chart-hd"><b>Tool Usage</b><span>调用分布</span></div>
+      <div class="chart-bd"><svg id="toolChart" viewBox="0 0 420 250" role="img" aria-label="工具调用分布"></svg></div>
+    </div>
+    <div class="chart-card">
+      <div class="chart-hd"><b>Run Facts</b><span>口径与边界</span></div>
+      <div class="chart-bd" style="padding:6px 15px 14px">
+        <div id="reviewRows"></div>
+      </div>
+    </div>
+  </div>
+
+  <div style="display:flex;align-items:baseline;justify-content:space-between;gap:14px;margin:30px 0 12px;border-bottom:1px solid var(--ink);padding-bottom:9px">
+    <h2 style="font:700 18px/1.3 var(--serif);letter-spacing:-.4px">逐笔与决策轨迹</h2>
+    <span class="label">Trace</span>
+  </div>
+
+  <div class="ticket" style="padding:0 16px" id="reviewTrades"></div>
+
+  <div class="note" style="margin-top:16px;max-width:78ch">
+    账户总资产 = 现金 + 持仓市值。净收益 = 已实现净盈亏 + 持仓浮盈 − 未平仓买入费用。浮盈不是已实现收益。
+    样本不足 60 个交易日时，平台不会给出排名或"DSP 显著"这类结论。
+  </div>
+
+  <div class="foot">
+    <span><b>口径</b> — 不复权成交价 / 单边费用 / T+1</span>
+    <span>全部为虚构样例</span>
+  </div>
+</section>
+
+<!-- ============ 04 CONNECT ============ -->
+<section id="connect" class="view" hidden>
+  <div class="pagehead">
+    <div>
+      <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">
+        <span class="label">№ 04 — Connect</span>
+        <span class="stamp brass">设计稿 · 未执行真实授权</span>
+      </div>
+      <h1>把熟悉的 Agent 带进来。</h1>
+      <p class="deck">Skill 引导接入，本地 Runner 管理会话。你仍然在 openOutcry 里查看每一次研究、订单与审批，凭据不写入轨迹。</p>
+    </div>
+  </div>
+
+  <div class="steps">
+    <article class="ticket step">
+      <div class="step-no">01</div>
+      <h3>安装 Skill</h3>
+      <p>在你的 Agent 环境里安装 openOutcry Skill，它负责发现训练场、读取受控资料并提供标准动作格式。</p>
+      <pre class="code">$ <span class="k">openoutcry</span> skill install
+<span class="s"># 仅注册能力，不上传凭据</span></pre>
+      <button class="btn ghost sm" id="copySkillBtn">复制安装命令</button>
+    </article>
+
+    <article class="ticket step">
+      <div class="step-no">02</div>
+      <h3>启动本地 Runner</h3>
+      <p>Runner 在你的机器上持有模型凭据并驱动 Agent；平台只接收观察结果与动作意图，不接触密钥。</p>
+      <pre class="code">$ <span class="k">npx</span> openoutcry-runner --port 7431
+<span class="s">✓ waiting for handshake</span></pre>
+      <div class="field">
+        <label for="workerType">Agent 来源</label>
+        <select id="workerType">
+          <option value="codex">Codex · 价值研究（本地）</option>
+          <option value="native">openOutcry · 研究员（内置）</option>
+          <option value="kimi">Kimi · 研究助手（本地）</option>
+          <option value="custom">自定义 Agent（本地）</option>
+        </select>
+      </div>
+    </article>
+
+    <article class="ticket step">
+      <div class="step-no">03</div>
+      <h3>握手与预检</h3>
+      <p>平台检查协议版本、动作格式与工具白名单。预检不通过时说明阻断原因，不会静默切换模型。</p>
+      <button class="btn ver wide" id="connectBtn">模拟连接</button>
+      <p class="error-text" id="connectResult" style="min-height:34px;color:var(--ink-3);font-family:var(--sans);font-size:12px"></p>
+      <button class="btn solid wide" id="enterConnectedBtn" disabled>进入训练场</button>
+    </article>
+  </div>
+
+  <div style="margin-top:26px" class="ticket">
+    <div class="ticket-hd"><span class="label">Boundary</span><span class="ticket-no">接入边界</span></div>
+    <div class="ticket-bd cols" style="columns:2;margin:0">
+      <p><strong>Skill</strong> 负责发现并使用训练场；<strong>MCP</strong> 只暴露当前实验允许的研究工具。</p>
+      <p><strong>训练场协议</strong> 负责 observation / action；<strong>规则引擎</strong> 负责校验、拒单、撮合与账户变更。</p>
+      <p>外部 Agent 只能提出动作，不能直接成交，也没有资金转移权限。断线、心跳超时或动作解析失败时暂停运行并说明原因。</p>
+      <p>本地接入默认自动授权，不导出长期密钥；凭据不写入轨迹，也不进入导出的 JSON。</p>
+    </div>
+  </div>
+
+  <div class="foot"><span><b>Connect</b> — Skill / Runner / Preflight</span><span>设计稿</span></div>
+</section>
+
+<!-- ============ 05 PROTOCOL ============ -->
+<section id="protocol" class="view" hidden>
+  <div class="pagehead">
+    <div>
+      <div class="label">№ 05 — Protocol &amp; Skill</div>
+      <h1>协议与 Skill</h1>
+      <p class="deck">会话消息、平台事件与训练动作分开记录。以下均为语义示例，不是已上线接口。</p>
+    </div>
+    <span class="stamp brass">语义示例</span>
+  </div>
+
+  <div class="ticket">
+    <div class="ticket-hd" style="border-bottom:1px solid var(--rule)">
+      <div class="tabs" style="border-bottom:0;margin:-9px 0 -9px -12px" role="tablist">
+        <button data-protocol="message" aria-selected="true">会话消息</button>
+        <button data-protocol="event" aria-selected="false">平台事件</button>
+        <button data-protocol="action" aria-selected="false">训练动作</button>
+      </div>
+      <span class="ticket-no" id="protocolTitle">session.message</span>
+    </div>
+    <pre class="code" id="protocolCode" style="border:0"></pre>
+  </div>
+
+  <div class="steps" style="margin-top:16px">
+    <div class="ticket step">
+      <div class="label">01 — Observation</div>
+      <h3>环境只给观察</h3>
+      <p>模拟时钟、账户、持仓与受控资料。所有资料带截止时间与证据编号，晚于截止时间的资料物理不可见。</p>
+    </div>
+    <div class="ticket step">
+      <div class="label">02 — Action</div>
+      <h3>动作必须结构化</h3>
+      <p>Agent 只能提交标准动作：下单、止损、请求资料。解析失败即暂停，不做猜测式补全。</p>
+    </div>
+    <div class="ticket step">
+      <div class="label">03 — Event</div>
+      <h3>事件不可改写</h3>
+      <p>每一次提案、审批、拒单与撮合都追加为事件，带序号与时间戳，可离线回放。</p>
+    </div>
+  </div>
+
+  <div class="foot"><span><b>Protocol</b> — observation / action / event</span><span>v0.1 语义草案</span></div>
+</section>
+
+<!-- ============ 06 GUIDE ============ -->
+<section id="guide" class="view" hidden>
+  <div class="pagehead">
+    <div>
+      <div class="label">№ 06 — Product Brief</div>
+      <h1>一个入口，完成一次改进。</h1>
+      <p class="deck">本文件合并 Agent 工作室与模拟交易场原型；详细产品规划仍保留在 Markdown 文档中。</p>
+    </div>
+    <span class="stamp pine">Prototype</span>
+  </div>
+
+  <div class="tickets3" style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px">
+    <article class="ticket step">
+      <div class="step-no">01</div>
+      <h3>准备 Agent</h3>
+      <p>内置模板或本地接入 → 配置提示词 → 选择训练场模板。Skill 和协议放在辅助入口，不干扰日常操作。</p>
+    </article>
+    <article class="ticket step">
+      <div class="step-no">02</div>
+      <h3>在训练场里跑</h3>
+      <p>固定历史时间、股票池、资金与规则。Agent 只能通过受控出口研究，提出的订单先成为提案，再由人批准、修改或拒绝。</p>
+    </article>
+    <article class="ticket step">
+      <div class="step-no">03</div>
+      <h3>复盘并改一个变量</h3>
+      <p>看净值与回撤、看逐笔证据，复制配置、只改一个变量重跑，再与旧版本对比。</p>
+    </article>
+  </div>
+
+  <div class="cols" style="margin-top:26px">
+    <h3>为什么不是一个聊天框</h3>
+    <p>聊天框能把一段分析讲得像模像样，但它无法回答三个问题：这个判断在当时的信息条件下是否成立？订单是否真的按 A 股规则成交？下一次修改到底改对了哪个变量？所以这里的主界面不是对话框，而是「观察—提案—审批—撮合—复盘」的账本。</p>
+    <h3>为什么要有审批</h3>
+    <p>把资金完全交给自主 Agent，在真实场景里没有人敢这么做。平台把「提出意图」和「实际成交」拆成两步，分别留档，于是报告里可以区分自主决策、人工确认和人机混合三种协作程度。</p>
+    <h3>为什么强调样本门槛</h3>
+    <p>二十个交易日的收益曲线看起来再漂亮，也不足以支撑排名。平台在样本不足时明确拒绝给出结论，而不是把一条漂亮的曲线当成绩效证明。</p>
+    <h3>本原型的边界</h3>
+    <p>所有数字、公司名与事件均为虚构样例，用于演示交互与信息结构。协议、撮合与审计能力以产品文档为准，本文件不代表已实现的服务。</p>
+  </div>
+
+  <div class="foot"><span><b>openOutcry</b> — 交易智能体评测设施</span><span>Prototype v2 · 2026-10</span></div>
+</section>
+
+  </main>
+</div>
+
+<dialog id="snapshotDialog" aria-labelledby="snapshotTitle">
+  <div class="dlg-hd">
+    <div><div class="label">Run Snapshot</div><h2 id="snapshotTitle">运行配置 · 已锁定</h2></div>
+    <button class="dlg-close" data-close aria-label="关闭">✕</button>
+  </div>
+  <div class="dlg-bd">
+    <p style="font-size:12px;color:var(--ink-3);margin-bottom:10px">以下参数在运行时不能修改；需要改参数请复制配置后重跑。</p>
+    <dl class="snapshot" id="snapshotRows"></dl>
+  </div>
+  <div class="dlg-ft"><button class="btn ghost sm" data-close>关闭</button></div>
+</dialog>
+
+<dialog id="goalDialog" aria-labelledby="goalTitle">
+  <div class="dlg-hd">
+    <div><div class="label">Autonomy</div><h2 id="goalTitle">继续自主运行</h2></div>
+    <button class="dlg-close" data-close aria-label="关闭">✕</button>
+  </div>
+  <div class="dlg-bd">
+    <p style="font-size:13px;line-height:1.7;color:var(--ink-2)">进入自主推进后，Agent 会连续处理后续交易日，订单不再逐单等待人工确认。你仍然可以随时追加带时间戳的指导，但不能再改写已经提交的动作。</p>
+    <div class="note">自主运行会被标记为「自主运行」协作方式，报告中与人工确认运行分开统计。</div>
+  </div>
+  <div class="dlg-ft">
+    <button class="btn ghost sm" data-close>取消</button>
+    <button class="btn solid sm" id="goalConfirm">确认进入自主推进</button>
+  </div>
+</dialog>
+
+<dialog id="modifyDialog" aria-labelledby="modifyTitle">
+  <div class="dlg-hd">
+    <div><div class="label">Modify</div><h2 id="modifyTitle">修改卖出数量</h2></div>
+    <button class="dlg-close" data-close aria-label="关闭">✕</button>
+  </div>
+  <form id="modifyForm">
+    <div class="dlg-bd">
+      <div class="field">
+        <label for="modifyQty">最终数量（股）</label>
+        <input type="number" id="modifyQty" value="100" min="100" max="600" step="100">
+      </div>
+      <p class="error-text" id="modifyError"></p>
+      <div class="note">原始提案 100 股会被完整保留。平台分别记录 Agent 原始意图与人类最终动作，「人机混合」协作方式随之生效。</div>
+    </div>
+    <div class="dlg-ft">
+      <button type="button" class="btn ghost sm" data-close>取消</button>
+      <button type="submit" class="btn ver sm">提交修改后批准</button>
+    </div>
+  </form>
+</dialog>
+
+<dialog id="detailDialog" aria-labelledby="detailTitle">
+  <div class="dlg-hd">
+    <div><div class="label">Trace Detail</div><h2 id="detailTitle">操作详情</h2></div>
+    <button class="dlg-close" data-close aria-label="关闭">✕</button>
+  </div>
+  <div class="dlg-bd" id="detailBody"></div>
+  <div class="dlg-ft"><button class="btn ghost sm" data-close>关闭</button></div>
+</dialog>
+
+<dialog id="replayDialog" aria-labelledby="replayTitle">
+  <div class="dlg-hd">
+    <div><div class="label">Replay</div><h2 id="replayTitle">原轨迹回放</h2></div>
+    <button class="dlg-close" data-close aria-label="关闭">✕</button>
+  </div>
+  <div class="dlg-bd">
+    <p style="font-size:12px;color:var(--ink-3);margin-bottom:10px">按事件序号顺序回放，不重新调用模型，不改变账户。</p>
+    <div class="replay-list" id="replayList"></div>
+    <div class="replay-detail" id="replayDetail"></div>
+  </div>
+  <div class="dlg-ft"><button class="btn ghost sm" data-close>关闭</button></div>
+</dialog>
+
+<dialog id="abortDialog" aria-labelledby="abortTitle">
+  <div class="dlg-hd">
+    <div><div class="label">Abort</div><h2 id="abortTitle">中止本次运行？</h2></div>
+    <button class="dlg-close" data-close aria-label="关闭">✕</button>
+  </div>
+  <div class="dlg-bd">
+    <p style="font-size:13px;line-height:1.7;color:var(--ink-2)">中止后，未完成的提案会被标记为已终止，账户与轨迹保留，可继续复盘但不能续跑。</p>
+    <div class="note">已发生的成交与费用不会回滚。</div>
+  </div>
+  <div class="dlg-ft">
+    <button class="btn ghost sm" data-close>继续运行</button>
+    <button class="btn ver sm" id="abortConfirm">确认中止</button>
+  </div>
+</dialog>
+
+<dialog id="agentDialog" aria-labelledby="agentTitle">
+  <div class="dlg-hd">
+    <div><div class="label">Agent Config</div><h2 id="agentTitle">Agent 配置</h2></div>
+    <button class="dlg-close" data-close aria-label="关闭">✕</button>
+  </div>
+  <form id="agentForm">
+    <div class="dlg-bd" style="display:flex;flex-direction:column;gap:13px">
+      <div class="field"><label for="agentName">名称</label><input type="text" id="agentName" value=""></div>
+      <div class="field"><label for="agentPrompt">系统提示词</label>
+        <textarea id="agentPrompt" style="min-height:88px;border:1px solid var(--rule);background:#fff;padding:9px 11px;font-size:12.5px;line-height:1.6;border-radius:0"></textarea>
+      </div>
+      <p class="error-text" id="savedDraft"></p>
+      <div class="note">配置只保存在本次浏览器内存中。已完成实验引用的版本不可变，修改需要走「复制为新版本」。</div>
+    </div>
+    <div class="dlg-ft">
+      <button type="button" class="btn ghost sm" data-close>取消</button>
+      <button type="submit" class="btn solid sm">保存为草稿</button>
+    </div>
+  </form>
+</dialog>
+
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+<script>
+(function(){
+"use strict";
+var $ = function(id){ return document.getElementById(id); };
+var money = function(v){ return '¥' + Number(v).toLocaleString('zh-CN',{minimumFractionDigits:2,maximumFractionDigits:2}); };
+var signed = function(v){ return (v >= 0 ? '+' : '−') + money(Math.abs(v)); };
+var round = function(v){ return Math.round(v * 100) / 100; };
+var esc = function(v){ return String(v).replace(/[&<>"']/g, function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]; }); };
+
+var agents = {
+  codex:{name:'Codex · 价值研究',source:'本地 Runner',version:'v0.3',qualification:'探索运行 · 隔离未验证'},
+  native:{name:'openOutcry · 研究员',source:'内置模板',version:'v0.8',qualification:'受控模板 · 未执行真实审计'},
+  kimi:{name:'Kimi · 研究助手',source:'本地 Runner',version:'演示',qualification:'探索运行 · 隔离未验证'},
+  custom:{name:'自定义 Agent',source:'本地 Runner',version:'演示',qualification:'探索运行 · 隔离未验证'}
+};
+
+function initialState(agent){
+  if (!agent) agent = 'native';
+  return {
+    agent: agent, initial: 100000, cash: 77028.6, realized: 2168.6, fees: 200,
+    status: 'active', mode: 'approval', collaboration: '人工确认',
+    proposal: { status:'pending', original:100, quantity:100, price:20.3 },
+    clock: '2024-04-23 09:15',
+    holdings: [
+      { name:'公司-017', quantity:600, sellable:600, cost:18.2, price:20.3, entryFee:20 },
+      { name:'公司-042', quantity:300, sellable:300, cost:31.6, price:33.22, entryFee:20 },
+      { name:'公司-008', quantity:100, sellable:100, cost:46.8, price:45.88, entryFee:20 }
+    ],
+    events: [
+      { kind:'agent', title:'已接收当时可见的观察', body:'当前阶段：盘前研究。行情和资料截至 2024-04-22；不包含当天的开盘或收盘价格。', meta:'observation · 09:15' },
+      { kind:'tool', title:'检索并阅读现金流资料', body:'读取证据 ev_018（经营披露）与 ev_024（现金流补充说明）。仅返回冻结版本的片段，无研究助手判断。', meta:'search / read · 截止 04-22 23:59' },
+      { kind:'agent', title:'建议适度减仓，保留观察仓位', body:'示例资料显示回款周期延长，建议减少公司-017 的 100 股敞口，保留其余持仓。资料不能保证未来价格走势。', meta:'结构化理由 · ev_018 / ev_024' },
+      { kind:'order', title:'提交卖出提案，等待确认', body:'公司-017 · 100 股 · 限价 ¥20.30。仅为提案，尚未成交，账户不变。', meta:'order.proposed · 09:15' }
+    ],
+    trades: [
+      { id:'buy17', name:'公司-017', side:'买入', quantity:600, price:18.2, fee:20, time:'2024-04-18 开盘', pnl:null, reason:'以估值与现金流披露建立观察仓位。', evidence:'ev_011', status:'已成交' },
+      { id:'buy42', name:'公司-042', side:'买入', quantity:300, price:31.6, fee:20, time:'2024-04-19 开盘', pnl:null, reason:'分散持仓，跟踪经营现金回收。', evidence:'ev_012', status:'已成交' },
+      { id:'buy08', name:'公司-008', side:'买入', quantity:100, price:46.8, fee:20, time:'2024-04-22 开盘', pnl:null, reason:'小仓位观察经营修复，控制单一标的风险。', evidence:'ev_015', status:'已成交' },
+      { id:'closed', name:'公司-026', side:'卖出', quantity:1000, price:22.3086, fee:140, time:'2024-04-22 开盘', pnl:2168.6, cost:20, reason:'达到原定退出条件后完成平仓。', evidence:'ev_016', status:'已成交' }
+    ]
+  };
+}
+
+var state = initialState('native');
+var currentView = 'studio';
+var selectedTab = 'holdings';
+var draftAgent = 'codex';
+var connected = false;
+var toastTimer;
+
+var totals = function(){
+  var market = round(state.holdings.reduce(function(a,h){ return a + h.quantity * h.price; }, 0));
+  var floating = round(state.holdings.reduce(function(a,h){ return a + h.quantity * (h.price - h.cost); }, 0));
+  return { market:market, floating:floating, equity:round(state.cash + market), net:round(state.cash + market - state.initial) };
+};
+
+var toast = function(text){
+  clearTimeout(toastTimer);
+  $('toast').textContent = text;
+  $('toast').classList.add('show');
+  toastTimer = setTimeout(function(){ $('toast').classList.remove('show'); }, 3000);
+};
+
+var titles = { studio:'Agent 工作室', training:'训练场', review:'结果与复盘', connect:'连接 Agent', protocol:'协议与 Skill', guide:'产品说明' };
+
+function showView(name){
+  if (!titles[name]) return;
+  currentView = name;
+  var views = document.querySelectorAll('.view');
+  for (var i = 0; i < views.length; i++) views[i].hidden = (views[i].id !== name);
+  var navs = document.querySelectorAll('[data-view]');
+  for (var j = 0; j < navs.length; j++) {
+    if (navs[j].dataset.view === name) navs[j].setAttribute('aria-current','page');
+    else navs[j].removeAttribute('aria-current');
+  }
+  $('crumb').textContent = titles[name];
+  try { history.replaceState(null, '', '#' + name); } catch (err) {}
+  window.scrollTo(0, 0);
+  requestAnimationFrame(function(){ window.scrollTo(0, 0); });
+}
+
+/* ---------------- 图表 ---------------- */
+var NAV = [100000,99860,100240,99920,100680,101120,100840,101460,102080,101720,101380,102260,102940,102580,102240,103180,103760,103420,103010,103762.6];
+var BENCH = [100000,99880,99720,99640,99820,99960,99680,99420,99260,99080,98860,99040,99320,99180,98940,99260,99540,99320,99060,99240];
+var TOOLS = [['行情快照',22],['受控搜索',14],['公告与财报读取',9],['计划与自检',6],['风控拒单',3]];
+
+function bounds(list){
+  var min = Infinity, max = -Infinity;
+  for (var i = 0; i < list.length; i++) for (var j = 0; j < list[i].length; j++) {
+    if (list[i][j] < min) min = list[i][j];
+    if (list[i][j] > max) max = list[i][j];
+  }
+  var pad = (max - min) * 0.14 || 1;
+  return { min: min - pad, max: max + pad, span: (max - min + pad * 2) || 1 };
+}
+function proj(vals, W, H, P, sc){
+  var step = (W - P.l - P.r) / (vals.length - 1);
+  var pts = [];
+  for (var i = 0; i < vals.length; i++) {
+    pts.push([P.l + i * step, P.t + (H - P.t - P.b) * (1 - (vals[i] - sc.min) / sc.span)]);
+  }
+  return pts;
+}
+function lineD(pts){ return pts.map(function(p,i){ return (i ? 'L' : 'M') + p[0].toFixed(1) + ' ' + p[1].toFixed(1); }).join(' '); }
+function areaD(pts, baseY){
+  if (!pts.length) return '';
+  return lineD(pts) + ' L' + pts[pts.length-1][0].toFixed(1) + ' ' + baseY.toFixed(1) + ' L' + pts[0][0].toFixed(1) + ' ' + baseY.toFixed(1) + ' Z';
+}
+
+function drawEquity(){
+  var svg = $('equityChart'); if (!svg) return;
+  var W = 720, H = 250, P = { l:56, r:14, t:16, b:26 };
+  var sc = bounds([NAV, BENCH]);
+  var baseY = H - P.b;
+  var g = [];
+  for (var i = 0; i <= 4; i++) {
+    var y = P.t + (H - P.t - P.b) * i / 4;
+    var val = sc.max - sc.span * i / 4;
+    g.push('<line x1="' + P.l + '" y1="' + y.toFixed(1) + '" x2="' + (W - P.r) + '" y2="' + y.toFixed(1) + '" stroke="rgba(201,214,203,.12)" stroke-width="1"/>');
+    g.push('<text x="' + (P.l - 9) + '" y="' + (y + 3.5).toFixed(1) + '" text-anchor="end" font-family="Consolas,monospace" font-size="9.5" fill="#5E7268">' + (val/1000).toFixed(1) + 'k</text>');
+  }
+  var aPts = proj(NAV, W, H, P, sc), bPts = proj(BENCH, W, H, P, sc);
+  var grad = '<defs><linearGradient id="gArea" x1="0" y1="0" x2="0" y2="1">' +
+    '<stop offset="0%" stop-color="#E8785F" stop-opacity=".32"/><stop offset="100%" stop-color="#E8785F" stop-opacity="0"/></linearGradient></defs>';
+  var zeroY = P.t + (H - P.t - P.b) * (1 - (100000 - sc.min) / sc.span);
+  return svg.innerHTML = grad + g.join('') +
+    '<line x1="' + P.l + '" y1="' + zeroY.toFixed(1) + '" x2="' + (W - P.r) + '" y2="' + zeroY.toFixed(1) + '" stroke="#42584C" stroke-width="1" stroke-dasharray="2 4"/>' +
+    '<path d="' + areaD(aPts, baseY) + '" fill="url(#gArea)"/>' +
+    '<path d="' + lineD(bPts) + '" fill="none" stroke="#B9C7BD" stroke-width="1.4" stroke-dasharray="4 3" stroke-opacity=".8"/>' +
+    '<path d="' + lineD(aPts) + '" fill="none" stroke="#E8785F" stroke-width="2.2" stroke-linejoin="round"/>' +
+    '<circle cx="' + aPts[aPts.length-1][0].toFixed(1) + '" cy="' + aPts[aPts.length-1][1].toFixed(1) + '" r="3.6" fill="#E8785F"/>' +
+    '<text x="' + (P.l) + '" y="' + (H - 8) + '" font-family="Consolas,monospace" font-size="9.5" fill="#5E7268">04-01</text>' +
+    '<text x="' + (W - P.r) + '" y="' + (H - 8) + '" text-anchor="end" font-family="Consolas,monospace" font-size="9.5" fill="#5E7268">04-23</text>';
+}
+
+function drawDrawdown(){
+  var svg = $('drawdownChart'); if (!svg) return;
+  var W = 420, H = 250, P = { l:40, r:12, t:16, b:26 };
+  var peak = -Infinity, dd = [];
+  for (var i = 0; i < NAV.length; i++) {
+    if (NAV[i] > peak) peak = NAV[i];
+    dd.push(-(peak - NAV[i]) / peak * 100);
+  }
+  var sc = { min: Math.min.apply(null, dd) * 1.18 - 0.1, max: 0, span: 0 };
+  sc.span = (sc.max - sc.min) || 1;
+  var pts = proj(dd, W, H, P, sc);
+  var baseY = P.t;
+  var g = [];
+  for (var k = 0; k <= 3; k++) {
+    var y = P.t + (H - P.t - P.b) * k / 3;
+    var val = sc.max - sc.span * k / 3;
+    g.push('<line x1="' + P.l + '" y1="' + y.toFixed(1) + '" x2="' + (W - P.r) + '" y2="' + y.toFixed(1) + '" stroke="rgba(201,214,203,.12)"/>');
+    g.push('<text x="' + (P.l - 7) + '" y="' + (y + 3.5).toFixed(1) + '" text-anchor="end" font-family="Consolas,monospace" font-size="9.5" fill="#5E7268">' + val.toFixed(1) + '%</text>');
+  }
+  return svg.innerHTML = g.join('') +
+    '<path d="' + areaD(pts, baseY) + '" fill="rgba(214,190,110,.14)"/>' +
+    '<path d="' + lineD(pts) + '" fill="none" stroke="#D6BE6E" stroke-width="1.8" stroke-linejoin="round"/>' +
+    '<line x1="' + P.l + '" y1="' + baseY + '" x2="' + (W - P.r) + '" y2="' + baseY + '" stroke="#42584C" stroke-width="1"/>' +
+    '<text x="' + (W - P.r) + '" y="' + (H - 8) + '" text-anchor="end" font-family="Consolas,monospace" font-size="9.5" fill="#5E7268">20 交易日</text>';
+}
+
+function drawTools(){
+  var svg = $('toolChart'); if (!svg) return;
+  var W = 420, P = { l:96, r:34, t:14 }, rowH = 38, max = 0;
+  for (var i = 0; i < TOOLS.length; i++) if (TOOLS[i][1] > max) max = TOOLS[i][1];
+  var parts = [];
+  for (var j = 0; j < TOOLS.length; j++) {
+    var y = P.t + j * rowH;
+    var w = (W - P.l - P.r) * (TOOLS[j][1] / max);
+    parts.push('<text x="' + (P.l - 10) + '" y="' + (y + 11) + '" text-anchor="end" font-family="-apple-system,Segoe UI,Microsoft YaHei" font-size="10.5" fill="#9DB4A7">' + TOOLS[j][0] + '</text>');
+    parts.push('<rect x="' + P.l + '" y="' + y + '" width="' + (W - P.l - P.r) + '" height="13" fill="rgba(201,214,203,.07)"/>');
+    parts.push('<rect x="' + P.l + '" y="' + y + '" width="' + w.toFixed(1) + '" height="13" fill="' + (j === 4 ? '#E8785F' : '#C6D8CB') + '" opacity="' + (j === 4 ? '.9' : '.72') + '"/>');
+    parts.push('<text x="' + (W - P.r + 8) + '" y="' + (y + 11) + '" font-family="Consolas,monospace" font-size="10.5" fill="#D3E0D6">' + TOOLS[j][1] + '</text>');
+  }
+  return svg.innerHTML = parts.join('');
+}
+
+/* ---------------- 渲染 ---------------- */
+var STATUS_TEXT = { aborted:'已中止', disconnected:'断线暂停', paused:'已暂停' };
+
+function bandCells(){
+  var t = totals();
+  var items = [
+    ['账户净值', money(t.equity), '初始资金 ' + money(state.initial), ''],
+    ['累计净收益', signed(t.net), (t.net / state.initial * 100).toFixed(2) + '% · 已扣费用', t.net >= 0 ? 'up' : 'dn'],
+    ['可用现金', money(state.cash), '占总资产 ' + (state.cash / t.equity * 100).toFixed(1) + '%', ''],
+    ['持仓市值', money(t.market), state.holdings.length + ' 个标的 · 当前估值', '']
+  ];
+  return items.map(function(x){
+    return '<div class="band-cell"><span class="label">' + x[0] + '</span><b class="' + x[3] + '">' + x[1] + '</b><small>' + x[2] + '</small></div>';
+  }).join('');
+}
+
+function runStatus(){
+  if (state.status === 'aborted') return '已中止';
+  if (state.status === 'disconnected') return '断线暂停';
+  if (state.status === 'paused') return '已暂停';
+  if (state.proposal.status === 'pending') return '待确认';
+  if (state.proposal.status === 'submitted') return '待撮合';
+  return '运行中';
+}
+
+function render(){
+  var t = totals();
+  var a = agents[state.agent];
+  var st = runStatus();
+
+  $('trainingTitle').textContent = a.name;
+  $('currentAgent').textContent = a.name + ' · ' + a.source;
+  $('eligibility').textContent = a.qualification;
+  $('collaboration').textContent = state.collaboration;
+  $('eventCount').textContent = state.events.length + ' 条事件';
+  $('clockLabel').textContent = state.clock + ' · ' + (state.clock.indexOf('09:30') > -1 ? '开盘撮合后，运行到此暂停' : '盘前研究，行情与资料截至上一日');
+  $('recentStatus').textContent = st;
+  $('accountSummary').innerHTML = bandCells();
+  $('reviewMetrics').innerHTML = bandCells();
+
+  var stamp = $('runStatusStamp');
+  stamp.textContent = st;
+  stamp.className = 'stamp' + (st === '已中止' || st === '断线暂停' ? '' : (st === '待确认' || st === '已暂停') ? ' brass' : ' pine');
+
+  $('modeLabel').textContent = state.mode === 'goal' ? '自主推进' : '逐单确认';
+  $('composerMode').textContent = state.mode === 'goal' ? '自主推进中 · 只能追加指导' : '追加指导将标记为人机协作';
+  $('pauseBtn').textContent = (state.status === 'paused' || state.status === 'disconnected') ? '继续' : '暂停';
+  $('pauseBtn').disabled = state.status === 'aborted';
+  $('messageInput').disabled = state.status === 'aborted';
+  $('sendBtn').disabled = state.status === 'aborted';
+  $('connectionState').textContent = state.status === 'disconnected' ? '● 连接断开' : '● 连接正常';
+  $('connectionState').style.color = state.status === 'disconnected' ? '#EF8E7E' : '#6FCF9B';
+
+  $('accountRows').innerHTML =
+    '<div class="kv"><span>净收益</span><span class="dots"></span><b class="' + (t.net >= 0 ? 'pos' : 'neg') + '">' + signed(t.net) + '</b></div>' +
+    '<div class="kv"><span>已实现</span><span class="dots"></span><b>' + signed(state.realized) + '</b></div>' +
+    '<div class="kv"><span>浮动盈亏</span><span class="dots"></span><b class="' + (t.floating >= 0 ? 'pos' : 'neg') + '">' + signed(t.floating) + '</b></div>' +
+    '<div class="kv"><span>累计费用</span><span class="dots"></span><b>−' + money(state.fees) + '</b></div>';
+
+  $('holdingCount').textContent = state.holdings.length + ' 标的';
+  $('holdingsList').innerHTML = state.holdings.map(function(h){
+    var pnl = round(h.quantity * (h.price - h.cost));
+    var share = (h.quantity * h.price / t.equity * 100).toFixed(1);
+    return '<div class="holding">' +
+      '<div class="holding-top"><b>' + h.name + '</b><em class="' + (pnl >= 0 ? 'pos' : 'neg') + '">' + signed(pnl) + '</em></div>' +
+      '<div class="holding-sub"><span>' + h.quantity + ' 股 · 成本 ' + h.cost + '</span><span>' + share + '%</span></div>' +
+      '<div class="holding-sub"><span>可卖 ' + h.sellable + ' 股</span><span class="tag lock">T+1</span></div>' +
+      '</div>';
+  }).join('');
+
+  $('timeline').innerHTML = state.events.map(function(e, i){
+    var mark = { agent:'AGENT', tool:'TOOL', order:'ORDER', user:'HUMAN', error:'ERROR' }[e.kind] || 'EVENT';
+    var cls = { agent:'agent', tool:'tool', order:'order', user:'user' }[e.kind] || '';
+    return '<div class="ev">' +
+      '<div class="ev-seq"><b>#' + String(i + 1).padStart(4, '0') + '</b></div>' +
+      '<div class="ev-body">' +
+        '<div class="ev-meta"><span class="chip ' + cls + '">' + mark + '</span><span class="ev-time">' + esc(e.meta) + '</span></div>' +
+        '<div class="ev-title">' + esc(e.title) + '</div>' +
+        '<div class="ev-text">' + esc(e.body) + '</div>' +
+        (e.kind === 'tool' ? '<button class="ev-link" data-evidence>查看当时的证据快照</button>' : '') +
+      '</div></div>';
+  }).join('');
+  var lb = $('timeline');
+  lb.scrollTop = lb.scrollHeight;
+
+  var p = state.proposal;
+  var pStatus = { pending:'等待确认', submitted:'已提交 · 未成交', rejected:'已拒绝', filled:'已成交', cancelled:'已终止' }[p.status];
+  $('proposalQty').textContent = p.quantity;
+  $('proposalStatus').textContent = pStatus;
+  $('proposalStamp').textContent = { pending:'待确认', submitted:'待撮合', rejected:'已拒绝', filled:'已成交', cancelled:'已终止' }[p.status];
+  $('proposalStamp').className = 'stamp' + (p.status === 'filled' ? ' pine' : '');
+  $('proposalText').textContent = p.quantity + ' 股 · 限价 ' + money(p.price) + ' · 参考估值下毛收益约 ' + signed(round(p.quantity * (p.price - 18.2))) + '，实际结果取决于后续撮合与费用。';
+
+  var pendingMode = p.status === 'pending' && state.mode !== 'goal';
+  $('approveBtn').hidden = !pendingMode;
+  $('modifyBtn').hidden = !pendingMode;
+  $('rejectBtn').hidden = !pendingMode;
+  ['approveBtn','modifyBtn','rejectBtn','matchBtn'].forEach(function(id){ $(id).disabled = state.status !== 'active'; });
+  $('matchBtn').hidden = p.status !== 'submitted';
+
+  $('approvalNote').textContent =
+    p.status === 'filled' ? '成交、费用与持仓已同步更新；原始与最终数量均保留。' :
+    p.status === 'rejected' ? '已记录人工拒绝。不会撮合，现金与持仓没有变化。' :
+    p.status === 'cancelled' ? '运行已中止，提案终止，账户记录保留。' :
+    p.status === 'submitted' ? '已提交，等待环境在下一时点揭示可成交价格。' :
+    '批准仅提交订单，不等于成交；预计盈亏不计入已实现收益。';
+
+  $('reviewSubtitle').textContent = (state.status === 'aborted' ? '运行已中止，仅保留已发生结果。' : '运行尚未完成，以下仅为当前快照。') + ' ' + state.clock + ' · ' + state.collaboration;
+
+  $('reviewRows').innerHTML = [
+    ['已成交记录', state.trades.length + ' 笔（含开仓）'],
+    ['费用累计', money(state.fees)],
+    ['本次提案', pStatus],
+    ['决策轨迹', state.events.length + ' 条，可离线回看'],
+    ['评测资格', a.qualification],
+    ['样本与结论', '样本不足，不排名']
+  ].map(function(x){ return '<div class="report-row"><span class="dim">' + esc(x[0]) + '</span><span class="dots"></span><b>' + esc(x[1]) + '</b></div>'; }).join('');
+
+  $('reviewTrades').innerHTML = state.trades.map(function(tr){
+    var cls = tr.pnl === null ? 'dim' : (tr.pnl >= 0 ? 'pos' : 'neg');
+    return '<button class="rowlink" data-trade="' + tr.id + '">' +
+      '<span><b>' + tr.side + ' ' + tr.name + ' · ' + tr.quantity + ' 股</b><small>' + tr.time + ' · ' + money(tr.price) + ' · 费用 ' + money(tr.fee) + ' · ' + tr.evidence + '</small></span>' +
+      '<span class="' + cls + '" style="font-family:var(--mono);font-size:11.5px">' + (tr.pnl === null ? '建仓' : signed(tr.pnl)) + '</span></button>';
+  }).join('');
+
+  $('holdings').innerHTML = state.holdings.map(function(h){
+    var pnl = round(h.quantity * (h.price - h.cost));
+    return '<div class="report-row"><span>' + h.name + '<br><small class="dim" style="font-family:var(--mono);font-size:9.5px">' + h.quantity + ' 股 · 可卖 ' + h.sellable + '</small></span><span class="dots"></span><b class="' + (pnl >= 0 ? 'pos' : 'neg') + '">' + signed(pnl) + '</b></div>';
+  }).join('');
+
+  $('trades').innerHTML = '<button class="rowlink" data-trade="proposal"><span><b>卖出提案 · ' + p.quantity + ' 股</b><small>' + pStatus + ' · 原始 100 股</small></span><span class="stamp" style="font-size:8px;padding:2px 5px">查看</span></button>' +
+    state.trades.slice().reverse().map(function(tr){
+      var cls = tr.pnl === null ? 'dim' : (tr.pnl >= 0 ? 'pos' : 'neg');
+      return '<button class="rowlink" data-trade="' + tr.id + '"><span><b>' + tr.side + ' ' + tr.name + '</b><small>' + tr.quantity + ' 股 · ' + tr.time + '</small></span><b class="' + cls + '">' + (tr.pnl === null ? '—' : signed(tr.pnl)) + '</b></button>';
+    }).join('');
+
+  var openFees = round(state.holdings.reduce(function(s,h){ return s + h.entryFee; }, 0));
+  $('pnl').innerHTML =
+    '<div class="report-row"><span>已实现净盈亏</span><span class="dots"></span><b class="' + (state.realized >= 0 ? 'pos' : 'neg') + '">' + signed(state.realized) + '</b></div>' +
+    '<div class="report-row"><span>持仓浮动盈亏</span><span class="dots"></span><b class="' + (t.floating >= 0 ? 'pos' : 'neg') + '">' + signed(t.floating) + '</b></div>' +
+    '<div class="report-row"><span>未平仓买入费用</span><span class="dots"></span><b>−' + money(openFees) + '</b></div>' +
+    '<div class="report-row"><span>累计净收益</span><span class="dots"></span><b class="' + (t.net >= 0 ? 'pos' : 'neg') + '">' + signed(t.net) + '</b></div>' +
+    '<div class="note">浮盈不是已实现收益。账户总资产 = 现金 + 持仓市值。</div>';
+
+  setTab(selectedTab);
+}
+
+function setTab(name){
+  selectedTab = name;
+  var tabs = document.querySelectorAll('[data-tab]');
+  for (var i = 0; i < tabs.length; i++) {
+    var on = tabs[i].dataset.tab === name;
+    tabs[i].setAttribute('aria-selected', on ? 'true' : 'false');
+    tabs[i].tabIndex = on ? 0 : -1;
+  }
+  ['holdings','trades','pnl'].forEach(function(id){ $(id).hidden = id !== name; });
+}
+
+/* ---------------- 弹窗 ---------------- */
+function openDetail(id){
+  var body = $('detailBody');
+  if (id === 'proposal') {
+    $('detailTitle').textContent = '卖出提案 · 公司-017';
+    body.innerHTML = '<dl class="snapshot">' +
+      '<div><dt>原始 / 最终</dt><dd>100 / ' + state.proposal.quantity + ' 股</dd></div>' +
+      '<div><dt>限价</dt><dd>¥20.30</dd></div>' +
+      '<div><dt>当前状态</dt><dd>' + esc($('proposalStatus').textContent) + '</dd></div>' +
+      '<div><dt>证据</dt><dd>ev_018 / ev_024</dd></div></dl>' +
+      '<p style="font-size:13px;line-height:1.7;color:var(--ink-2)">示例经营披露显示回款周期延长，Agent 因此提出减仓。平台只负责返回资料，不替 Agent 下投资结论。</p>' +
+      '<div class="note">T+1：原仓位已过结算日，可卖 600 股。后续开盘价只在点击「演示开盘撮合」后由环境揭示；满足规则也不保证真实市场能成交。</div>' +
+      '<details class="audit"><summary>结构化动作与校验</summary><pre>' + esc(JSON.stringify({ type:'order', side:'sell', asset:'公司-017', original_quantity:100, final_quantity:state.proposal.quantity, limit:20.3, evidence:['ev_018','ev_024'], status:state.proposal.status }, null, 2)) + '</pre></details>';
+  } else {
+    var tr = null;
+    for (var i = 0; i < state.trades.length; i++) if (state.trades[i].id === id) tr = state.trades[i];
+    if (!tr) return;
+    $('detailTitle').textContent = tr.side + ' ' + tr.name;
+    body.innerHTML = '<dl class="snapshot">' +
+      '<div><dt>操作</dt><dd>' + tr.side + ' ' + tr.name + ' × ' + tr.quantity + '</dd></div>' +
+      '<div><dt>时点</dt><dd>' + tr.time + '</dd></div>' +
+      '<div><dt>成交价 / 费用</dt><dd>' + money(tr.price) + ' / ' + money(tr.fee) + '</dd></div>' +
+      '<div><dt>对应盈亏</dt><dd>' + (tr.pnl === null ? '仅建立持仓，尚未实现收益' : signed(tr.pnl) + '（已扣费用）') + '</dd></div>' +
+      '<div><dt>证据</dt><dd>' + tr.evidence + '</dd></div></dl>' +
+      '<h3 style="font:700 13px/1.4 var(--serif);margin:10px 0 4px">当时的结构化理由</h3>' +
+      '<p style="font-size:12.5px;line-height:1.7;color:var(--ink-2)">' + esc(tr.reason) + '</p>' +
+      '<div class="note">' + (tr.pnl === null ? '当前浮动盈亏请看持仓页，不能把浮盈计作这笔买入的已实现利润。' : '净实现盈亏 = 数量 ×（成交价 − 成本价）− 对应费用。') + ' 本条为虚构历史样例。</div>';
+  }
+  $('detailDialog').showModal();
+}
+
+function snapshot(){
+  var a = agents[state.agent];
+  $('snapshotRows').innerHTML = [
+    ['Agent', a.name + ' / ' + a.version],
+    ['会话 / 运行', 'sess_demo_001 / run_demo_001'],
+    ['窗口', '2024-04-01 至 04-30'],
+    ['初始资金', '¥100,000.00'],
+    ['股票池', '固定 3 标的 + 历史已平仓样例'],
+    ['数据 / 资料库', 'market-demo-v1 / evidence-demo-v2'],
+    ['规则', '日频 A 股 · D-1 资料 · T+1'],
+    ['预算', '12 / 20 次，额度固定'],
+    ['费用模型', '单次卖出 ¥7；历史记录逐笔列明'],
+    ['当前类型', state.collaboration + ' · ' + a.qualification]
+  ].map(function(x){ return '<div><dt>' + x[0] + '</dt><dd>' + esc(x[1]) + '</dd></div>'; }).join('');
+  $('snapshotDialog').showModal();
+}
+
+function replay(){
+  var saved = state.events.map(function(e){ return { title:e.title, body:e.body, meta:e.meta }; });
+  $('replayList').innerHTML = saved.map(function(e, i){
+    return '<button class="replay-item" data-replay="' + i + '" aria-pressed="' + (i === 0 ? 'true' : 'false') + '"><b>' + String(i+1).padStart(2,'0') + ' · ' + esc(e.title) + '</b><small>' + esc(e.meta) + '</small></button>';
+  }).join('');
+  $('replayDetail').textContent = saved[0].body;
+  $('replayList').onclick = function(ev){
+    var b = ev.target.closest('[data-replay]');
+    if (!b) return;
+    var kids = document.querySelectorAll('[data-replay]');
+    for (var i = 0; i < kids.length; i++) kids[i].setAttribute('aria-pressed', kids[i] === b ? 'true' : 'false');
+    $('replayDetail').textContent = saved[Number(b.dataset.replay)].body;
+  };
+  $('replayDialog').showModal();
+}
+
+/* ---------------- 动作 ---------------- */
+function appendEvent(kind, title, body, meta){
+  state.events.push({ kind:kind, title:title, body:body, meta:meta });
+  render();
+}
+
+function submitProposal(quantity, actor){
+  if (state.status !== 'active' || state.proposal.status !== 'pending') return;
+  actor = actor || '人工确认';
+  state.proposal.quantity = quantity;
+  state.proposal.status = 'submitted';
+  if (actor === 'Agent 自主提交') {
+    if (state.collaboration === '人工确认') state.collaboration = '自主运行';
+  } else {
+    state.collaboration = (quantity === state.proposal.original) ? '人工确认' : '人机混合';
+  }
+  appendEvent(actor === 'Agent 自主提交' ? 'agent' : 'user', actor + '，进入待撮合', quantity + ' 股 · 限价 ¥20.30；原始提案 100 股保留。账户尚未变化。', 'order.submitted · 09:15');
+  toast('订单已提交，尚未成交');
+}
+
+function fillProposal(){
+  if (state.proposal.status !== 'submitted') return;
+  var price = 20.36, qty = state.proposal.quantity, fee = 7;
+  state.cash = round(state.cash + price * qty - fee);
+  state.realized = round(state.realized + (price - 18.2) * qty - fee);
+  state.fees = round(state.fees + fee);
+  for (var i = 0; i < state.holdings.length; i++) {
+    if (state.holdings[i].name === '公司-017') {
+      state.holdings[i].quantity -= qty;
+      state.holdings[i].sellable -= qty;
+      if (state.holdings[i].quantity <= 0) state.holdings.splice(i, 1);
+      break;
+    }
+  }
+  state.trades.push({ id:'sell17', name:'公司-017', side:'卖出', quantity:qty, price:price, fee:fee, time:'2024-04-23 开盘', pnl:round((price - 18.2) * qty - fee), reason:'开盘后按提案减仓，兑现部分浮盈。', evidence:'ev_018', status:'已成交' });
+  state.proposal.status = 'filled';
+  state.clock = '2024-04-23 09:30';
+  appendEvent('order', '撮合完成', qty + ' 股 · 成交价 ' + money(price) + ' · 费用 ' + money(fee) + '。已实现盈亏同步更新。', 'order.filled · 09:30');
+  toast('演示撮合完成');
+}
+
+/* ---------------- 事件绑定 ---------------- */
+document.querySelectorAll('[data-view]').forEach(function(b){ b.addEventListener('click', function(){ showView(b.dataset.view); }); });
+document.querySelectorAll('[data-open-agent]').forEach(function(b){
+  b.addEventListener('click', function(){
+    var a = b.dataset.openAgent;
+    if (a !== state.agent) {
+      if (!window.confirm('切换 Agent 将开始新的演示会话，并重置当前演示。继续？')) return;
+      state = initialState(a);
+      selectedTab = 'holdings';
+      render();
+    }
+    showView('training');
+  });
+});
+document.querySelectorAll('[data-config-agent]').forEach(function(b){
+  b.addEventListener('click', function(){
+    draftAgent = b.dataset.configAgent;
+    $('agentName').value = agents[draftAgent].name;
+    $('agentPrompt').value = '仅使用平台受控资料，优先检查现金流风险。提出标准动作并引用证据，不承诺收益。';
+    $('savedDraft').textContent = '';
+    $('agentDialog').showModal();
+  });
+});
+document.querySelectorAll('[data-close]').forEach(function(b){ b.addEventListener('click', function(){ b.closest('dialog').close(); }); });
+document.querySelectorAll('[data-tab]').forEach(function(b){
+  b.addEventListener('click', function(){ setTab(b.dataset.tab); });
+  b.addEventListener('keydown', function(e){
+    var tabs = Array.prototype.slice.call(document.querySelectorAll('[data-tab]'));
+    var i = tabs.indexOf(b), n;
+    if (e.key === 'ArrowRight') n = (i + 1) % tabs.length;
+    if (e.key === 'ArrowLeft') n = (i + tabs.length - 1) % tabs.length;
+    if (e.key === 'Home') n = 0;
+    if (e.key === 'End') n = tabs.length - 1;
+    if (n === undefined) return;
+    e.preventDefault();
+    tabs[n].focus();
+    setTab(tabs[n].dataset.tab);
+  });
+});
+
+$('timeline').addEventListener('click', function(e){ if (e.target.closest('[data-evidence]')) openDetail('proposal'); });
+$('trades').addEventListener('click', function(e){
+  var b = e.target.closest('[data-trade]');
+  if (b) openDetail(b.dataset.trade);
+});
+$('reviewTrades').addEventListener('click', function(e){
+  var b = e.target.closest('[data-trade]');
+  if (b) openDetail(b.dataset.trade);
+});
+$('proposalDetail').addEventListener('click', function(){ openDetail('proposal'); });
+
+$('approveBtn').addEventListener('click', function(){ submitProposal(state.proposal.quantity, '人工确认'); });
+$('rejectBtn').addEventListener('click', function(){
+  if (state.proposal.status !== 'pending') return;
+  state.proposal.status = 'rejected';
+  state.collaboration = '人工确认';
+  appendEvent('user', '人工拒绝提案', '卖出提案被拒绝，未提交撮合。账户与持仓不变。', 'order.rejected · 09:16');
+  toast('已拒绝该提案');
+});
+$('modifyBtn').addEventListener('click', function(){
+  $('modifyQty').value = state.proposal.quantity;
+  $('modifyError').textContent = '';
+  $('modifyDialog').showModal();
+});
+$('modifyForm').addEventListener('submit', function(e){
+  e.preventDefault();
+  var v = Number($('modifyQty').value);
+  if (!(v >= 100 && v <= 600 && v % 100 === 0)) { $('modifyError').textContent = '请输入 100–600 之间、100 的整数倍。'; return; }
+  $('modifyDialog').close();
+  submitProposal(v, '人工修改后批准');
+});
+$('matchBtn').addEventListener('click', fillProposal);
+
+$('sendBtn').addEventListener('click', sendMessage);
+$('messageInput').addEventListener('keydown', function(e){
+  if (e.key === 'Enter' && (e.metaKey || e.ctrlKey)) { e.preventDefault(); sendMessage(); }
+});
+function sendMessage(){
+  var v = $('messageInput').value.trim();
+  if (!v) return;
+  if (v === '/goal') { state.mode = 'goal'; $('messageInput').value = ''; $('goalDialog').showModal(); return; }
+  appendEvent('user', '人工指导', v + '\n（指导以带时间戳的消息追加，不改变已提交的动作。）', 'guidance · 人机协作');
+  state.collaboration = '人机混合';
+  $('messageInput').value = '';
+  render();
+  toast('指导已追加');
+}
+$('goalConfirm').addEventListener('click', function(){
+  state.mode = 'goal';
+  state.collaboration = '自主运行';
+  $('goalDialog').close();
+  appendEvent('agent', '进入自主推进模式', '后续交易日由 Agent 连续处理，订单不再逐单等待人工确认；仍可追加带时间戳的指导。', 'mode.goal · 已确认');
+  toast('已进入自主推进');
+});
+
+$('pauseBtn').addEventListener('click', function(){
+  if (state.status === 'aborted') return;
+  if (state.status === 'active') { state.status = 'paused'; appendEvent('error', '运行已暂停', '用户暂停运行。时钟、账户与轨迹保持不变，可继续。', 'run.paused'); }
+  else { state.status = 'active'; appendEvent('agent', '运行已继续', '从暂停时点恢复，未重放已发生事件。', 'run.resumed'); }
+  render();
+});
+$('abortBtn').addEventListener('click', function(){ $('abortDialog').showModal(); });
+$('abortConfirm').addEventListener('click', function(){
+  $('abortDialog').close();
+  state.status = 'aborted';
+  if (state.proposal.status === 'pending' || state.proposal.status === 'submitted') state.proposal.status = 'cancelled';
+  appendEvent('error', '运行已中止', '用户中止本次运行。账户与轨迹保留，可继续复盘但不能续跑。', 'run.aborted');
+  render();
+  toast('运行已中止');
+});
+
+$('snapshotBtn').addEventListener('click', snapshot);
+$('templateBtn').addEventListener('click', snapshot);
+$('replayBtn').addEventListener('click', replay);
+$('reviewReplay').addEventListener('click', replay);
+
+$('agentForm').addEventListener('submit', function(e){
+  e.preventDefault();
+  $('savedDraft').textContent = '草稿已保存在本次浏览器内存中：' + $('agentName').value + ' · ' + agents[draftAgent].version + '-draft。当前运行不变。';
+  state.draft = { name: $('agentName').value, prompt: $('agentPrompt').value, parent: agents[draftAgent].version };
+});
+$('copyConfigBtn').addEventListener('click', function(){
+  draftAgent = state.agent;
+  $('agentName').value = agents[state.agent].name + ' · 副本';
+  $('agentPrompt').value = '仅使用受控资料，先分析现金流；对比时每次只修改一个变量。';
+  $('savedDraft').textContent = '';
+  $('agentDialog').showModal();
+});
+
+$('connectBtn').addEventListener('click', function(){
+  connected = true;
+  $('connectResult').textContent = '模拟连接完成。未启动进程，未执行真实授权，严格评测资格仍未验证。';
+  $('connectResult').style.color = 'var(--pine)';
+  $('enterConnectedBtn').disabled = false;
+});
+$('workerType').addEventListener('change', function(){
+  connected = false;
+  $('connectResult').textContent = '来源已改变，请重新模拟连接。';
+  $('connectResult').style.color = 'var(--ink-3)';
+  $('enterConnectedBtn').disabled = true;
+});
+$('enterConnectedBtn').addEventListener('click', function(){ if (connected) { var v = $('workerType').value; if (v !== state.agent) { state = initialState(v); render(); } showView('training'); } });
+
+$('copySkillBtn').addEventListener('click', function(){
+  if (navigator.clipboard) {
+    navigator.clipboard.writeText('/install openoutcry-skill').then(function(){ toast('已复制安装示例'); }, function(){ toast('剪贴板不可用'); });
+  } else toast('示例：/install openoutcry-skill');
+});
+
+$('exportBtn').addEventListener('click', function(){
+  var t = totals();
+  var data = { notice:'全部为虚构原型数据，非真实绩效', agent: agents[state.agent], run: { id:'run_demo_001', status: state.status, clock: state.clock, mode: state.mode, collaboration: state.collaboration }, account: { equity:t.equity, net:t.net, cash:state.cash, fees:state.fees }, holdings: state.holdings, trades: state.trades, events: state.events };
+  var url = URL.createObjectURL(new Blob([JSON.stringify(data, null, 2)], { type:'application/json' }));
+  var a = document.createElement('a');
+  a.href = url; a.download = 'openOutcry-模拟运行.json'; a.click();
+  setTimeout(function(){ URL.revokeObjectURL(url); }, 1000);
+  toast('已导出 JSON');
+});
+
+var protocol = {
+  message: { type:'session.message', session_id:'sess_demo_001', run_id:'run_demo_001', mode:'guidance', content:'请解释减仓依据' },
+  event: { type:'platform.event', event:'order.proposed', event_id:'evt_demo_004', run_id:'run_demo_001', seq:4, evidence_ids:['ev_018','ev_024'] },
+  action: { type:'agent.action', run_id:'run_demo_001', action:'order', side:'sell', asset:'公司-017', quantity:100, limit:20.3, status:'proposed' }
+};
+function setProtocol(key){
+  $('protocolTitle').textContent = protocol[key].type;
+  $('protocolCode').textContent = JSON.stringify(protocol[key], null, 2);
+  document.querySelectorAll('[data-protocol]').forEach(function(b){ b.setAttribute('aria-selected', b.dataset.protocol === key ? 'true' : 'false'); });
+}
+document.querySelectorAll('[data-protocol]').forEach(function(b){ b.addEventListener('click', function(){ setProtocol(b.dataset.protocol); }); });
+
+drawEquity(); drawDrawdown(); drawTools();
+render();
+setProtocol('message');
+showView(titles[location.hash.slice(1)] ? location.hash.slice(1) : 'studio');
+// 浏览器处理 #hash 锚点的方式不一致，加载后统一回到顶部
+window.addEventListener('load', function(){ window.scrollTo(0, 0); });
+setTimeout(function(){ window.scrollTo(0, 0); }, 60);
+})();
+</script>
+</body>
+</html>

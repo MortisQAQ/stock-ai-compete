@@ -1,0 +1,784 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>openOutcry · UI 参照与改造方向</title>
+<style>
+:root{
+  --paper:#f4f5f1; --card:#fff; --ink:#1f3229; --ink2:#4a5b50; --muted:#7a8a80;
+  --line:#e1e7de; --line2:#cbd6c6; --accent:#345d45; --accent-soft:#edf3e9;
+  --dark:#16241c; --warm:#a45c30; --up:#c0392b; --dn:#1e7a4b;
+  --mono:"JetBrains Mono",Consolas,"Cascadia Mono",monospace;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--paper);color:var(--ink);
+  font:15px/1.65 Inter,"Segoe UI","Microsoft YaHei",sans-serif;-webkit-font-smoothing:antialiased}
+.wrap{max-width:1180px;margin:0 auto;padding:56px 32px 96px}
+h1,h2,h3{margin:0;font-weight:650;letter-spacing:-.4px}
+h1{font:700 40px/1.2 Georgia,serif;letter-spacing:-1.2px}
+h2{font-size:24px;margin:0 0 6px}
+h3{font-size:16px}
+p{margin:0}
+a{color:var(--accent)}
+.eyebrow{font:600 11px/1 var(--mono);letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
+.lede{color:var(--ink2);max-width:70ch;margin-top:14px;font-size:16px}
+.hr{height:1px;background:var(--line);margin:56px 0}
+.head{display:flex;justify-content:space-between;align-items:flex-start;gap:32px;flex-wrap:wrap}
+.badge{display:inline-flex;align-items:center;gap:8px;background:var(--accent-soft);
+  border:1px solid var(--line2);color:var(--accent);border-radius:999px;padding:7px 14px;font-size:12.5px;font-weight:600}
+.badge.clickable{cursor:pointer;user-select:none}
+.badge.clickable:hover{border-color:var(--accent)}
+.dot{width:7px;height:7px;border-radius:50%;background:var(--warm)}
+.concl{background:var(--dark);color:#dfe9e2;border-radius:14px;padding:26px 28px;margin-top:28px}
+.concl strong,.concl b{color:#fff}
+.concl .k{color:#8fd6a8}
+.concl.light{background:#fdf3ee;color:var(--ink);border:1px solid #ecd8c8}
+.concl.light b{color:var(--warm)}
+.sec{margin-top:56px}
+.sec-hd{display:flex;align-items:baseline;gap:14px;margin-bottom:22px;flex-wrap:wrap}
+.sec-hd .n{font:600 11px/1 var(--mono);color:var(--warm);letter-spacing:.1em}
+
+.refs{display:grid;gap:22px}
+.ref{background:var(--card);border:1px solid var(--line);border-radius:14px;overflow:hidden}
+.ref-hd{display:flex;align-items:center;gap:12px;padding:16px 20px;border-bottom:1px solid var(--line);flex-wrap:wrap}
+.ref-hd .t{font-weight:650;font-size:15px}
+.ref-hd .src{font-size:12px;color:var(--muted);font-family:var(--mono)}
+.tag{font-size:11.5px;padding:3px 9px;border-radius:999px;background:var(--accent-soft);
+  color:var(--accent);border:1px solid var(--line2);font-weight:600}
+.tag.warm{background:#faf0e8;color:var(--warm);border-color:#ecd8c8}
+
+.shot{position:relative;display:block;background:#0d1117;max-height:520px;overflow:hidden;cursor:zoom-in}
+.shot img{display:block;width:100%;height:auto;transition:opacity .2s}
+.shot:hover img{opacity:.94}
+.shot.tall{max-height:460px}
+.shot::after{content:"";position:absolute;left:0;right:0;bottom:0;height:72px;pointer-events:none;
+  background:linear-gradient(to bottom,rgba(13,17,23,0),rgba(13,17,23,.8))}
+.shot .zoom-hint{position:absolute;right:12px;bottom:12px;z-index:2;pointer-events:none;
+  display:inline-flex;align-items:center;gap:6px;background:rgba(255,255,255,.14);color:#fff;
+  border:1px solid rgba(255,255,255,.3);backdrop-filter:blur(6px);border-radius:999px;
+  padding:5px 11px;font-size:11.5px;font-weight:600;opacity:0;transition:opacity .18s}
+.shot:hover .zoom-hint{opacity:1}
+.notes{display:grid;grid-template-columns:1fr 1fr;gap:0}
+.notes>div{padding:16px 20px}
+.notes>div:first-child{border-right:1px solid var(--line)}
+.notes h4{margin:0 0 8px;font-size:12px;font-family:var(--mono);letter-spacing:.08em;text-transform:uppercase}
+.notes .good h4{color:var(--dn)}
+.notes .bad h4{color:var(--warm)}
+.notes ul{margin:0;padding-left:18px}
+.notes li{margin:5px 0;font-size:13.5px;color:var(--ink2)}
+.notes li b{color:var(--ink);font-weight:600}
+
+.ours{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
+.ours figure{margin:0;background:var(--card);border:1px solid var(--line);border-radius:12px;overflow:hidden}
+.ours figcaption{padding:12px 14px;font-size:13px;color:var(--ink2);border-top:1px solid var(--line)}
+.ours figcaption b{display:block;color:var(--ink);font-size:13.5px;margin-bottom:3px}
+.ours .shot{max-height:280px}
+
+table{width:100%;border-collapse:collapse;background:var(--card);border:1px solid var(--line);border-radius:12px;overflow:hidden}
+th,td{padding:11px 14px;text-align:left;border-bottom:1px solid var(--line);font-size:13.5px;vertical-align:top}
+th{background:#f8faf6;font-size:12px;font-family:var(--mono);letter-spacing:.05em;text-transform:uppercase;color:var(--ink2);font-weight:600}
+tr:last-child td{border-bottom:none}
+td.c,th.c{text-align:center;width:96px}
+.yes{color:var(--dn);font-weight:700}
+.no{color:#b9c2ba}
+.half{color:var(--warm);font-weight:600}
+tr.hl td{background:#f2f7ef}
+table code,.mono{font-family:var(--mono);font-size:12.5px;color:var(--ink2)}
+
+.tokens{display:grid;grid-template-columns:1.1fr 1fr;gap:18px}
+.panel{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:18px 20px}
+.sw{display:flex;align-items:center;gap:10px;margin:7px 0;font-size:13px}
+.sw i{width:22px;height:22px;border-radius:6px;border:1px solid rgba(0,0,0,.08);flex:none}
+.sw code{font-family:var(--mono);font-size:12px;color:var(--muted)}
+.mono{font-size:12.5px;line-height:1.9;white-space:pre-wrap}
+
+.lists{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
+.lst{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:18px 20px}
+.lst h4{margin:0 0 12px;font-size:13px;font-family:var(--mono);letter-spacing:.06em}
+.lst.p0 h4{color:var(--up)} .lst.p1 h4{color:var(--warm)} .lst.p2 h4{color:var(--muted)}
+.lst ul{margin:0;padding:0;list-style:none}
+.lst li{position:relative;padding-left:20px;margin:9px 0;font-size:13.5px;color:var(--ink2)}
+.lst li:before{content:"";position:absolute;left:0;top:6px;width:11px;height:11px;border:1.5px solid var(--line2);border-radius:3px}
+.foot{margin-top:56px;padding-top:20px;border-top:1px solid var(--line);font-size:12.5px;color:var(--muted);
+  display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap}
+
+/* lightbox */
+.lb{position:fixed;inset:0;z-index:9999;background:#070b0e;display:flex;flex-direction:column}
+.lb[hidden]{display:none}
+.lb-top{display:flex;align-items:center;gap:14px;padding:12px 18px;background:rgba(13,17,23,.94);
+  border-bottom:1px solid rgba(255,255,255,.09);color:#dfe9e2;flex-wrap:wrap}
+.lb-title{font-size:13.5px;font-weight:600;color:#eef5f0;flex:1;min-width:180px;
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.lb-actions{display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+.lb-actions button{display:inline-flex;align-items:center;justify-content:center;min-width:34px;height:32px;
+  padding:0 10px;border-radius:8px;cursor:pointer;background:rgba(255,255,255,.07);color:#e6efe9;
+  border:1px solid rgba(255,255,255,.14);font:600 12.5px/1 Inter,"Microsoft YaHei",sans-serif;
+  transition:background .15s,border-color .15s}
+.lb-actions button:hover{background:rgba(255,255,255,.15);border-color:rgba(255,255,255,.3)}
+.lb-actions button:active{transform:translateY(1px)}
+.lb-actions .sep{width:1px;height:20px;background:rgba(255,255,255,.14);margin:0 4px}
+.lb-scale{font:600 12px/1 var(--mono);color:#9fb3a8;min-width:54px;text-align:center;font-variant-numeric:tabular-nums}
+.lb-stage{position:relative;flex:1;overflow:hidden;cursor:grab;touch-action:none;
+  background-color:#0a0f12;
+  background-image:linear-gradient(45deg,#101820 25%,transparent 25%,transparent 75%,#101820 75%),
+                   linear-gradient(45deg,#101820 25%,transparent 25%,transparent 75%,#101820 75%);
+  background-size:24px 24px;background-position:0 0,12px 12px}
+.lb-stage.dragging{cursor:grabbing}
+.lb-stage img{position:absolute;left:0;top:0;transform-origin:0 0;will-change:transform;
+  user-select:none;-webkit-user-drag:none;max-width:none;max-height:none;
+  box-shadow:0 18px 60px rgba(0,0,0,.62);background:#fff}
+.lb-foot{padding:9px 18px;background:rgba(13,17,23,.94);border-top:1px solid rgba(255,255,255,.09);
+  color:#8fa396;font-size:11.5px;font-family:var(--mono);text-align:center}
+
+@media (max-width:900px){
+  .notes,.tokens,.lists{grid-template-columns:1fr}
+  .notes>div:first-child{border-right:none;border-bottom:1px solid var(--line)}
+  .ours{grid-template-columns:1fr}
+  h1{font-size:30px}
+  .lb-title{display:none}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="head">
+    <div>
+      <div class="eyebrow">openOutcry · 期中汇报材料 · 设计参照</div>
+      <h1 style="margin-top:12px">同行的界面，<br>与我们要补的那一半。</h1>
+      <p class="lede">四家真实产品的界面实拍（不看宣传稿），与 openOutcry 当前原型同口径比对：同为 1440 宽桌面、同为"把一次运行讲清楚"这个任务。结论不是"换风格"，而是"补数据层"。<b>任意截图可点击放大，滚轮自由缩放。</b></p>
+    </div>
+    <div class="badge clickable" id="open-first" title="打开第一张大图">⌕ 点击截图可放大 · 滚轮缩放</div>
+  </div>
+
+  <div class="concl">
+    <p style="font-size:15px;line-height:1.8">
+      我们<b>不缺设计感，缺"仪器感"</b>。现有原型是漂亮的浅色编辑式版面，但它看起来像"产品文档的网页版"，而不是"一台跑和测 Agent 的设施"。<br>
+      同赛道对手在<b>信息密度、数据可视化、可审计性</b>上全面压过我们；而我们在<b>人机协同、证据编号、接入向导</b>上又明显领先。<br>
+      因此方向是 <span class="k">浅纸骨架 + 深色数据层</span> 的混合体——叙事用浅色（投影、打印友好），数字、图表、台账、原始 JSON 用深色等宽块。这个位置，TraderHarness（全暗）和 TradingAgents-CN（全亮 Streamlit）都没占。
+    </p>
+  </div>
+
+  <div class="hr"></div>
+
+  <div class="sec">
+    <div class="sec-hd">
+      <span class="n">01</span><h2>参照物</h2>
+      <span style="font-size:13px;color:var(--muted)">按"对我们有用程度"排序 · 截图可点击放大</span>
+    </div>
+
+    <div class="refs">
+
+      <article class="ref">
+        <div class="ref-hd">
+          <span class="t">TraderHarness · 回测控制室</span>
+          <span class="src">HephaestLab · 同赛道正面竞争</span>
+          <span class="tag warm">最该学</span>
+        </div>
+        <div class="shot">
+          <img src="ui-refs/th-live-control-room.png" alt="TraderHarness 实时运行页面"
+               data-caption="TraderHarness · 回测控制室（实时运行 / WebSocket 事件流）">
+          <span class="zoom-hint">点击放大</span>
+        </div>
+        <div class="notes">
+          <div class="good"><h4>它做对了</h4><ul>
+            <li><b>事件台账，不是聊天记录</b>：每条带序号 #5998、时间、类型 chip（全部/阶段/工具/订单/错误/思考）、智能体筛选、自动滚动</li>
+            <li><b>运行上下文常驻页头</b>："当前运行 ba685837 · 已完成 · 4 个智能体"</li>
+            <li><b>状态条诚实到刺眼</b>："系统就绪 · 严格时点追溯"</li>
+            <li><b>KPI 与图表同屏</b>：净值、四智能体对比、实时曲线</li>
+          </ul></div>
+          <div class="bad"><h4>它的代价</h4><ul>
+            <li><b>像素办公室占了整屏主视觉</b>——好看，但在评测场景里它不是证据，只是氛围</li>
+            <li>近黑 + 低对比灰，久读疲劳，投影到教室会糊</li>
+            <li>它是"多 Agent 并排跑"，与我们的"单次运行 + 人工审批"不是一回事</li>
+          </ul></div>
+        </div>
+      </article>
+
+      <article class="ref">
+        <div class="ref-hd">
+          <span class="t">TraderHarness · 研究档案</span>
+          <span class="src">同一产品 · 结果页（长图）</span>
+        </div>
+        <div class="shot tall">
+          <img src="ui-refs/th-results-workbench.png" alt="TraderHarness 回测研究档案"
+               data-caption="TraderHarness · 回测研究档案：KPI 条 / 权益曲线与基准 / 水下回撤 / 工具使用 / 每日账本（长图，可缩放细看）">
+          <span class="zoom-hint">点击查看完整长图</span>
+        </div>
+        <div class="notes">
+          <div class="good"><h4>它做对了</h4><ul>
+            <li><b>图表三件套</b>：权益曲线（含基准）、水下回撤、工具使用横条——正是我们复盘页完全缺失的东西</li>
+            <li><b>tab 化</b>：逐笔复盘 / 绩效总览 / 完整决策轨迹 / 成交台账</li>
+            <li><b>每日收益与回撤台账</b>：一行一天，涨跌直接上色</li>
+            <li><b>指标口径写清楚</b>：夏普 3.04 "风险调整后收益"</li>
+          </ul></div>
+          <div class="bad"><h4>它的代价</h4><ul>
+            <li>信息极密，无引导，新用户不知道从哪个数字开始看</li>
+            <li>配色单一（蓝/绿/红），层级靠字号撑</li>
+          </ul></div>
+        </div>
+      </article>
+
+      <article class="ref">
+        <div class="ref-hd">
+          <span class="t">TraderHarness · 运行对比</span>
+          <span class="src">我们文档里有、界面里没有的一级页面</span>
+        </div>
+        <div class="shot">
+          <img src="ui-refs/th-compare.png" alt="TraderHarness 智能体对比页"
+               data-caption="TraderHarness · 智能体对比：多曲线叠加 + 横向排名表（含相对沪深 300）">
+          <span class="zoom-hint">点击放大</span>
+        </div>
+        <div class="notes">
+          <div class="good"><h4>它做对了</h4><ul>
+            <li><b>对比是一级页面</b>：多曲线叠加 + 横向排名表（累计收益 / 相对沪深300 / 夏普 / 最大回撤 / 胜率 / 成交次数）</li>
+            <li><b>"相对基准"单独一列</b>——比绝对收益诚实得多</li>
+            <li>每行右侧"逐笔复盘"直达证据</li>
+          </ul></div>
+          <div class="bad"><h4>它缺的</h4><ul>
+            <li>没有样本量门槛提示，没有 DSR/过拟合修正</li>
+            <li>排名榜不区分"严格运行 / 探索运行"</li>
+          </ul></div>
+        </div>
+      </article>
+
+      <article class="ref">
+        <div class="ref-hd">
+          <span class="t">TraderHarness · 逐笔复盘</span>
+          <span class="src">"可追溯"最具体的形态</span>
+        </div>
+        <div class="shot tall">
+          <img src="ui-refs/th-trade-review.png" alt="TraderHarness 逐笔复盘"
+               data-caption="TraderHarness · 逐笔复盘：成交流水 / K 线上下文 / 决策链 / 执行证据原始 JSON">
+          <span class="zoom-hint">点击查看完整长图</span>
+        </div>
+        <div class="notes">
+          <div class="good"><h4>三段式结构</h4><ul>
+            <li>左：成交流水（代码 / 日期 / 买卖方向 / 阶段）</li>
+            <li>中上：K 线上下文；中下：决策链三条理由</li>
+            <li>右：<b>执行证据原始 JSON</b>（action / price / quantity / net_income / portfolio_after）</li>
+            <li>页内明写："系统不会伪造缺失的隐藏推理"</li>
+          </ul></div>
+          <div class="bad"><h4>可借的结构</h4><ul>
+            <li>"决策链 + 原始动作"正是我们 <b>证据编号 ev_018 / ev_024</b> 该有的呈现位置</li>
+            <li>我们的订单审批（批准/修改/拒绝）应当长在这个页面上</li>
+          </ul></div>
+        </div>
+      </article>
+
+      <article class="ref">
+        <div class="ref-hd">
+          <span class="t">PanWatch · 模拟盘</span>
+          <span class="src">TNT-Likely · A股 AI 持仓监控</span>
+          <span class="tag">密度范本</span>
+        </div>
+        <div class="shot">
+          <img src="ui-refs/panwatch-papertrading.png" alt="PanWatch 模拟盘页面"
+               data-caption="PanWatch · 模拟盘：KPI 条 / 收益曲线 / 策略绩效表">
+          <span class="zoom-hint">点击放大</span>
+        </div>
+        <div class="notes">
+          <div class="good"><h4>它做对了</h4><ul>
+            <li><b>一屏 5–6 个 KPI</b>：总资产 / 总收益 / 胜率 / 最大回撤 / 可用资金，标签极小数字极大</li>
+            <li><b>收益曲线 + 策略绩效表</b>同一页闭环</li>
+            <li><b>红涨绿跌</b>——符合 A 股习惯</li>
+            <li>行内标注数据来源与时效："来源: TradingAgents 深度 · 21:08（已过期）"</li>
+          </ul></div>
+          <div class="bad"><h4>它的代价</h4><ul>
+            <li>密到没有呼吸感，无主次层级</li>
+            <li>只有"当下"，没有"为什么"——决策不可追溯</li>
+          </ul></div>
+        </div>
+      </article>
+
+      <article class="ref">
+        <div class="ref-hd">
+          <span class="t">PanWatch · 持仓</span>
+          <span class="src">高密度表格与行内标注</span>
+        </div>
+        <div class="shot">
+          <img src="ui-refs/panwatch-portfolio.png" alt="PanWatch 持仓页"
+               data-caption="PanWatch · 持仓：一屏六列指标 + 行内 chip 与来源时效标注">
+          <span class="zoom-hint">点击放大</span>
+        </div>
+      </article>
+
+      <article class="ref">
+        <div class="ref-hd">
+          <span class="t">QuantConnect · 回测报告</span>
+          <span class="src">经典量化平台 · 报告的"标准答案"</span>
+          <span class="tag warm">可信度落 UI 的范本</span>
+        </div>
+        <div class="shot">
+          <img src="ui-refs/qc-backtest-top.png" alt="QuantConnect 回测结果页"
+               data-caption="QuantConnect · 回测结果：KPI 条 / 净值与每日表现 / 回撤 / 过拟合徽章">
+          <span class="zoom-hint">点击放大</span>
+        </div>
+        <div class="notes">
+          <div class="good"><h4>它做对了</h4><ul>
+            <li><b>KPI 条 + 三层图垂直堆叠</b>：净值（含每日表现柱）→ 回撤 → 资产暴露/排名侧栏</li>
+            <li><b>把"过拟合风险"做成界面徽章</b>：Research Guide 明写 "99 Backtests Remaining → Likely Not Overfit"、"3 Parameters Detected"</li>
+            <li>侧栏 PSR 9.6% / Rank 17 带进度条</li>
+          </ul></div>
+          <div class="bad"><h4>它的代价</h4><ul>
+            <li>无圆角、细线框，2008 年报表审美</li>
+            <li>英文语境、指标默认用户看得懂</li>
+          </ul></div>
+        </div>
+      </article>
+
+      <article class="ref">
+        <div class="ref-hd">
+          <span class="t">QuantConnect · 回测列表</span>
+          <span class="src">"每次运行都是一行可比较记录"</span>
+        </div>
+        <div class="shot">
+          <img src="ui-refs/qc-backtest-view.png" alt="QuantConnect 回测列表"
+               data-caption="QuantConnect · 回测列表：Name / 状态 / PSR / Sharpe / Trades / 时间">
+          <span class="zoom-hint">点击放大</span>
+        </div>
+      </article>
+
+      <article class="ref">
+        <div class="ref-hd">
+          <span class="t">TradingAgents-CN · 报告式界面</span>
+          <span class="src">hsliuping · 同题不同解</span>
+          <span class="tag warm">反面教材</span>
+        </div>
+        <div class="shot">
+          <img src="ui-refs/tacn-report.png" alt="TradingAgents-CN 分析报告"
+               data-caption="TradingAgents-CN · 分析报告：Streamlit 默认样式 + emoji 图标">
+          <span class="zoom-hint">点击放大</span>
+        </div>
+        <div class="notes">
+          <div class="good"><h4>可取之处</h4><ul>
+            <li><b>按角色分 tab</b>组织长报告（市场技术 / 基本面 / 新闻事件 / 风险评估 / 投资建议 / 研究团队决策），长文本不糊成一坨</li>
+            <li>决策摘要四个大字：投资建议 / 置信度 / 风险评分 / 目标价位</li>
+          </ul></div>
+          <div class="bad"><h4>它暴露的问题</h4><ul>
+            <li>Streamlit 默认样式 + emoji 当图标（📊🧠⚖️🚀），视觉廉价</li>
+            <li><b>本质是"问一次生成一份报告"</b>：没有运行 ID、没有事件流、没有账户、没有回放</li>
+            <li>这恰好反证我们的差异化是真的</li>
+          </ul></div>
+        </div>
+      </article>
+
+    </div>
+  </div>
+
+  <div class="hr"></div>
+
+  <div class="sec">
+    <div class="sec-hd">
+      <span class="n">02</span><h2>我们的现状</h2>
+      <span style="font-size:13px;color:var(--muted)">原型 v2 已按本报告改造完毕 · Playwright 1440 实拍 · 可放大</span>
+    </div>
+    <div class="ours">
+      <figure>
+        <div class="shot">
+          <img src="ui-refs/ours-studio.png" alt="我们的 Agent 工作室"
+               data-caption="openOutcry · Agent 工作室（当前原型）">
+          <span class="zoom-hint">放大</span>
+        </div>
+        <figcaption><b>Agent 工作室</b>票据式卡片 + 右上「实时运行卡」把当前快照前置；不再是纯文字列表。</figcaption>
+      </figure>
+      <figure>
+        <div class="shot">
+          <img src="ui-refs/ours-training.png" alt="我们的训练场"
+               data-caption="openOutcry · 训练场（当前原型）">
+          <span class="zoom-hint">放大</span>
+        </div>
+        <figcaption><b>训练场</b>三栏同屏：左模拟时钟与账户、中结构化台账与审批票、右预算与可信度；<b>审批卡在首屏即可点</b>。</figcaption>
+      </figure>
+      <figure>
+        <div class="shot">
+          <img src="ui-refs/ours-review.png" alt="我们的结果与复盘"
+               data-caption="openOutcry · 结果与复盘（当前原型）">
+          <span class="zoom-hint">放大</span>
+        </div>
+        <figcaption><b>结果与复盘</b>四张手写内联 SVG：净值 vs 基准、水下回撤、工具分布、运行口径；"样本不足不排名"仍是硬结论。</figcaption>
+      </figure>
+    </div>
+
+    <div class="concl light" style="margin-top:22px">
+      <p style="font-size:14px;line-height:1.8">
+<b>已修复 · 四件事。</b> ① 涨跌改为 A 股红涨绿跌（<span class="mono" style="display:inline">#C2352A / #1E7A4B</span>）；② 深色仪器带承载 KPI 与全部图表；③ 事件由气泡改为带序号的台账；④ 页头常驻可信度徽条。原型同时整体重做为「纸质大厅」视觉系统。
+      </p>
+    </div>
+  </div>
+
+  <div class="hr"></div>
+
+  <div class="sec">
+    <div class="sec-hd"><span class="n">03</span><h2>差距矩阵</h2></div>
+    <table>
+      <thead><tr>
+        <th>能力</th><th class="c">我们</th><th class="c">TraderHarness</th><th class="c">PanWatch</th><th class="c">QuantConnect</th>
+      </tr></thead>
+      <tbody>
+        <tr><td>净值曲线</td><td class="c yes">✓</td><td class="c yes">✓</td><td class="c yes">✓</td><td class="c yes">✓✓</td></tr>
+        <tr><td>回撤 / 水下曲线</td><td class="c yes">✓</td><td class="c yes">✓</td><td class="c half">仅数值</td><td class="c yes">✓</td></tr>
+        <tr><td>事件台账（序号/筛选/自动滚动）</td><td class="c yes">✓</td><td class="c yes">✓</td><td class="c no">✗</td><td class="c no">✗</td></tr>
+        <tr><td>多运行对比 / 横向排名</td><td class="c no">✗</td><td class="c yes">✓</td><td class="c no">✗</td><td class="c yes">✓</td></tr>
+        <tr><td>逐笔复盘 + K 线上下文</td><td class="c no">✗</td><td class="c yes">✓</td><td class="c half">半</td><td class="c no">✗</td></tr>
+        <tr><td>可信度 / 过拟合徽章</td><td class="c yes">✓</td><td class="c yes">✓</td><td class="c no">✗</td><td class="c yes">✓</td></tr>
+        <tr class="hl"><td><b>订单审批 / 人机协同</b></td><td class="c yes">✓</td><td class="c no">✗</td><td class="c no">✗</td><td class="c no">✗</td></tr>
+        <tr class="hl"><td><b>证据编号 / 受控搜索出口</b></td><td class="c yes">✓</td><td class="c half">半</td><td class="c no">✗</td><td class="c no">✗</td></tr>
+        <tr class="hl"><td><b>Agent 接入向导</b></td><td class="c yes">✓</td><td class="c half">半</td><td class="c no">✗</td><td class="c no">✗</td></tr>
+      </tbody>
+    </table>
+    <p style="margin-top:14px;font-size:13.5px;color:var(--ink2)">
+      读法：三项独有优势都在<b>可信与协作</b>，短板原本集中在<b>结果可视化</b>。原型 v2 已补齐净值、回撤、台账与可信度徽章；仅剩「多运行对比页」待做。
+    </p>
+  </div>
+
+  <div class="hr"></div>
+
+  <div class="sec">
+    <div class="sec-hd"><span class="n">04</span><h2>设计方向与令牌</h2></div>
+    <div class="tokens">
+      <div class="panel">
+        <h3 style="margin-bottom:10px">保留</h3>
+        <ul style="margin:0 0 18px;padding-left:18px;font-size:13.5px;color:var(--ink2)">
+          <li>浅纸底 + 墨绿 + 橙点，身份明确，投影与打印都友好</li>
+          <li>衬线品牌字（Georgia）</li>
+          <li>克制文案（"样本不足，不排名"）</li>
+        </ul>
+        <h3 style="margin-bottom:10px">引入</h3>
+        <ul style="margin:0;padding-left:18px;font-size:13.5px;color:var(--ink2)">
+          <li><b>深色数据带</b>：KPI 条、图表底、事件台账、原始 JSON</li>
+          <li><b>图表三件套</b>：净值（含基准）/ 水下回撤 / 成交与工具分布</li>
+          <li><b>事件台账化</b>：序号 + 时间 + 类型 chip + 筛选 + 自动滚动</li>
+          <li><b>可信度徽章条常驻页头</b>：资料时点 · 研究出口 · 轨迹完整性 · 样本量 · DSR</li>
+          <li><b>运行对比页</b>（新增一级页面）</li>
+        </ul>
+      </div>
+      <div class="panel">
+        <h3 style="margin-bottom:12px">色板</h3>
+        <div class="sw"><i style="background:#f4f5f1"></i>纸底 <code>#F4F5F1</code></div>
+        <div class="sw"><i style="background:#16241c"></i>深色数据带 <code>#16241C</code></div>
+        <div class="sw"><i style="background:#345d45"></i>主色墨绿 <code>#345D45</code></div>
+        <div class="sw"><i style="background:#a45c30"></i>暖橙（品牌点） <code>#A45C30</code></div>
+        <div class="sw"><i style="background:#c0392b"></i>涨（A 股） <code>#C0392B</code></div>
+        <div class="sw"><i style="background:#1e7a4b"></i>跌（A 股） <code>#1E7A4B</code></div>
+        <div class="sw"><i style="background:#e1e7de"></i>hairline <code>#E1E7DE</code></div>
+        <div class="mono" style="margin-top:14px">字号 32/24/18/15/13/12
+行高 正文1.6 表格1.35 KPI1.1
+间距 4 基栅格 · 卡片内距 16
+圆角 卡片12 控件8 chip999
+数字 tabular-nums + 等宽</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="hr"></div>
+
+  <div class="sec">
+    <div class="sec-hd"><span class="n">05</span><h2>改造清单</h2></div>
+    <div class="lists">
+      <div class="lst p0">
+        <h4>P0 · 已在原型 v2 完成 ✓</h4>
+        <ul>
+          <li>涨跌配色改为红涨绿跌 + 设置项</li>
+          <li>训练场：深色 KPI 带 + 净值曲线（含基准）</li>
+          <li>复盘页重构：KPI 带 + 净值/回撤双图 + 交易台账 + 横向对比表</li>
+          <li>事件区台账化（序号/时间/类型/筛选/自动滚动）</li>
+          <li>可信度徽章条常驻页头</li>
+        </ul>
+      </div>
+      <div class="lst p1">
+        <h4>P1</h4>
+        <ul>
+          <li>新增「运行对比」页（多曲线 + 排名表）</li>
+          <li>逐笔复盘抽屉（K 线 + 决策链 + 原始动作 JSON）</li>
+          <li>全站数字等宽 + tabular-nums</li>
+          <li>数据来源与时效行内标注</li>
+        </ul>
+      </div>
+      <div class="lst p2">
+        <h4>P2</h4>
+        <ul>
+          <li>密度 / 圆角 / 间距系统统一</li>
+          <li>深色模式（跟随系统）</li>
+          <li>像素办公室彩蛋（可选，非首屏）</li>
+        </ul>
+      </div>
+    </div>
+    <p style="margin-top:18px;font-size:13.5px;color:var(--ink2);max-width:74ch">
+      工程约束：原型是单文件 HTML、无构建无依赖，图表用手写内联 SVG，预计 +800～1200 行、体积控制在 120 KB 内。必须处理空数据 / 单点 / 全负三种边界，改完用 Playwright 三页截图回归。
+    </p>
+  </div>
+
+  <div class="hr"></div>
+
+  <div class="sec">
+    <div class="sec-hd">
+      <span class="n">06</span><h2>TraderHarness 架构速读</h2>
+      <span style="font-size:13px;color:var(--muted)">从代码与依赖文件读出来的，不看宣传稿</span>
+    </div>
+    <table>
+      <thead><tr><th style="width:100px">层</th><th>他们的做法（已核对仓库）</th><th style="width:300px">对我们的启示</th></tr></thead>
+      <tbody>
+        <tr>
+          <td><b>引擎</b></td>
+          <td>纯 Python 包 <code>traderharness</code>（PyPI，≥3.10）；<code>core/</code> 下 engine / env / events / portfolio / calendar / budget / runner 各自成文件，依赖只有 pandas / numpy / httpx / pyarrow</td>
+          <td>先定死 core 的六件事：模拟时钟、观测、账户、撮合、事件、预算。不要一开始就碰界面</td>
+        </tr>
+        <tr>
+          <td><b>抗污染</b></td>
+          <td><code>masking.py</code> / <code>entity_masking.py</code> / <code>leakage.py</code> 三个独立模块，而非一个开关函数</td>
+          <td>我们文档里的"五开关"应一开关一模块，能单独写单测、单独做 A/B</td>
+        </tr>
+        <tr>
+          <td><b>服务</b></td>
+          <td>FastAPI + uvicorn（<code>server/app.py</code>），外加 <code>run_manager</code> 与 <code>paper_manager</code> 两个生命周期管理器</td>
+          <td>运行生命周期 ≠ 模拟盘会话，两者要分开管理；前端只订阅事件流</td>
+        </tr>
+        <tr>
+          <td><b>前端</b></td>
+          <td>React 19 + Vite + React Router + lucide-react；<code>webui/e2e</code> 用 Playwright 端到端</td>
+          <td>原型阶段保持单文件没问题；开发期必须换成 Vite + 组件化，否则图表和表格会失控</td>
+        </tr>
+        <tr>
+          <td><b>回放</b></td>
+          <td>轨迹是 <code>.jsonl</code>，且把 demo 回放（<code>momentum_dragon_2024-03-14.jsonl</code>）打进 wheel 随包分发，做到"零凭据三步体验"</td>
+          <td>把我们的"可回放"尽快定成 jsonl 事件格式，并内置一条样例轨迹用于汇报现场演示</td>
+        </tr>
+        <tr>
+          <td><b>数据</b></td>
+          <td>可选依赖里是 <code>baostock</code> / <code>mootdx</code> / <code>duckdb</code>；README 称覆盖五年全市场日线与 5 分钟线</td>
+          <td><b>强信号</b>：A 股历史行情用免费源可行 → 我们的"数据可行性"风险应下调，真正要验证的是历史新闻/公告的时点快照</td>
+        </tr>
+        <tr>
+          <td><b>交付</b></td>
+          <td>PyPI 包 + mkdocs 文档站 + CI + Dockerfile + CHANGELOG，版本 1.1.0（Research Beta）</td>
+          <td>期末至少要有"可 pip 安装 + 一条命令跑起来"的形态，文档站比 Word 更有说服力</td>
+        </tr>
+      </tbody>
+    </table>
+    <p style="margin-top:14px;font-size:13.5px;color:var(--ink2);max-width:78ch">
+      一个必须正视的事实：它已经跑过 21 个交易日的魔鬼窗口基准，拿出四个模型的区间收益、夏普、回撤、胜率对照表。这类"可复现的小基准"正是期中之后我们必须补的东西——比再多三页产品文档都更能证明系统真的存在。
+    </p>
+  </div>
+
+  <div class="foot">
+    <span>图片来源：各项目仓库 docs/assets、docs/screenshots；QuantConnect 官方文档 CDN；openOutcry 原型由 Playwright 实拍。架构信息取自 TraderHarness 仓库 pyproject.toml / webui/package.json / traderharness 目录结构。</span>
+    <span>research/ui-refs/ · 2026-10-28</span>
+  </div>
+
+</div>
+
+<div class="lb" id="lb" hidden>
+  <div class="lb-top">
+    <div class="lb-title" id="lb-title"></div>
+    <div class="lb-actions">
+      <button type="button" data-act="prev" title="上一张 (←)">‹</button>
+      <button type="button" data-act="next" title="下一张 (→)">›</button>
+      <span class="sep"></span>
+      <button type="button" data-act="zoomout" title="缩小 (-)">−</button>
+      <span class="lb-scale" id="lb-scale">100%</span>
+      <button type="button" data-act="zoomin" title="放大 (+)">+</button>
+      <span class="sep"></span>
+      <button type="button" data-act="width" title="适应宽度 (W)">宽</button>
+      <button type="button" data-act="fit" title="适应窗口 (0)">适应</button>
+      <button type="button" data-act="one" title="原始尺寸 (1)">1:1</button>
+      <span class="sep"></span>
+      <button type="button" data-act="close" title="关闭 (Esc)">✕</button>
+    </div>
+  </div>
+  <div class="lb-stage" id="lb-stage"><img class="lb-img" id="lb-img" alt=""></div>
+  <div class="lb-foot">滚轮缩放 · 拖拽平移 · 双击切换 适应/1:1 · ←/→ 切换 · +/- 缩放 · W 适应宽度 · 0 适应 · 1 原始 · Esc 关闭</div>
+</div>
+
+<script>
+(function(){
+  "use strict";
+  var items = [], seen = {};
+  var imgs = document.querySelectorAll("img[data-caption]");
+  for (var i = 0; i < imgs.length; i++) {
+    var el = imgs[i], src = el.getAttribute("src");
+    if (!src || seen[src]) continue;
+    seen[src] = 1;
+    items.push({ src: src, caption: el.getAttribute("data-caption") || el.getAttribute("alt") || "" });
+  }
+
+  var lb = document.getElementById("lb");
+  var stage = document.getElementById("lb-stage");
+  var img = document.getElementById("lb-img");
+  var scaleEl = document.getElementById("lb-scale");
+  var titleEl = document.getElementById("lb-title");
+  var openFirst = document.getElementById("open-first");
+
+  var idx = 0, scale = 1, tx = 0, ty = 0, natW = 0, natH = 0, isFit = true;
+  var pointers = new Map(), drag = null, pinch = null;
+  var MIN = 0.05, MAX = 16;
+
+  function stageBox(){ var r = stage.getBoundingClientRect(); return { w: r.width, h: r.height }; }
+  function paint(){
+    img.style.transform = "translate3d(" + tx + "px," + ty + "px,0) scale(" + scale + ")";
+    scaleEl.textContent = Math.round(scale * 100) + "%";
+  }
+  function clamp(v){ return Math.min(MAX, Math.max(MIN, v)); }
+  function widthFit(){
+    var b = stageBox();
+    if (!natW || !natH || !b.w) return;
+    isFit = true;
+    scale = clamp(Math.min(b.w / natW, 1));
+    tx = (b.w - natW * scale) / 2;
+    ty = 0;
+    paint();
+  }
+  function fit(){
+    var b = stageBox();
+    if (!natW || !natH || !b.w || !b.h) return;
+    var sContain = Math.min(b.w / natW, b.h / natH, 1);
+    var sWidth = Math.min(b.w / natW, 1);
+    // 整页缩到 50% 以下就再看不清数字了：改为按宽度铺满、顶部对齐，让用户拖拽纵览
+    if (sContain < 0.5 && sWidth > sContain * 1.3) { widthFit(); return; }
+    isFit = true;
+    scale = clamp(sContain);
+    tx = (b.w - natW * scale) / 2;
+    ty = (b.h - natH * scale) / 2;
+    paint();
+  }
+  function actual(){
+    var b = stageBox();
+    isFit = false; scale = 1;
+    tx = (b.w - natW) / 2; ty = (b.h - natH) / 2;
+    paint();
+  }
+  function zoomAt(cx, cy, factor){
+    var ns = clamp(scale * factor);
+    if (ns === scale) return;
+    tx = cx - (cx - tx) * (ns / scale);
+    ty = cy - (cy - ty) * (ns / scale);
+    scale = ns; isFit = false; paint();
+  }
+  function zoomCenter(f){ var b = stageBox(); zoomAt(b.w / 2, b.h / 2, f); }
+
+  function show(n){
+    if (!items.length) return;
+    idx = (n % items.length + items.length) % items.length;
+    var it = items[idx];
+    titleEl.textContent = (it.caption || "第 " + (idx + 1) + " 张") + "　（" + (idx + 1) + "/" + items.length + "）";
+    img.alt = it.caption || "";
+    natW = 0; natH = 0; scale = 1; tx = 0; ty = 0;
+    img.style.transform = "translate3d(0,0,0) scale(1)";
+    scaleEl.textContent = "…";
+    img.onload = function(){ natW = img.naturalWidth; natH = img.naturalHeight; fit(); };
+    img.src = it.src;
+    if (img.complete && img.naturalWidth) { natW = img.naturalWidth; natH = img.naturalHeight; fit(); }
+  }
+  function open(n){
+    show(n);
+    lb.hidden = false;
+    document.body.style.overflow = "hidden";
+  }
+  function close(){
+    lb.hidden = true;
+    img.removeAttribute("src");
+    document.body.style.overflow = "";
+  }
+
+  for (var k = 0; k < items.length; k++) {
+    (function(i){
+      var same = document.querySelectorAll('img[src="' + items[i].src + '"]');
+      for (var j = 0; j < same.length; j++) {
+        same[j].style.cursor = "zoom-in";
+        same[j].addEventListener("click", function(ev){ ev.preventDefault(); open(i); });
+      }
+    })(k);
+  }
+  if (openFirst) openFirst.addEventListener("click", function(){ open(0); });
+
+  lb.addEventListener("click", function(ev){
+    var btn = ev.target.closest ? ev.target.closest("button[data-act]") : null;
+    if (!btn) return;
+    ev.stopPropagation();
+    var act = btn.getAttribute("data-act");
+    if (act === "close") close();
+    else if (act === "prev") show(idx - 1);
+    else if (act === "next") show(idx + 1);
+    else if (act === "zoomin") zoomCenter(1.25);
+    else if (act === "zoomout") zoomCenter(1 / 1.25);
+    else if (act === "width") widthFit();
+    else if (act === "fit") fit();
+    else if (act === "one") actual();
+  });
+
+  stage.addEventListener("wheel", function(ev){
+    ev.preventDefault();
+    var r = stage.getBoundingClientRect();
+    zoomAt(ev.clientX - r.left, ev.clientY - r.top, Math.exp(-ev.deltaY * 0.0015));
+  }, { passive: false });
+
+  stage.addEventListener("pointerdown", function(ev){
+    pointers.set(ev.pointerId, { x: ev.clientX, y: ev.clientY });
+    if (pointers.size === 1) {
+      drag = { x: ev.clientX, y: ev.clientY };
+      stage.classList.add("dragging");
+      try { stage.setPointerCapture(ev.pointerId); } catch (e) {}
+    } else if (pointers.size === 2) {
+      drag = null;
+      var pts = Array.from(pointers.values());
+      pinch = { dist: Math.hypot(pts[0].x - pts[1].x, pts[0].y - pts[1].y) || 1, scale: scale };
+    }
+  });
+  stage.addEventListener("pointermove", function(ev){
+    if (!pointers.has(ev.pointerId)) return;
+    pointers.set(ev.pointerId, { x: ev.clientX, y: ev.clientY });
+    if (pointers.size === 2 && pinch) {
+      var pts = Array.from(pointers.values());
+      var d = Math.hypot(pts[0].x - pts[1].x, pts[0].y - pts[1].y);
+      var r = stage.getBoundingClientRect();
+      var cx = (pts[0].x + pts[1].x) / 2 - r.left;
+      var cy = (pts[0].y + pts[1].y) / 2 - r.top;
+      zoomAt(cx, cy, (pinch.scale * (d / pinch.dist)) / scale);
+      return;
+    }
+    if (drag) {
+      tx += ev.clientX - drag.x;
+      ty += ev.clientY - drag.y;
+      drag = { x: ev.clientX, y: ev.clientY };
+      isFit = false; paint();
+    }
+  });
+  function endPointer(ev){
+    pointers.delete(ev.pointerId);
+    if (pointers.size < 2) pinch = null;
+    if (pointers.size === 0) { drag = null; stage.classList.remove("dragging"); }
+  }
+  stage.addEventListener("pointerup", endPointer);
+  stage.addEventListener("pointercancel", endPointer);
+
+  stage.addEventListener("dblclick", function(ev){
+    ev.preventDefault();
+    if (isFit) actual(); else fit();
+  });
+
+  document.addEventListener("keydown", function(ev){
+    if (lb.hidden) return;
+    var k = ev.key;
+    if (k === "Escape") close();
+    else if (k === "ArrowRight") show(idx + 1);
+    else if (k === "ArrowLeft") show(idx - 1);
+    else if (k === "+" || k === "=") zoomCenter(1.25);
+    else if (k === "-" || k === "_") zoomCenter(1 / 1.25);
+    else if (k === "0") fit();
+    else if (k === "w" || k === "W") widthFit();
+    else if (k === "1") actual();
+    else return;
+    ev.preventDefault();
+  });
+
+  window.addEventListener("resize", function(){
+    if (!lb.hidden && isFit) fit();
+  });
+
+  window.__lb = { open: open, close: close, count: function(){ return items.length; },
+                  state: function(){ return { idx: idx, scale: scale, tx: tx, ty: ty }; } };
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,241 @@
+@layer components {
+/* ============================================================
+   MDX 产品文档版式（纸质大厅：宋体标题 + 纸面正文 + 漆板代码/图表）
+   所有后代选择器仅作用于文档直接子节点（.mdx-doc > ...），
+   严禁污染 <CodeDemo> 舞台内挂载的真实业务组件样式！
+   所有字号使用 tokens.css 流体变量，严格遵守 ≥ --fs-min (13px) 契约。
+   ============================================================ */
+.mdx-doc {
+  max-width: 960px;
+  color: var(--ink);
+  font-size: var(--fs-body);
+  line-height: var(--lh-body);
+}
+
+.mdx-doc > * + * {
+  margin-top: 16px;
+}
+
+.mdx-doc > h1 {
+  font: 700 var(--fs-h1) / 1.18 var(--serif);
+  letter-spacing: -0.02em;
+  color: var(--ink);
+  margin-top: 8px;
+}
+
+.mdx-doc > h2 {
+  font: 700 var(--fs-h2) / 1.3 var(--serif);
+  letter-spacing: -0.01em;
+  color: var(--ink);
+  margin-top: 40px;
+  padding-top: 18px;
+  border-top: 2px solid var(--ink);
+}
+
+.mdx-doc > h3 {
+  font: 700 var(--fs-body) / 1.4 var(--serif);
+  color: var(--ink);
+  margin-top: 24px;
+}
+
+.mdx-doc > p {
+  color: var(--ink-2);
+  font-size: var(--fs-body);
+  line-height: 1.7;
+}
+
+.mdx-doc > p strong,
+.mdx-doc > ul strong,
+.mdx-doc > ol strong,
+.mdx-doc > blockquote strong {
+  color: var(--ink);
+  font-weight: 700;
+}
+
+.mdx-doc > ul,
+.mdx-doc > ol {
+  margin-top: 12px;
+  padding-left: 22px;
+  color: var(--ink-2);
+  font-size: var(--fs-body);
+  line-height: 1.68;
+}
+
+.mdx-doc > ul {
+  list-style: disc;
+}
+
+.mdx-doc > ol {
+  list-style: decimal;
+}
+
+.mdx-doc > ul > li + li,
+.mdx-doc > ol > li + li {
+  margin-top: 6px;
+}
+
+.mdx-doc > blockquote {
+  margin: 18px 0;
+  padding: 12px 16px;
+  border-left: 3px solid var(--ver);
+  background: var(--bone-hi);
+  color: var(--ink-2);
+  font-size: var(--fs-sm);
+  line-height: var(--lh-sm);
+}
+
+.mdx-doc > blockquote > p {
+  color: var(--ink-2);
+  font-size: var(--fs-sm);
+  line-height: var(--lh-sm);
+}
+
+.mdx-doc > hr {
+  border: 0;
+  border-top: 1px solid var(--rule-strong);
+  margin: 28px 0;
+}
+
+.mdx-doc > p > code,
+.mdx-doc > ul > li > code,
+.mdx-doc > ol > li > code,
+.mdx-doc > blockquote code,
+.mdx-table-wrap code {
+  padding: 2px 6px;
+  border: 1px solid var(--rule);
+  background: var(--bone-hi);
+  color: var(--ink);
+  font-family: var(--mono);
+  font-size: var(--fs-micro);
+}
+
+.mdx-table-wrap {
+  width: 100%;
+  overflow-x: auto;
+  margin: 18px 0;
+}
+
+.mdx-table-wrap > table {
+  width: 100%;
+  border-collapse: collapse;
+  background: var(--bone-hi);
+  border: 1px solid var(--rule-strong);
+  margin: 0;
+}
+
+.mdx-table-wrap th,
+.mdx-table-wrap td {
+  padding: 10px 12px;
+  text-align: left;
+  border-bottom: 1px solid var(--rule-soft);
+  font-size: var(--fs-sm);
+  line-height: var(--lh-sm);
+  vertical-align: top;
+}
+
+.mdx-table-wrap th {
+  font: 600 var(--fs-micro) / 1.3 var(--mono);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--ink-2);
+  background: var(--bone);
+  border-bottom: 1px solid var(--rule-strong);
+}
+
+/* ---------- Mermaid 图表框 ---------- */
+.mdx-diagram {
+  margin: 20px 0;
+  padding: 18px 16px;
+  border: 1px solid var(--rule-strong);
+  background: var(--bone-hi);
+  box-shadow: var(--hard);
+  overflow-x: auto;
+}
+
+.mdx-diagram svg {
+  display: block;
+  max-width: 100%;
+  height: auto;
+  margin: 0 auto;
+}
+
+.mdx-diagram-note {
+  color: var(--ink-2);
+  font-size: var(--fs-sm);
+  line-height: var(--lh-sm);
+  text-align: center;
+}
+
+.mdx-diagram-note b {
+  display: block;
+  margin-bottom: 4px;
+  color: var(--ink);
+  font-family: var(--serif);
+  font-size: var(--fs-body);
+}
+
+.mdx-diagram-failed {
+  border-style: dashed;
+  box-shadow: none;
+}
+
+/* ---------- Live Demo + 真实源码容器 ---------- */
+.doc-demo {
+  margin: 24px 0;
+  border: 1px solid var(--ink);
+  background: var(--bone-hi);
+  box-shadow: var(--hard-lg);
+  min-width: 0;
+}
+
+.doc-demo-hd {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 10px 16px;
+  border-bottom: 1px solid var(--ink);
+  background: var(--bone);
+}
+
+.doc-demo-title {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 10px;
+  min-width: 0;
+}
+
+.doc-demo-title b {
+  font: 700 var(--fs-sm) / 1.3 var(--serif);
+  color: var(--ink);
+}
+
+.doc-demo-path {
+  font: 600 var(--fs-micro) / 1.3 var(--mono);
+  color: var(--ink-2);
+}
+
+.doc-demo-stage {
+  padding: 18px;
+  background: var(--bone);
+  overflow-x: auto;
+  min-width: 0;
+}
+
+.doc-demo-caption {
+  padding: 10px 16px;
+  border-top: 1px dashed var(--rule-strong);
+  background: var(--bone-hi);
+  color: var(--ink-2);
+  font-size: var(--fs-sm);
+  line-height: var(--lh-sm);
+}
+
+.doc-demo pre.code {
+  max-height: 440px;
+  border: 0;
+  color: var(--plate-ink);
+}
+}

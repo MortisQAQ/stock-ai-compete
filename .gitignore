@@ -30,3 +30,9 @@ _shots/
 
 # 演示稿工具导出的草稿
 draft_*_folder/
+
+# 浏览器取证过程的临时截图与脚本
+.tmp-browser/
+
+# 历史尝试归档（约 155MB，本地留存，不入库）
+_archive/

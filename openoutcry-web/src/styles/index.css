@@ -23,6 +23,7 @@
 @import './training.css' layer(components);
 @import './review.css' layer(components);
 @import './misc.css' layer(components);
+@import './docs.css' layer(components);
 
 /* ============================================================
    shadcn 语义层：把「纸质大厅」色板映射到 shadcn 的语义变量，
