@@ -34,5 +34,15 @@ draft_*_folder/
 # 浏览器取证过程的临时截图与脚本
 .tmp-browser/
 
+# 本地临时工作目录：放参考实现的源码（如个人博客原码），对着抄用的，不入库
+tmp/
+
 # 历史尝试归档（约 155MB，本地留存，不入库）
 _archive/
+
+# 本机取证截图与临时调研草稿
+.shots/
+.tmp-research/
+
+# 一次性浏览器探针脚本
+openoutcry-web/scripts/_*.mjs

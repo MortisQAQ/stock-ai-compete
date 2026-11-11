@@ -26,7 +26,7 @@ function DialogOverlay({ className, ...props }: React.ComponentProps<typeof Dial
     <DialogPrimitive.Overlay
       data-slot="dialog-overlay"
       className={cn(
-        'fixed inset-0 z-[9100] bg-[rgba(14,22,19,0.55)] backdrop-blur-[2px]',
+        'fixed inset-0 z-[9100] bg-[rgba(0,0,0,0.72)] backdrop-blur-[2px]',
         'data-[state=open]:animate-in data-[state=open]:fade-in-0 data-[state=closed]:animate-out data-[state=closed]:fade-out-0',
         className,
       )}
@@ -48,8 +48,9 @@ function DialogContent({
         data-slot="dialog-content"
         className={cn(
           'fixed top-1/2 left-1/2 z-[9101] grid w-full max-w-[calc(100%-2rem)] -translate-x-1/2 -translate-y-1/2',
-          'grid-rows-[auto_minmax(0,1fr)_auto] overflow-hidden rounded-md border border-ink bg-card text-card-foreground',
-          'shadow-[8px_8px_0_rgba(18,26,21,0.22)] duration-150',
+          // 弹层是唯一允许有投影的东西：它真的浮在所有内容之上
+          'grid-rows-[auto_minmax(0,1fr)_auto] overflow-hidden rounded-xl border border-[var(--line-soft)] bg-[var(--bg-2)] text-card-foreground',
+          'shadow-[var(--shadow-pop)] duration-150',
           'data-[state=open]:animate-in data-[state=open]:fade-in-0 data-[state=open]:zoom-in-95',
           'data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=closed]:zoom-out-95',
           'sm:max-w-lg',
@@ -61,7 +62,7 @@ function DialogContent({
         {showCloseButton && (
           <DialogPrimitive.Close
             data-slot="dialog-close"
-            className="absolute top-3 right-3 grid size-7 place-items-center rounded-xs border border-ink/25 text-ink-2 transition-colors hover:border-ver hover:bg-ver hover:text-white disabled:pointer-events-none"
+            className="absolute top-3 right-3 grid size-7 place-items-center rounded-xs border border-border text-[var(--fg-1)] transition-colors hover:border-[var(--accent)] hover:bg-[var(--accent-soft)] hover:text-foreground disabled:pointer-events-none"
           >
             <XIcon className="size-3.5" />
             <span className="sr-only">关闭</span>
@@ -90,7 +91,7 @@ function DialogTitle({ className, ...props }: React.ComponentProps<typeof Dialog
   return (
     <DialogPrimitive.Title
       data-slot="dialog-title"
-      className={cn('font-serif text-h2 font-bold leading-tight tracking-[-0.01em]', className)}
+      className={cn('font-sans text-h2 font-semibold leading-tight tracking-[-0.02em]', className)}
       {...props}
     />
   )

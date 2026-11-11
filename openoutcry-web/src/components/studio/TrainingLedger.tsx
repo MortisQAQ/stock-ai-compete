@@ -11,10 +11,12 @@ import { cn } from '../../lib/utils'
 /** 团队徽记：两字代号，比取名字首字稳定 */
 const AGENT_CODE: Record<string, string> = { codex: 'CX', native: 'OC', kimi: 'KM', custom: '??' }
 
+/* 运行中是「系统在跑」= 结构色（酸橙），不是涨跌红。
+   待确认才用 warn，已结束退回灰阶。 */
 const TONE: Record<TrainingStatus, string> = {
-  running: 'text-[var(--ver)]',
-  pending: 'text-[var(--brass)]',
-  done: 'text-[var(--ink-3)]',
+  running: 'text-[var(--lime)]',
+  pending: 'text-[var(--warn)]',
+  done: 'text-[var(--fg-2)]',
 }
 
 /**
@@ -26,7 +28,7 @@ export function TrainingLedger() {
   const running = TRAINING_SEED.filter((t) => t.status === 'running').length
 
   return (
-    <section aria-labelledby="ledger-h" className="mt-10">
+    <section aria-labelledby="ledger-h" className="mt-12">
       <div className="section-hd">
         <h2 id="ledger-h">训练台账</h2>
         <div className="section-hd-side">
@@ -36,8 +38,12 @@ export function TrainingLedger() {
         </div>
       </div>
 
-      <div className="border-t border-[var(--ink)]">
-        <div className="hidden items-center gap-4 px-1 pt-2 pb-1.5 md:flex" aria-hidden>
+      {/* 台账是「板」不是「框」：一根上边线 + 一档底色，左右不出线 */}
+      <div className="plate">
+        <div
+          className="hidden items-center gap-4 px-[var(--sp-5)] pb-[var(--sp-3)] pt-[var(--sp-4)] md:flex"
+          aria-hidden
+        >
           <Col className="flex-1">训练</Col>
           <Col className="w-[132px] shrink-0">团队</Col>
           <Col className="w-[176px] shrink-0">时段</Col>
@@ -46,7 +52,8 @@ export function TrainingLedger() {
           <span className="w-4 shrink-0" />
         </div>
 
-        <ul>
+        {/* 表头与首行之间留 10px：表头不再是「紧贴第一行的一行小字」 */}
+        <ul className="mt-2.5">
           {TRAINING_SEED.map((t) => (
             <TrainingRow key={t.id} training={t} onOpen={() => navigate('/training')} />
           ))}
@@ -59,10 +66,7 @@ export function TrainingLedger() {
 function Col({ children, className }: { children: React.ReactNode; className?: string }) {
   return (
     <span
-      className={cn(
-        'font-mono text-micro font-semibold uppercase tracking-[0.16em] text-[var(--ink-3)]',
-        className,
-      )}
+      className={cn('cond text-micro font-semibold text-[var(--fg-2)]', className)}
     >
       {children}
     </span>
@@ -74,23 +78,24 @@ function TrainingRow({ training, onOpen }: { training: TrainingRecord; onOpen: (
   const active = training.status === 'running'
 
   return (
-    <li className="relative border-b border-[var(--rule)]">
-      {active ? <span aria-hidden className="absolute inset-y-0 left-0 w-[2px] bg-[var(--ver)]" /> : null}
+    <li className="relative border-b border-[var(--line-soft)] last:border-b-0">
+      {/* 运行中 = 结构色竖条，不是涨跌红 */}
+      {active ? <span aria-hidden className="absolute inset-y-0 left-0 w-[2px] bg-[var(--lime)]" /> : null}
       <button
         type="button"
         onClick={onOpen}
-        className="group flex w-full items-center gap-4 px-1 py-3 text-left transition-colors hover:bg-[var(--bone-lo)]/55 focus-visible:bg-[var(--bone-lo)]/55"
+        className="group flex w-full items-center gap-4 px-[var(--sp-5)] py-[14px] text-left transition-colors hover:bg-[var(--bg-2)] focus-visible:bg-[var(--bg-2)]"
       >
         <span className="min-w-0 flex-1">
           <span className="flex flex-wrap items-baseline gap-x-2">
             <span className="shrink-0 font-mono text-micro tracking-[0.08em] text-[var(--ink-3)]">
               {training.no}
             </span>
-            <span className="line-clamp-2 min-w-0 font-serif text-row font-bold leading-snug tracking-[-0.01em] text-ink md:truncate">
+            <span className="line-clamp-2 min-w-0 font-sans text-row font-semibold leading-snug tracking-[-0.02em] text-ink md:truncate">
               {training.title}
             </span>
           </span>
-          <span className="mt-1 flex flex-wrap items-center gap-x-2 gap-y-0.5 text-note text-[var(--ink-3)]">
+          <span className="mt-1.5 flex flex-wrap items-center gap-x-2 gap-y-0.5 text-note text-[var(--fg-2)]">
             <span className="md:hidden">{training.from.slice(5)} → {training.to.slice(5)}</span>
             <span>{training.universe}</span>
             {training.result ? (
@@ -111,7 +116,7 @@ function TrainingRow({ training, onOpen }: { training: TrainingRecord; onOpen: (
             <span
               key={id}
               title={agentOf(id).name}
-              className="grid size-7 place-items-center border border-[var(--rule)] bg-[var(--bone-hi)] font-mono text-micro font-semibold uppercase text-ink-2"
+              className="grid size-7 place-items-center border border-[var(--rule)] bg-[var(--bg-1)] font-mono text-micro font-semibold uppercase text-ink-2"
             >
               {AGENT_CODE[id]}
             </span>
@@ -127,9 +132,9 @@ function TrainingRow({ training, onOpen }: { training: TrainingRecord; onOpen: (
           <span className="block text-right font-mono text-note font-semibold text-ink-2">
             {training.day} / {training.days}
           </span>
-          <span className="mt-1 block h-[3px] w-full bg-[var(--bone-3)]">
+          <span className="mt-1.5 block h-[5px] w-full overflow-hidden rounded-full bg-[var(--bg-3)]">
             <span
-              className={cn('block h-full', active ? 'bg-[var(--ver)]' : 'bg-[var(--ink-3)]')}
+              className={cn('block h-full', active ? 'bg-[var(--lime)]' : 'bg-[var(--fg-2)]')}
               style={{ width: pct + '%' }}
             />
           </span>

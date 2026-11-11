@@ -19,7 +19,13 @@ const MODES = ['逐案确认', '自主推进'] as const
 /**
  * 委托单：新建训练页的核心控件。
  * 一次训练由「时段 × 标的池 × 团队 × 规则」四件事定义，所以表单就是四格。
- * 原型阶段只做本地状态，不写回 RunStore。
+ *
+ * 版式：**2×2 栅格**，不是四列等宽。
+ * 四列等宽时每一列只有 ~280px，所有控件被压成同一种高度、同一种间距，
+ * 眼睛找不到任何分组依据 —— 这正是「元素排列太密集」的根因。
+ * 改成 2×2 之后每格有 560px，标题 / 控件 / 选项可以按 --sp-3 起跳，
+ * 而不用靠缩字号把东西塞进去。
+ * 容器是「板」不是「框」：只有一根上边线 + 一档底色，左右不出线。
  */
 export function MandateTicket() {
   const navigate = useNavigate()
@@ -50,46 +56,47 @@ export function MandateTicket() {
   const budget = Math.max(1, team.length) * 400
 
   return (
-    <section aria-labelledby="mandate-h" className="mt-9">
+    <section aria-labelledby="mandate-h" className="mt-11">
       <div className="section-hd">
         <h2 id="mandate-h">开具委托单</h2>
         <div className="section-hd-side">
           <span className="count">№ 0043</span>
-          <Stamp tone={issued ? 'ver' : 'brass'}>{issued ? '已开具' : '草稿'}</Stamp>
+          <Stamp tone={issued ? 'lime' : 'slate'}>{issued ? '已开具' : '草稿'}</Stamp>
         </div>
       </div>
 
-      <div className="border border-[var(--ink)] bg-card shadow-[var(--hard)]">
-        <div className="flex flex-wrap items-center justify-between gap-x-3 gap-y-1 border-b border-[var(--ink)] px-4 py-2.5">
+      {/* 板：一根上边线 + 一档底色，左右不出线 */}
+      <div className="plate">
+        <div className="flex flex-wrap items-center justify-between gap-x-4 gap-y-2 border-b border-[var(--line-soft)] px-[var(--sp-5)] py-[var(--sp-4)]">
           <span className="label">Training Mandate</span>
-          <span className="whitespace-nowrap font-mono text-micro tracking-[0.14em] text-[var(--ink-3)]">
+          <span className="cond text-micro text-[var(--fg-2)]">
             {from} → {to} · {days} 个交易日
           </span>
         </div>
 
-        <div className="grid divide-y divide-[var(--rule)] md:grid-cols-2 xl:grid-cols-4 xl:divide-x xl:divide-y-0">
+        <div className="grid grid-cols-1 gap-x-[var(--sp-7)] gap-y-0 p-[var(--sp-5)] md:grid-cols-2">
           {/* 01 时段 */}
-          <fieldset className="min-w-0 p-4">
+          <fieldset className="min-w-0 pb-[var(--sp-6)]">
             <legend className="sr-only">训练时段</legend>
             <FieldHead no="01" title="时段" note="交易日历受控" />
-            <div className="flex items-center gap-1.5">
+            <div className="flex items-center gap-2">
               <Input
                 type="date"
                 value={from}
                 onChange={(e) => setFrom(e.target.value)}
                 aria-label="起始日期"
-                className="h-9 min-w-0 flex-1 px-2 font-mono text-note"
+                className="h-11 min-w-0 flex-1 px-3 font-mono text-note"
               />
-              <ArrowRight aria-hidden className="size-3.5 shrink-0 text-[var(--ink-3)]" />
+              <ArrowRight aria-hidden className="size-4 shrink-0 text-[var(--fg-2)]" />
               <Input
                 type="date"
                 value={to}
                 onChange={(e) => setTo(e.target.value)}
                 aria-label="结束日期"
-                className="h-9 min-w-0 flex-1 px-2 font-mono text-note"
+                className="h-11 min-w-0 flex-1 px-3 font-mono text-note"
               />
             </div>
-            <div className="mt-2.5 space-y-1.5">
+            <div className="mt-[var(--sp-4)] flex flex-col gap-2">
               {SESSION_PRESETS.map((s) => (
                 <Choice
                   key={s.id}
@@ -104,10 +111,10 @@ export function MandateTicket() {
           </fieldset>
 
           {/* 02 标的池 */}
-          <fieldset className="min-w-0 p-4">
+          <fieldset className="min-w-0 pb-[var(--sp-6)]">
             <legend className="sr-only">标的池</legend>
             <FieldHead no="02" title="标的池" note={chosenUniverse.code} />
-            <div className="space-y-1.5">
+            <div className="flex flex-col gap-2">
               {UNIVERSE_PRESETS.map((u) => (
                 <Choice
                   key={u.id}
@@ -122,10 +129,10 @@ export function MandateTicket() {
           </fieldset>
 
           {/* 03 团队 */}
-          <fieldset className="min-w-0 p-4">
+          <fieldset className="min-w-0 pb-[var(--sp-6)] md:border-t md:border-[var(--line-soft)] md:pt-[var(--sp-5)]">
             <legend className="sr-only">Agent 团队</legend>
             <FieldHead no="03" title="团队" note={team.length + ' 位'} />
-            <div className="space-y-1.5">
+            <div className="flex flex-col gap-2">
               {AGENT_ORDER.map((id) => {
                 const agent = agentOf(id)
                 const on = team.includes(id)
@@ -134,26 +141,32 @@ export function MandateTicket() {
                   <label
                     key={id}
                     className={cn(
-                      'flex cursor-pointer items-center gap-2 border px-2 py-1.5 transition-colors',
-                      on
-                        ? 'border-[var(--ink)] bg-[var(--bone-lo)]'
-                        : 'border-[var(--rule)] hover:border-[var(--rule-strong)]',
+                      'relative flex min-h-11 cursor-pointer items-center gap-3 rounded-lg px-3.5 py-2.5 transition-colors',
+                      on ? 'bg-[var(--lime-soft)]' : 'bg-[var(--bg-2)] hover:bg-[var(--bg-3)]',
                     )}
                   >
+                    {on ? (
+                      <span aria-hidden className="absolute inset-y-0 left-0 w-[2px] rounded-l-lg bg-[var(--lime)]" />
+                    ) : null}
                     <input
                       type="checkbox"
                       checked={on}
                       onChange={() => toggleAgent(id)}
-                      className="size-3.5 shrink-0 accent-[var(--ink)]"
+                      className="size-4 shrink-0 accent-[var(--lime)]"
                     />
-                    <span className="min-w-0 flex-1 truncate text-note font-medium text-ink">
+                    <span
+                      className={cn(
+                        'min-w-0 flex-1 truncate text-note font-medium',
+                        on ? 'text-[var(--fg-0)]' : 'text-[var(--fg-1)]',
+                      )}
+                    >
                       {agent.name.split(' · ')[0]}
                     </span>
                     <span
-                      className={
-                        'shrink-0 font-mono text-micro uppercase tracking-[0.1em] ' +
-                        (on ? 'text-[var(--ink-2)]' : 'text-[var(--ink-3)]')
-                      }
+                      className={cn(
+                        'cond shrink-0 text-micro',
+                        on ? 'text-[var(--lime)]' : 'text-[var(--fg-2)]',
+                      )}
                     >
                       {on ? role : '—'}
                     </span>
@@ -162,36 +175,36 @@ export function MandateTicket() {
               })}
             </div>
             {team.length === 0 ? (
-              <p className="mt-2 text-note text-[var(--ver)]">至少需要委托 1 位 Agent</p>
+              <p className="mt-[var(--sp-3)] text-note text-[var(--up)]">至少需要委托 1 位 Agent</p>
             ) : (
               <Button
                 type="button"
                 variant="ghost"
                 size="sm"
-                className="mt-1 h-8 w-full justify-start px-1 text-micro font-normal"
+                className="mt-2 h-10 w-full justify-start px-2 text-micro font-normal"
                 onClick={() => open({ kind: 'agent', agentId: team[0] })}
               >
-                <Settings2 aria-hidden className="size-3" />
+                <Settings2 aria-hidden className="size-3.5" />
                 配置 {agentOf(team[0]).name.split(' · ')[0]}
               </Button>
             )}
           </fieldset>
 
           {/* 04 规则 */}
-          <fieldset className="min-w-0 p-4">
+          <fieldset className="min-w-0 pb-[var(--sp-6)] md:border-t md:border-[var(--line-soft)] md:pt-[var(--sp-5)]">
             <legend className="sr-only">资金与规则</legend>
             <FieldHead no="04" title="规则" note={capital} />
-            <div className="grid grid-cols-2 gap-1.5">
+            <div className="grid grid-cols-2 gap-2">
               {CAPITALS.map((c) => (
                 <Chip key={c} checked={capital === c} onSelect={() => setCapital(c)} label={c} />
               ))}
             </div>
-            <div className="mt-1.5 grid grid-cols-2 gap-1.5">
+            <div className="mt-2 grid grid-cols-2 gap-2">
               {MODES.map((m) => (
                 <Chip key={m} checked={mode === m} onSelect={() => setMode(m)} label={m} />
               ))}
             </div>
-            <dl className="mt-2.5 space-y-1.5 border-t border-[var(--rule)] pt-2 text-note text-[var(--ink-3)]">
+            <dl className="mt-[var(--sp-5)] border-t border-[var(--line-soft)] pt-[var(--sp-3)] text-note">
               <Row k="费用" v="¥5 / 笔" />
               <Row k="滑点" v="万三" />
               <Row k="时段" v={chosenSession.name} />
@@ -200,12 +213,12 @@ export function MandateTicket() {
         </div>
 
         {/* 摘要 + 开具 */}
-        <div className="flex flex-wrap items-end justify-between gap-3 border-t border-[var(--ink)] bg-[var(--bone-lo)]/60 px-4 py-3">
+        <div className="flex flex-wrap items-end justify-between gap-4 border-t border-[var(--line-soft)] px-[var(--sp-5)] py-[var(--sp-5)]">
           <div className="min-w-0">
-            <p className="font-serif text-row font-bold leading-snug tracking-[-0.01em] text-ink">
+            <p className="font-sans text-body font-semibold leading-snug tracking-[-0.01em] text-[var(--fg-0)]">
               {days} 个交易日 · {chosenUniverse.name} · {team.length} 位 Agent · {mode}
             </p>
-            <p className="mt-1 font-mono text-micro uppercase tracking-[0.14em] text-[var(--ink-2)]">
+            <p className="cond mt-2 text-micro text-[var(--fg-2)]">
               工具预算 {budget.toLocaleString('en-US')} 次 · 逐条留痕 · 不可事后改写
             </p>
           </div>
@@ -232,23 +245,22 @@ export function MandateTicket() {
 
 function Row({ k, v }: { k: string; v: string }) {
   return (
-    <div className="flex items-baseline justify-between gap-2">
-      <dt>{k}</dt>
-      <dd className="truncate font-mono text-note text-ink-2">{v}</dd>
+    <div className="flex items-baseline justify-between gap-3 py-2">
+      <dt className="text-[var(--fg-2)]">{k}</dt>
+      <dd className="truncate font-mono text-note text-[var(--fg-0)]">{v}</dd>
     </div>
   )
 }
 
 function FieldHead({ no, title, note }: { no: string; title: string; note: string }) {
   return (
-    <div className="mb-2.5 flex items-baseline justify-between gap-2 border-b border-[var(--rule)] pb-1.5">
-      <span className="flex items-baseline gap-1.5">
-        <span className="font-mono text-micro tracking-[0.1em] text-[var(--ver)]">{no}</span>
-        <span className="text-body font-semibold tracking-[0.04em] text-ink">{title}</span>
+    <div className="mb-[var(--sp-4)] flex items-baseline justify-between gap-3 border-b border-[var(--line)] pb-2">
+      <span className="flex items-baseline gap-2.5">
+        {/* 分节序号 01/02/03 → 酸橙：它是坐标系里的刻度，不是告警 */}
+        <span className="cond text-micro text-[var(--lime)]">{no}</span>
+        <span className="text-body font-semibold tracking-[0.01em] text-[var(--fg-0)]">{title}</span>
       </span>
-      <span className="shrink-0 font-mono text-micro uppercase tracking-[0.1em] text-[var(--ink-3)]">
-        {note}
-      </span>
+      <span className="cond shrink-0 text-micro text-[var(--fg-2)]">{note}</span>
     </div>
   )
 }
@@ -269,26 +281,36 @@ function Choice({
   return (
     <label
       className={cn(
-        'flex cursor-pointer items-start gap-2 border px-2 py-1.5 transition-colors',
-        checked
-          ? 'border-[var(--ink)] bg-[var(--bone-lo)]'
-          : 'border-[var(--rule)] hover:border-[var(--rule-strong)]',
+        'relative flex min-h-11 cursor-pointer items-start gap-3 rounded-lg px-3.5 py-3 transition-colors',
+        checked ? 'bg-[var(--lime-soft)]' : 'bg-[var(--bg-2)] hover:bg-[var(--bg-3)]',
       )}
     >
+      {checked ? (
+        <span aria-hidden className="absolute inset-y-0 left-0 w-[2px] rounded-l-lg bg-[var(--lime)]" />
+      ) : null}
       <input
         type="radio"
         name={name}
         checked={checked}
         onChange={onSelect}
-        className="mt-[3px] size-3.5 shrink-0 accent-[var(--ver)]"
+        className="mt-1 size-4 shrink-0 accent-[var(--lime)]"
       />
       <span className="min-w-0">
-        <span className="block text-note font-medium leading-snug text-ink">{title}</span>
         <span
-          className={
-            'mt-0.5 block text-micro leading-snug ' +
-            (checked ? 'text-[var(--ink-2)]' : 'text-[var(--ink-3)]')
-          }
+          className={cn(
+            'block text-note font-medium leading-snug',
+            checked ? 'text-[var(--fg-0)]' : 'text-[var(--fg-1)]',
+          )}
+        >
+          {title}
+        </span>
+        {/* 选中项底色是 lime-soft，比 --bg-1 亮一档：注文必须跟着抬到 --fg-1，
+            否则 fg-2 在其上只有 4.0:1 */}
+        <span
+          className={cn(
+            'mt-1 block text-micro leading-snug',
+            checked ? 'text-[var(--fg-1)]' : 'text-[var(--fg-2)]',
+          )}
         >
           {note}
         </span>
@@ -304,12 +326,15 @@ function Chip({ checked, onSelect, label }: { checked: boolean; onSelect: () => 
       onClick={onSelect}
       aria-pressed={checked}
       className={cn(
-        'whitespace-nowrap border px-1.5 py-2 font-mono text-note transition-colors',
+        'relative min-h-11 whitespace-nowrap rounded-lg px-3 font-mono text-note transition-colors',
         checked
-          ? 'border-[var(--ink)] bg-[var(--ink)] text-[var(--bone-hi)]'
-          : 'border-[var(--rule)] text-ink-2 hover:border-[var(--rule-strong)]',
+          ? 'bg-[var(--lime-soft)] text-[var(--fg-0)]'
+          : 'bg-[var(--bg-2)] text-[var(--fg-1)] hover:bg-[var(--bg-3)]',
       )}
     >
+      {checked ? (
+        <span aria-hidden className="absolute inset-y-0 left-0 w-[2px] rounded-l-lg bg-[var(--lime)]" />
+      ) : null}
       {label}
     </button>
   )

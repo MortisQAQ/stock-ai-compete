@@ -30,11 +30,15 @@ export function ReviewPage() {
 
   return (
     <>
+      <div className="vlabel page-vlabel" aria-hidden="true">
+        OPENOUTCRY / AUDIT TRAIL / 2026
+      </div>
+
       <div className="pagehead">
         <div>
           <div className="flex flex-wrap items-center gap-2.5">
             <span className="label">№ 03 — Review</span>
-            <Stamp tone="brass">样本不足 · 不排名</Stamp>
+            <Stamp tone="slate">样本不足 · 不排名</Stamp>
           </div>
           <h1>看结果，也看过程。</h1>
           <p className="deck">
@@ -72,7 +76,8 @@ export function ReviewPage() {
         }
       />
 
-      <div className="charts">
+      {/* 本页主区块 */}
+      <div className="charts frame">
         <div className="chart-card">
           <div className="chart-hd">
             <b>Equity vs Benchmark</b>

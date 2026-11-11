@@ -19,17 +19,22 @@ export function ProtocolPage() {
 
   return (
     <>
+      <div className="vlabel page-vlabel" aria-hidden="true">
+        OPENOUTCRY / PROTOCOL SPEC / 2026
+      </div>
+
       <div className="pagehead">
         <div>
           <div className="label">№ 05 — Protocol &amp; Skill</div>
           <h1>协议与 Skill</h1>
           <p className="deck">会话消息、平台事件与训练动作分开记录。以下均为语义示例，不是已上线接口。</p>
         </div>
-        <Stamp tone="brass">语义示例</Stamp>
+        <Stamp tone="slate">语义示例</Stamp>
       </div>
 
+      {/* 本页主区块 */}
       <Card className="overflow-hidden">
-        <div className="flex items-center justify-between gap-3 border-b border-border pl-1 pr-4">
+        <div className="flex items-center justify-between gap-3 border-b border-[var(--line-soft)] pl-1 pr-4">
           <Tabs value={tab} onValueChange={(value) => setTab(value as ProtocolKey)}>
             <TabsList className="w-auto border-b-0">
               {TABS.map((item) => (

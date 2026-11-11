@@ -4,34 +4,81 @@
    这里只留跨页面复用的版式原子：印章、撕口、数字带、行、Toast。
    ============================================================ */
 
-/* ---------- 印章 ---------- */
+/* ---------- 仪器铭牌字 ----------
+   英文小标签 / 序号 / 状态统一走 Oswald 窄体 + 大字距 + 大写。
+   同字号下窄体只占一半宽度，正好承载金融界面里的长英文标签，
+   也让「中文正文（Inter 系）+ 英文铭牌（Oswald）」形成两种材质。 */
+.cond {
+  font-family: var(--cond);
+  font-weight: 500;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+}
+
+/* ---------- 板 ----------
+   表单 / 台账这类容器不要四边全包：四边框会把它们读成「又一个卡片」，
+   和真正需要强调的卡片抢注意力。只留一根上边线 + 一档底色，
+   视觉上从「框」变成「板」——它是被钉在版面坐标系上的一层，不是浮起的盒子。 */
+.plate {
+  position: relative;
+  background: var(--bg-1);
+  border: 0;
+  border-top: 1px solid var(--line-lime-soft);
+  border-radius: var(--radius-lg);
+}
+
+/* 博客同款左上短标尺（2rem × 2px 酸橙刻度），替代四边白框 */
+.plate::before {
+  content: '';
+  position: absolute;
+  top: -1px;
+  left: 20px;
+  width: 2rem;
+  height: 2px;
+  background: var(--lime);
+  opacity: 0.75;
+  pointer-events: none;
+}
+
+/* ---------- 印章 ----------
+   1px 实线 + 12% 同色底：暗底上 2px 描边会糊成一团，
+   靠同色底的色相而不是靠粗细来识别。 */
 .stamp {
   display: inline-flex;
   align-items: center;
   gap: 6px;
   padding: 4px 9px;
-  border: 2px solid currentColor;
-  color: var(--ver);
+  border: 1px solid currentColor;
+  color: var(--up);
+  background: var(--up-soft);
   font: 700 var(--fs-micro) / 1 var(--mono);
   letter-spacing: 0.16em;
   text-transform: uppercase;
-  transform: rotate(-2deg);
-  background: rgba(247, 243, 234, 0.6);
   white-space: nowrap;
 }
 
 .stamp.pine {
-  color: var(--pine);
+  color: var(--down);
+  background: var(--down-soft);
 }
 
 .stamp.brass {
-  color: var(--brass);
+  color: var(--warn);
+  background: var(--warn-soft);
 }
 
 .stamp.slate {
-  color: var(--slate-dim);
-  border-color: var(--slate-line);
+  color: var(--fg-2);
+  border-color: var(--line);
   background: transparent;
+}
+
+/* 结构状态（已开具 / 当前 / 运行中）= 酸橙。
+   红只留给涨跌与真正的告警，否则一屏里会出现第四种信号色。 */
+.stamp.lime {
+  color: var(--lime);
+  border-color: var(--line-lime);
+  background: var(--lime-soft);
 }
 
 .stamp.sm {
@@ -40,32 +87,29 @@
   letter-spacing: 0.12em;
 }
 
-/* ---------- 票据撕口：顶部一排半圆 ---------- */
-.perf::before {
-  content: '';
-  position: absolute;
-  left: 0;
-  right: 0;
-  top: -5px;
-  height: 10px;
-  pointer-events: none;
-  background-image: radial-gradient(circle at 5px 5px, var(--bone) 0 2.6px, transparent 2.6px);
-  background-size: 20px 10px;
-}
-
-/* ---------- 深色数字带 ---------- */
+/* ---------- 数字带 ----------
+   不再是"深色块"：在暗底上它和卡片同一档，靠上下 1px 线分节。 */
 .band {
   position: relative;
-  background: var(--bone);
-  color: var(--ink);
+  background: var(--bg-1);
+  color: var(--fg-0);
   border: 0;
-  border-top: 3px solid var(--ink);
-  border-bottom: 1px solid var(--ink);
-  overflow: visible;
+  border-top: 1px solid var(--line-lime-soft);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
 }
 
 .band::before {
-  display: none;
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 20px;
+  z-index: 2;
+  width: 2rem;
+  height: 2px;
+  background: var(--lime);
+  opacity: 0.75;
+  pointer-events: none;
 }
 
 .band-in {
@@ -73,30 +117,30 @@
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: 1px;
-  background: rgba(22, 33, 28, 0.14);
+  background: var(--line-soft);
 }
 
 .band-cell {
-  background: var(--bone);
-  padding: 14px 20px 15px;
+  background: var(--bg-1);
+  padding: 22px 24px 20px;
 }
 
 .band-cell .label {
-  color: var(--brass);
+  color: var(--fg-2);
   display: block;
   margin-bottom: 10px;
 }
 
 .band-cell b {
   display: block;
-  font: 700 var(--fs-kpi)/1.05 var(--serif);
-  letter-spacing: -1.4px;
-  color: var(--ink);
+  font: 600 var(--fs-kpi)/1.05 var(--mono);
+  letter-spacing: -0.03em;
+  color: var(--fg-0);
   font-variant-numeric: tabular-nums;
 }
 
 .band-cell b.up {
-  color: var(--ver);
+  color: var(--up);
 }
 
 .band-cell b.dn {
@@ -108,52 +152,56 @@
   margin-top: 6px;
   font: 600 var(--fs-micro)/1.4 var(--mono);
   letter-spacing: 0.05em;
-  color: var(--ink-3);
+  color: var(--fg-2);
 }
 
 .band-tags {
   position: relative;
   display: flex;
-  gap: 20px;
+  gap: 26px;
   flex-wrap: wrap;
-  padding: 9px 20px;
-  background: var(--plate-1);
-  border-top: 1px solid var(--ink);
+  padding: 13px 24px;
+  background: var(--bg-1);
+  border-top: 1px solid var(--line-soft);
+  border-bottom: 0;
   font: 600 var(--fs-micro)/1.4 var(--mono);
   letter-spacing: 0.12em;
   text-transform: uppercase;
-  color: var(--plate-dim);
+  color: var(--fg-2);
 }
 
 .band-tags b {
-  color: var(--plate-ink);
+  color: var(--fg-0);
   font-weight: 600;
 }
 
 .band-tags s {
   text-decoration: none;
-  color: var(--down-dark);
+  color: var(--down);
 }
 
 /* ---------- 计量条 ---------- */
+/* 进度 = 「系统在跑」，属于结构而不是交互：填充用酸橙，轨道抬到 --bg-3。
+   上一版用交互青，结果一屏里到处是青，青就失去了「可点」的含义。 */
 .meter {
-  height: 5px;
-  background: var(--bone-lo);
-  border: 1px solid var(--rule);
+  height: 6px;
+  background: var(--bg-3);
+  border: 0;
+  border-radius: 999px;
   position: relative;
   overflow: hidden;
-  margin: 9px 0 7px;
+  margin: 12px 0 9px;
 }
 
 .meter i {
   display: block;
   height: 100%;
-  background: var(--pine);
+  background: var(--lime);
   transition: width 0.3s ease;
 }
 
 .meter.low i {
-  background: var(--ver);
+  background: var(--up);
 }
 
 .meter-note {
@@ -161,7 +209,7 @@
   justify-content: space-between;
   font: 600 var(--fs-micro)/1 var(--mono);
   letter-spacing: 0.08em;
-  color: var(--ink-3);
+  color: var(--fg-2);
 }
 
 /* ---------- 行 ---------- */
@@ -171,8 +219,8 @@
   align-items: baseline;
   justify-content: space-between;
   gap: 10px;
-  padding: 9px 0;
-  border-bottom: 1px solid var(--rule-soft);
+  padding: 14px 0;
+  border-bottom: 1px solid var(--line-soft);
   text-align: left;
   color: inherit;
 }
@@ -182,7 +230,7 @@
 }
 
 .rowlink:hover b {
-  color: var(--ver);
+  color: var(--accent);
 }
 
 .rowlink b {
@@ -194,15 +242,15 @@
   display: block;
   margin-top: 3px;
   font: 600 var(--fs-micro)/1.4 var(--mono);
-  color: var(--ink-3);
+  color: var(--fg-2);
   letter-spacing: 0.02em;
 }
 
 .report-row {
   display: flex;
   align-items: baseline;
-  padding: 7px 0;
-  border-bottom: 1px dotted rgba(18, 26, 21, 0.2);
+  padding: 11px 0;
+  border-bottom: 1px solid var(--line-soft);
   font-size: var(--fs-sm);
 }
 
@@ -214,18 +262,24 @@
   font: 600 var(--fs-sm)/1 var(--mono);
 }
 
+/* 说明块 = 结构，不是告警。
+   之前用 warn 底色，页面上出现两三块黄条，黄色就被稀释成「普通背景」，
+   真正需要人确认的东西反而跳不出来。这里改回结构色（酸橙细边 + 一档表面），
+   把黄完整地留给「待确认 / 告警」。 */
 .note {
   margin-top: 10px;
-  padding: 9px 11px;
-  background: rgba(138, 106, 59, 0.07);
-  border-left: 2px solid var(--brass);
+  padding: 10px 14px;
+  background: var(--bg-2);
+  border-left: 2px solid var(--line-lime);
   font-size: var(--fs-sm);
-  line-height: 1.65;
-  color: var(--ink-2);
+  line-height: 1.7;
+  /* 灰阶压一档，但不能压到 --fg-2：这块底色是 warn-soft（比 --bg-1 更亮），
+     fg-2 在其上只有 4.14:1，低于 AA。带底色的说明块一律用 --fg-1。 */
+  color: var(--fg-1);
 }
 
 .error-text {
-  color: var(--ver);
+  color: var(--up);
   font-size: var(--fs-micro);
   min-height: 16px;
   font-family: var(--mono);
@@ -250,14 +304,14 @@
   align-items: center;
   gap: 10px;
   padding: 11px 16px;
-  background: var(--plate-2);
-  color: var(--plate-ink);
-  border: 1px solid var(--plate-0);
+  background: var(--bg-3);
+  color: var(--fg-0);
+  border: 1px solid var(--line-strong);
   border-radius: 3px;
   font: 600 var(--fs-micro)/1.2 var(--mono);
   letter-spacing: 0.1em;
   text-transform: uppercase;
-  box-shadow: 4px 4px 0 rgba(22, 33, 28, 0.3);
+  box-shadow: var(--shadow-pop);
   cursor: pointer;
   animation: toast-in 0.18s cubic-bezier(0.25, 1, 0.5, 1);
   pointer-events: auto;
@@ -266,7 +320,6 @@
 
 .toast:hover {
   transform: translateY(-1px);
-  box-shadow: 5px 5px 0 rgba(194, 53, 42, 0.4);
 }
 
 .toast::before {
@@ -274,15 +327,15 @@
   width: 6px;
   height: 6px;
   flex: none;
-  background: var(--brass);
+  background: var(--warn);
 }
 
 .toast.success::before {
-  background: var(--down-dark);
+  background: var(--down);
 }
 
 .toast.warn::before {
-  background: var(--ver);
+  background: var(--up);
 }
 
 @keyframes toast-in {
@@ -304,14 +357,14 @@
   grid-template-columns: 132px minmax(0, 1fr);
   gap: 12px;
   padding: 8px 0;
-  border-bottom: 1px dotted rgba(18, 26, 21, 0.22);
+  border-bottom: 1px solid var(--line-soft);
 }
 
 .snapshot-list dt {
   font: 600 var(--fs-micro)/1.5 var(--mono);
   letter-spacing: 0.12em;
   text-transform: uppercase;
-  color: var(--ink-3);
+  color: var(--fg-2);
 }
 
 .snapshot-list dd {
@@ -330,23 +383,39 @@
 }
 
 .replay-item {
+  position: relative;
   display: block;
   width: 100%;
   text-align: left;
-  padding: 9px 11px;
-  border: 1px solid var(--rule);
-  background: var(--bone-hi);
+  padding: 10px 13px;
+  border: 0;
+  border-radius: var(--radius-lg);
+  background: var(--bg-2);
   color: inherit;
-  transition: border-color 0.12s, background 0.12s;
+  transition: background 0.12s;
 }
 
 .replay-item:hover {
-  border-color: var(--rule-strong, rgba(18, 26, 21, 0.32));
+  background: var(--bg-3);
 }
 
+/* 选中 = 酸橙底 + 左侧 2px 竖条。
+   选中态是「结构上被定位的那一格」，不是「可点的东西」，所以用结构色；
+   交互青仍然只负责「这里能点」。 */
 .replay-item[aria-pressed='true'] {
-  border-color: var(--ink);
-  background: var(--bone-lo);
+  background: var(--lime-soft);
+  color: var(--fg-0);
+}
+
+.replay-item[aria-pressed='true']::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 2px;
+  border-radius: var(--radius-lg) 0 0 var(--radius-lg);
+  background: var(--lime);
 }
 
 .replay-item b {
@@ -359,22 +428,24 @@
   display: block;
   margin-top: 3px;
   font: 600 var(--fs-micro)/1.4 var(--mono);
-  color: var(--ink-3);
+  color: var(--fg-2);
 }
 
 .replay-detail {
-  padding: 12px;
-  background: var(--bone-hi);
-  border: 1px solid var(--rule);
+  padding: 14px;
+  background: var(--well);
+  border: 1px solid var(--line-soft);
+  border-radius: var(--radius-lg);
   font-size: var(--fs-sm);
   line-height: 1.7;
-  color: var(--ink-2);
+  color: var(--fg-1);
   white-space: pre-wrap;
 }
 
 .audit {
-  margin-top: 12px;
-  border: 1px solid var(--rule);
+  margin-top: 14px;
+  border: 0;
+  border-top: 1px solid var(--line-lime-soft);
 }
 
 .audit summary {
@@ -383,15 +454,15 @@
   font: 600 var(--fs-micro)/1 var(--mono);
   letter-spacing: 0.14em;
   text-transform: uppercase;
-  color: var(--ink-2);
-  background: var(--bone);
+  color: var(--fg-1);
+  background: var(--bg-2);
 }
 
 .audit pre {
   margin: 0;
   padding: 12px;
-  background: var(--slate);
-  color: #c6d8cb;
+  background: var(--well);
+  color: var(--fg-1);
   font-size: var(--fs-micro);
   line-height: 1.7;
   overflow: auto;

@@ -38,7 +38,10 @@ export function DrawdownChart({ nav, height = 250 }: Props) {
       <line className="chart-zero-line" x1={P.l} y1={baseY} x2={W - P.r} y2={baseY} />
       {deepest >= 0 && pts[deepest] ? (
         <g>
-          <circle className="chart-drawdown-dot" cx={pts[deepest].x} cy={pts[deepest].y} r="2.6" />
+          {/* 圆点单独成组：标注文字落在舱面上，不压在圆点上 */}
+          <g>
+            <circle className="chart-drawdown-dot" cx={pts[deepest].x} cy={pts[deepest].y} r="2.6" />
+          </g>
           <text
             className="chart-drawdown-label"
             x={pts[deepest].x > W - 90 ? pts[deepest].x - 6 : pts[deepest].x + 6}

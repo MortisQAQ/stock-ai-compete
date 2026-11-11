@@ -1,0 +1,168 @@
+
+  /* ============================================================
+     DECK · FYP 2026 TERM 1 · PART 1 (Swiss / IKB)
+     Additive structure classes only.
+     S01 cover rows · S13 Three Forces · S20 Stacked Ledger ·
+     P9 takeaway list. No template base class is redefined here.
+     ============================================================ */
+
+  /* ---------- S01 · 封面三行索引 ---------- */
+  .cover-row{display:block;min-width:0}
+
+  /* ---------- S13 · Three Forces ---------- */
+  .three-forces{display:grid;grid-template-columns:5fr 11fr;gap:0 2vw;flex:1;min-height:0;align-items:stretch}
+  .hero-ink-col{display:flex;flex-direction:column;padding:3.2vh 2.2vw;position:relative;overflow:hidden;min-width:0}
+  .hero-ink-col .gap-title{
+    font-family:var(--font-sans);font-weight:300;
+    font-size:min(2.7vw,4.85vh);line-height:1.12;letter-spacing:0;
+    color:var(--text-primary);margin-top:auto;margin-bottom:auto
+  }
+  .hero-ink-col .gap-note{
+    font-family:var(--font-sans);font-size:max(16px,.98vw);
+    line-height:1.55;font-weight:400;color:rgba(var(--paper-rgb),.7);
+    max-width:30ch;position:absolute;left:2.2vw;right:2.2vw;bottom:3.2vh;z-index:1
+  }
+  .hero-ink-col .dots{
+    position:absolute;right:-1.6vw;bottom:21vh;width:8vw;height:11vh;
+    color:var(--paper);opacity:.16;pointer-events:none
+  }
+  .force-stack{display:grid;grid-template-rows:repeat(3,minmax(0,1fr));gap:1.6vh;min-width:0}
+  .force-card{
+    display:grid;grid-template-columns:8.4em minmax(0,1fr);gap:0 1.5vw;
+    align-items:center;padding:2.4vh 2vw;min-width:0;overflow:hidden
+  }
+  .force-num{
+    font-family:var(--sans);font-weight:200;font-size:min(3.4vw,6vh);
+    line-height:.9;letter-spacing:-.04em;color:var(--accent-display);
+    font-feature-settings:"tnum"
+  }
+  .force-copy{display:flex;flex-direction:column;gap:.7vh;min-width:0}
+  .force-card h4{
+    font-family:var(--sans),var(--sans-zh);font-weight:400;
+    font-size:min(1.72vw,3.05vh);line-height:1.2;letter-spacing:-.015em;
+    color:var(--text-primary)
+  }
+  .force-card .force-sub{
+    font-family:var(--mono);font-size:min(14px,1.944vh);font-weight:500;
+    letter-spacing:.12em;text-transform:uppercase;color:var(--text-helper)
+  }
+  .force-card p{
+    font-family:var(--sans),var(--sans-zh);font-size:max(16px,.98vw);
+    line-height:1.55;font-weight:400;color:var(--text-body)
+  }
+
+  /* ---------- S20 · Stacked KPI Ledger ---------- */
+  .stacked-ledger{flex:1;min-height:0;display:flex;flex-direction:column;justify-content:center}
+  .ledger-row{
+    flex:1;min-height:0;display:grid;
+    grid-template-columns:minmax(0,.28fr) minmax(0,1fr) auto;
+    gap:0 2.2vw;align-items:center;padding:1.6vh 0;
+    border-bottom:1px solid var(--border-subtle)
+  }
+  .ledger-row:first-child{border-top:1px solid var(--border-subtle)}
+  .ledger-num{
+    font-family:var(--sans);font-weight:200;font-size:min(6.2vw,11vh);
+    line-height:.88;letter-spacing:-.04em;white-space:nowrap;
+    color:var(--text-primary);font-feature-settings:"tnum","ss01"
+  }
+  .ledger-label{
+    font-family:var(--mono);font-size:min(14px,1.944vh);font-weight:500;
+    letter-spacing:.13em;text-transform:uppercase;color:var(--text-helper);
+    margin-bottom:.9vh
+  }
+  .ledger-desc{
+    font-family:var(--sans),var(--sans-zh);font-size:max(16px,1vw);
+    line-height:1.5;font-weight:400;color:var(--text-body);max-width:74ch
+  }
+  .ledger-icon{display:flex;align-items:center;justify-content:flex-end;color:var(--text-helper)}
+  .ledger-icon svg{width:max(26px,2vw);height:max(26px,2vw);stroke-width:1.1}
+
+  /* ---------- P9 · takeaway list (closing right half) ---------- */
+  .takeaway-list{list-style:none;margin:0;padding:0;display:flex;flex-direction:column}
+  .takeaway-list li{
+    display:grid;grid-template-columns:auto minmax(0,1fr);gap:0 1.6vw;
+    align-items:start;padding:2.4vh 0;border-top:1px solid var(--border-subtle)
+  }
+  .takeaway-list li:last-child{border-bottom:2px solid var(--accent)}
+  .takeaway-list .tk-num{
+    font-family:var(--sans);font-weight:200;font-size:min(3.2vw,5.6vh);
+    line-height:.9;letter-spacing:-.03em;color:var(--text-primary);
+    font-feature-settings:"tnum"
+  }
+  .takeaway-list h4{
+    font-family:var(--sans),var(--sans-zh);font-weight:400;
+    font-size:min(1.62vw,2.9vh);line-height:1.2;letter-spacing:-.015em;
+    color:var(--text-primary);margin-bottom:.9vh
+  }
+  .takeaway-list p{
+    font-family:var(--sans),var(--sans-zh);font-size:max(16px,.98vw);
+    line-height:1.55;font-weight:400;color:var(--text-secondary)
+  }
+  .takeaway-list li.is-accent .tk-num,.takeaway-list li.is-accent h4{color:var(--accent)}
+
+  /* ---------- P9 · 左半 IKB 底色作为背景层 ----------
+     面板底色交给 .panel-fill::before 铺,CSS 背景色仍然保持纯色直角;
+     这样 IKB 面板是"背景"而不是参与版式测量的内容块。 */
+  .split-half > .half.b-accent.panel-fill{background:transparent}
+  .split-half > .half.panel-fill::before{
+    content:"";position:absolute;inset:0;background:var(--accent);z-index:0
+  }
+
+  /* ============================================================
+     FONT PASS · 中文优先微软雅黑 / 中文大字报字距归零 / 字重阶梯上移
+     ------------------------------------------------------------
+     字体栈（--font-sans / --font-zh / --font-mono）只在 :root 令牌区
+     有一份权威定义，由 _build.mjs 写入；本段只做字距与字重的排版覆盖，
+     不重复声明 font-family，也不使用 !important。
+     ------------------------------------------------------------
+      判定口径：元素文本含中日韩字符（正则 \u4e00-\u9fff / \u3000-\u303f / \uff00-\uffef）
+     且字号 >= 1.8vw 的标题 / 大字报 → letter-spacing:0；纯拉丁标题保留负字距。
+     带内联 style 的标题无法被样式表覆盖，其内联值已在 _slides.partial.html
+     里逐个改过（见该文件内 letter-spacing:0 / font-weight 的内联声明）。
+     ============================================================ */
+
+  /* ---------- 1 · 中文标题字距归零 ----------
+     负字距是给拉丁字母设计的收紧；方块汉字被压紧会互相咬边、糊成一团。 */
+  .h-hero-zh,.h-xl-zh,.h-md,.h-sub,
+  .lead,
+  .duo-compare .col-ttl,
+  .hero-ink-col .gap-title,
+  .force-card h4,
+  .takeaway-list h4{letter-spacing:0}
+
+  /* 纯拉丁标题保留拉丁负字距（封面 openOutcry 等）：
+     用 [data-latin] 显式标记，权重 0-2-0 高于上面的 0-1-0，无需 !important。 */
+  .h-hero[data-latin],.h-xl[data-latin],.h-hero-zh[data-latin]{letter-spacing:-.03em}
+
+  /* ---------- 2 · 字重阶梯整体上移 ----------
+     微软雅黑只有 Light(300) / Regular(400) / Bold(700) 三个面；
+     原来给 Inter 用的 200 落到雅黑上会被就近匹配成 Light，笔画过细。 */
+  /* 超大标题 >= 8vw：200 → 300 */
+  .h-hero,.h-hero-zh{font-weight:300}
+  /* 大标题 4 ~ 7.9vw：200 ~ 300 → 300 */
+  .h-xl,.h-xl-zh,.num-mega,
+  .ledger-num,
+  .duo-compare .col-ttl,
+  .hero-ink-col .gap-title{font-weight:300}
+  /* 中标题 1.8 ~ 3.9vw：300 ~ 400 → 400 */
+  .h-md,
+  .force-num,
+  .takeaway-list .tk-num{font-weight:400}
+  /* 正文 16~20px 保持 400~500；元信息 13~15px 保持 500~600（不动） */
+
+  /* ---------- 3 · 孤字修正 ----------
+     06 页右侧第 1 条结论换字体后尾行只剩「型」。两个字；text-wrap:pretty
+     让浏览器在断行时避开孤字，只影响行尾，不改盒子、不改文案、不改结构。
+     不支持该属性的浏览器自动退回普通断行。 */
+  .takeaway-list p{text-wrap:pretty}
+
+
+
+  /* ============================================================
+     LAYOUT REPAIR · 04 页对偶栏不再被 auto margin 推到底
+     ------------------------------------------------------------
+     模板 .col-list 自带 margin-top:auto，右栏追问容器也用了内联
+     margin-top:auto，两者把内容全推到栏底，中间留出大片空洞。
+     这里统一改为固定间距，让内容从标题下方自然展开。
+     ============================================================ */
+  .duo-compare .col-list{margin-top:2.4vh;padding-top:2.4vh}

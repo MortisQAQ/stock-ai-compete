@@ -2,52 +2,57 @@
 .steps {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 16px;
-  margin-top: 22px;
+  gap: var(--sp-5);
+  margin-top: var(--sp-6);
 }
 
 .step {
-  padding: 16px;
+  padding: var(--sp-5);
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: var(--sp-4);
 }
 
+/* 步骤序号 = 结构信息，用酸橙。
+   它和分节头的方块、侧栏序号是同一个「坐标系」里的一组标记，
+   不应该用电光青 —— 青在这套语言里只表示「这里能点」。 */
 .step-no {
-  font: 700 var(--fs-display)/0.9 var(--serif);
-  letter-spacing: -2px;
-  color: var(--bone-lo);
-  -webkit-text-stroke: 1px rgba(18, 26, 21, 0.3);
+  font: 600 var(--fs-display) / 0.9 var(--mono);
+  letter-spacing: -0.02em;
+  color: var(--lime);
 }
 
 .step h3 {
-  font: 700 var(--fs-body)/1.4 var(--serif);
-  letter-spacing: -0.3px;
+  font: 600 var(--fs-body) / 1.4 var(--sans);
+  letter-spacing: -0.01em;
+  color: var(--fg-0);
 }
 
+/* 步骤说明是次级文字：压到灰阶第二档，和标题拉开层级 */
 .step p {
-  font-size: var(--fs-body);
-  line-height: 1.65;
-  color: var(--ink-2);
+  font-size: var(--fs-sm);
+  line-height: var(--lh-body);
+  color: var(--fg-2);
 }
 
 pre.code {
   margin: 0;
-  padding: 14px 16px;
-  background: var(--plate-1);
-  color: var(--plate-dim);
+  padding: 16px 18px;
+  border: 1px solid var(--line-soft);
+  border-radius: var(--radius-lg);
+  background-color: var(--well);
+  color: var(--fg-1);
   font-size: var(--fs-micro);
   line-height: 1.75;
   overflow: auto;
-  border: 1px solid var(--plate-0);
 }
 
 pre.code .k {
-  color: var(--up-dark);
+  color: var(--accent);
 }
 
 pre.code .s {
-  color: var(--brass-hi);
+  color: var(--fg-0);
 }
 
 .code-block {
@@ -56,11 +61,11 @@ pre.code .s {
 
 .cols {
   columns: 2;
-  column-gap: 34px;
-  margin-top: 20px;
+  column-gap: var(--sp-7);
+  margin-top: var(--sp-5);
   font-size: var(--fs-body);
-  line-height: 1.72;
-  color: var(--ink-2);
+  line-height: var(--lh-body);
+  color: var(--fg-2);
 }
 
 .cols h3 {
@@ -68,7 +73,7 @@ pre.code .s {
   margin: 0 0 6px;
   font: 700 var(--fs-sm)/1.4 var(--mono);
   letter-spacing: 0.06em;
-  color: var(--ink);
+  color: var(--fg-0);
 }
 
 .cols p {
@@ -79,16 +84,17 @@ pre.code .s {
   display: flex;
   flex-direction: column;
   gap: 10px;
-  padding: 12px 13px;
-  border: 1px solid var(--rule);
-  background: var(--bone);
+  padding: 13px 15px;
+  border: 1px solid var(--line-soft);
+  border-radius: var(--radius-lg);
+  background: var(--well);
   font: 600 var(--fs-micro)/1.5 var(--mono);
   letter-spacing: 0.06em;
-  color: var(--ink-3);
+  color: var(--fg-2);
 }
 
 .boot b {
-  color: var(--ink-2);
+  color: var(--fg-1);
 }
 
 @media (max-width: 1080px) {

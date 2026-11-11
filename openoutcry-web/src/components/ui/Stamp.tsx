@@ -2,7 +2,7 @@ import type { ReactNode } from 'react'
 import { cn } from '@/lib/utils'
 
 interface Props {
-  tone?: 'ver' | 'pine' | 'brass' | 'slate'
+  tone?: 'ver' | 'pine' | 'brass' | 'slate' | 'lime'
   size?: 'md' | 'sm'
   children: ReactNode
   className?: string

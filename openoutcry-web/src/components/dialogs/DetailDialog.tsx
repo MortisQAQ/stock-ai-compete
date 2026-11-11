@@ -98,7 +98,7 @@ export function DetailDialog({ open, id }: { open: boolean; id: string }) {
               <dd>{trade.evidence}</dd>
             </div>
           </dl>
-          <h3 className="mt-2.5 mb-1 font-serif text-note font-bold leading-snug">当时的结构化理由</h3>
+          <h3 className="mt-2.5 mb-1 font-sans text-note font-semibold leading-snug">当时的结构化理由</h3>
           <Prose>{trade.reason}</Prose>
           <div className="note">
             {trade.pnl === null

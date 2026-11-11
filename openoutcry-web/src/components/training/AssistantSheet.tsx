@@ -25,7 +25,7 @@ export function AssistantFab({ expanded, onOpen, fabRef }: FabProps) {
       aria-haspopup="dialog"
       aria-expanded={expanded}
       aria-label="打开 Agent 助手会话"
-      className="fixed bottom-5 right-4 z-[70] flex size-16 flex-col items-center justify-center gap-0.5 rounded-full border border-[var(--ink)] bg-[var(--ver)] text-white shadow-[0_4px_0_rgba(22,33,28,0.24)] transition-transform duration-150 ease-[var(--ease-out-quart)] active:translate-y-px"
+      className="fixed bottom-5 right-4 z-[70] flex size-16 flex-col items-center justify-center gap-0.5 rounded-full border border-[var(--accent)] bg-[var(--bg-2)] text-[var(--accent)] transition-transform duration-150 ease-[var(--ease-out-quart)] active:translate-y-px"
     >
       <Sparkles aria-hidden size={20} />
       <span className="font-mono text-[length:var(--fs-micro)] font-semibold tracking-[0.12em]">助手</span>
@@ -59,8 +59,8 @@ export function AssistantSheet({ open, onClose, returnFocusRef }: SheetProps) {
             returnFocusRef?.current?.focus()
           }}
           className={
-            'fixed inset-0 z-[80] flex h-[100dvh] w-full flex-col bg-[var(--bone)] ' +
-            "shadow-[0_-8px_24px_rgba(22,33,28,0.24)] [&_[data-slot='button']]:min-h-11 " +
+            'fixed inset-0 z-[80] flex h-[100dvh] w-full flex-col bg-[var(--bg-0)] ' +
+            "[&_[data-slot='button']]:min-h-11 " +
             'data-[state=open]:animate-in data-[state=open]:slide-in-from-bottom data-[state=open]:duration-300 ' +
             'data-[state=closed]:animate-out data-[state=closed]:slide-out-to-bottom data-[state=closed]:duration-200 ' +
             'data-[state=open]:ease-[var(--ease-out-quart)]'
@@ -68,7 +68,7 @@ export function AssistantSheet({ open, onClose, returnFocusRef }: SheetProps) {
         >
           <DialogPrimitive.Title className="sr-only">Agent 助手会话</DialogPrimitive.Title>
 
-          <header className="flex shrink-0 items-center gap-3 border-b border-[var(--ink)] bg-[var(--bone-hi)] px-4 py-2.5">
+          <header className="flex shrink-0 items-center gap-3 border-b border-[var(--line)] bg-[var(--bg-1)] px-4 py-2.5">
             <div className="min-w-0 flex-1">
               <div className="flex items-center gap-2">
                 <span className="label">会话</span>
@@ -76,13 +76,13 @@ export function AssistantSheet({ open, onClose, returnFocusRef }: SheetProps) {
                   ● 连接正常
                 </span>
               </div>
-              <p className="mt-1 truncate font-serif text-[length:var(--fs-body)] font-bold leading-snug text-[var(--ink)]">
+              <p className="mt-1 truncate font-sans text-[length:var(--fs-body)] font-semibold leading-snug text-[var(--ink)]">
                 {agent.name}
               </p>
             </div>
             <DialogPrimitive.Close
               aria-label="关闭助手，返回任务视图"
-              className="grid size-11 shrink-0 place-items-center border border-[var(--rule-strong)] bg-[var(--bone)] text-[var(--ink-2)] transition-colors hover:bg-[var(--bone-lo)]"
+              className="grid size-11 shrink-0 place-items-center rounded-lg bg-[var(--bg-2)] text-[var(--ink-2)] transition-colors hover:bg-[var(--bg-3)]"
             >
               <X aria-hidden size={18} />
             </DialogPrimitive.Close>

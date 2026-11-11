@@ -46,7 +46,7 @@ src/
     derive.ts              运行状态派生：合计、状态文案、是否可审批
     trainingTasks.ts       当前运行 → 训练任务列表
   components/
-    chrome/                Tape / Masthead / SideNav / MobileNav / AppShell
+    chrome/                Masthead / SideNav / MobileNav / AppShell
     ui/                    shadcn 源码组件（Button / Card / Badge / Tabs /
                            Dialog / Modal / Input / Textarea / Select / Label /
                            Prose）+ Stamp / Toasts

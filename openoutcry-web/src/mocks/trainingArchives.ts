@@ -10,6 +10,10 @@ export const MOCK_ARCHIVES: TrainingTask[] = [
   {
     id: 'task-team',
     name: '连续委托 · 第 3 个交易日',
+    conversations: [
+      { id: 'team-conv-1', name: '分工与预算', meta: '08:55 · 3 条对话', status: 'pending' },
+      { id: 'team-conv-2', name: '盘前资料检索', meta: '09:02 · 待放行', status: 'pending' },
+    ],
     assignee: {
       kind: 'team',
       name: '研究团队 · 3 个 Agent',
@@ -51,6 +55,10 @@ export const MOCK_ARCHIVES: TrainingTask[] = [
   {
     id: 'task-kimi',
     name: '事件驱动复盘 · 4 月第 3 周',
+    conversations: [
+      { id: 'kimi-conv-1', name: '事件打分', meta: '04-16 · 12 条披露', status: 'done' },
+      { id: 'kimi-conv-2', name: '建仓与平仓', meta: '04-17 → 04-19 · 2 笔成交', status: 'done' },
+    ],
     assignee: { kind: 'agent', name: 'Kimi · 研究助手' },
     startAt: '2024-04-16 09:15',
     endAt: '2024-04-19 15:00',
@@ -83,6 +91,10 @@ export const MOCK_ARCHIVES: TrainingTask[] = [
   {
     id: 'task-codex',
     name: '价值锚定 · 财务披露周',
+    conversations: [
+      { id: 'codex-conv-1', name: '估值区间', meta: '04-25 · 3 档假设', status: 'done' },
+      { id: 'codex-conv-2', name: '清仓决策', meta: '04-26 · 4 笔成交', status: 'done' },
+    ],
     assignee: { kind: 'agent', name: 'Codex · 价值研究' },
     startAt: '2024-04-25 09:15',
     endAt: '2024-04-26 15:00',

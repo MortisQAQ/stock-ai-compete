@@ -18,8 +18,8 @@ function KV({ k, v, last = false }: { k: string; v: string; last?: boolean }) {
   return (
     <div
       className={
-        'flex items-baseline justify-between gap-4 py-1.5' +
-        (last ? '' : ' border-b border-border')
+        'flex items-baseline justify-between gap-4 py-2' +
+        (last ? '' : ' border-b border-[var(--line-soft)]')
       }
     >
       <span className="text-note text-muted-foreground">{k}</span>
@@ -49,17 +49,22 @@ function AgentTile({
       interactive
       onClick={onSelect}
       aria-pressed={active}
-      className={active ? 'border-ink/60 shadow-raise' : ''}
+      className={
+        active
+          ? 'shadow-[inset_2px_0_0_var(--lime),inset_0_0_0_1px_var(--line-lime)]'
+          : ''
+      }
     >
       <CardHeader className="flex-wrap">
         <span>{meta.id}</span>
         <span className="flex flex-wrap items-center gap-1.5">
           {inUse && <Badge variant="outline">当前使用</Badge>}
-          <Badge variant={meta.cardOrigin === 'builtin' ? 'pine' : 'brass'}>{meta.tag}</Badge>
+          {/* 内置卡 = 结构色；外部卡只做中性描边 —— 黄留给「待确认」，不当分类色用 */}
+          <Badge variant={meta.cardOrigin === 'builtin' ? 'pine' : 'outline'}>{meta.tag}</Badge>
         </span>
       </CardHeader>
       <CardContent className="py-3">
-        <div className="font-serif text-body font-bold leading-snug tracking-[-0.01em]">
+        <div className="font-sans text-body font-semibold leading-snug tracking-[-0.02em]">
           {meta.name}
         </div>
         <p className="mt-1 mb-2.5 text-note leading-relaxed text-muted-foreground">
@@ -76,7 +81,7 @@ function AgentTile({
           last
         />
         <div className="mt-2.5 flex items-center gap-2">
-          <Stamp tone={meta.qualification.startsWith('受控') ? 'pine' : 'brass'} size="sm">
+          <Stamp tone={meta.qualification.startsWith('受控') ? 'pine' : 'slate'} size="sm">
             {meta.qualification}
           </Stamp>
           <span className="text-micro tracking-[0.06em] text-muted-foreground">
@@ -125,11 +130,15 @@ export function ConnectPage() {
 
   return (
     <>
+      <div className="vlabel page-vlabel" aria-hidden="true">
+        OPENOUTCRY / AGENT INTAKE / 2026
+      </div>
+
       <div className="pagehead">
         <div>
           <div className="flex flex-wrap items-center gap-2.5">
             <span className="label">№ 04 — Connect</span>
-            <Stamp tone="brass">设计稿 · 未执行真实授权</Stamp>
+            <Stamp tone="slate">设计稿 · 未执行真实授权</Stamp>
           </div>
           <h1>把熟悉的 Agent 带进来。</h1>
           <p className="deck">
@@ -151,7 +160,8 @@ export function ConnectPage() {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 gap-2.5 [&>*]:min-w-0 md:grid-cols-2">
+      {/* 接入步骤：三步一组，共用同一档底色 */}
+      <div className="grid grid-cols-1 gap-3 [&>*]:min-w-0 md:grid-cols-2">
         {AGENT_ORDER.map((id) => (
           <AgentTile
             key={id}
@@ -169,7 +179,7 @@ export function ConnectPage() {
             <Badge variant="outline">+</Badge>
           </CardHeader>
           <CardContent className="py-3">
-            <div className="font-serif text-body font-bold leading-snug tracking-[-0.01em]">
+            <div className="font-sans text-body font-semibold leading-snug tracking-[-0.02em]">
               接入新 Agent
             </div>
             <p className="mt-1 text-note leading-relaxed text-muted-foreground">
@@ -208,7 +218,7 @@ export function ConnectPage() {
         <CardContent className="grid grid-cols-1 gap-6 py-4 md:grid-cols-[minmax(0,1fr)_360px]">
           <div className="min-w-0">
             <KV k="来源" v={card.source + ' · ' + card.version} />
-            <div className="border-b border-border py-1.5">
+            <div className="border-b border-[var(--line-soft)] py-2">
               <div className="text-note text-muted-foreground">人格 persona</div>
               <p className="mt-1 text-note leading-relaxed text-foreground">
                 {card.persona || '未填写'}

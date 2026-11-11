@@ -22,14 +22,17 @@ export function ToolUsageChart({ data }: Props) {
             <text className="chart-tool-label" x={P.l - 10} y={y + 11} textAnchor="end">
               {d.label}
             </text>
-            <rect className="chart-tool-track" x={P.l} y={y} width={trackWidth} height="13" />
-            <rect
-              className={'chart-tool-bar' + (isRisk ? ' is-risk' : '')}
-              x={P.l}
-              y={y}
-              width={w}
-              height="13"
-            />
+            {/* 条形单独成组：文字实际落在舱面上，不压在条形上 */}
+            <g>
+              <rect className="chart-tool-track" x={P.l} y={y} width={trackWidth} height="13" />
+              <rect
+                className={'chart-tool-bar' + (isRisk ? ' is-risk' : '')}
+                x={P.l}
+                y={y}
+                width={w}
+                height="13"
+              />
+            </g>
             <text className="chart-value-label" x={W - P.r + 8} y={y + 11}>
               {d.count}
             </text>

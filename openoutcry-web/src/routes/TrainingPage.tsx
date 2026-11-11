@@ -1,31 +1,27 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 
-import { useRun } from '../store/RunProvider'
-import { LIVE_TASK_ID, trainingTasksOf } from '../store/trainingTasks'
 import { ConversationPane } from '../components/training/ConversationPane'
 import { WorkbenchPane } from '../components/training/WorkbenchPane'
-import { TaskSwitcher } from '../components/training/TaskSwitcher'
 import { MobileTaskView } from '../components/training/MobileTaskView'
 import { AssistantSheet } from '../components/training/AssistantSheet'
+import { useTraining } from '../store/TrainingProvider'
+import { useMediaQuery } from '../lib/useMediaQuery'
 
 const assistantInHistory = (): boolean =>
   Boolean((window.history.state as Record<string, unknown> | null)?.ooAssistant)
 
 /**
- * 训练场 —— VSCode 式工作台。
+ * 训练场 —— 对话 + 工作台两栏。
  *
- * 桌面（≥1100px）：三栏固定高度，中栏内部滚动，页面本身不出现纵向滚动。
- *   左 / 会话流 · 中 / 当前任务工作台 · 右 / 训练任务切换器
- * 移动（<1100px）：单列任务视图 + 右下浮动按钮拉起的全屏助手页。
- *
- * 高度推导：走带 28 + 报头 59 = 87；.page 的上下 padding（桌面 20/34 与 90）
- * 用负 margin 抵消，因此工作台高度恒为 100dvh − 87。
+ * 任务列表不在这里了：它已经搬进左栏的任务树（任务 → 对话）。
+ * 于是正文只剩两栏 —— 左「和 Agent 的会话」，右「这次任务的台账」。
+ * 移动端单列：任务视图 + 右下角助手页。
  */
 export function TrainingPage() {
-  const { state } = useRun()
-  const tasks = useMemo(() => trainingTasksOf(state), [state])
-  const [taskId, setTaskId] = useState(LIVE_TASK_ID)
-  const current = tasks.find((task) => task.id === taskId) ?? tasks[0]
+  const { current } = useTraining()
+  /* 二选一渲染：桌面两栏 / 移动单栏共用同一套工作台组件，
+     两边同时挂着会得到两份 DOM、两份页签状态。 */
+  const wide = useMediaQuery('(min-width: 1024px)')
 
   // 刷新后如果 history 里还带着助手页标记，就直接恢复成打开态（惰性初值，不用 effect 补）
   const [assistantOpen, setAssistantOpen] = useState(assistantInHistory)
@@ -58,33 +54,19 @@ export function TrainingPage() {
     <>
       <h1 className="sr-only">训练场 · {current.name}</h1>
 
-      <div
-        className={
-          'min-[1100px]:-mx-[38px] min-[1100px]:-mt-5 min-[1100px]:-mb-[90px] ' +
-          'min-[1100px]:w-[calc(100%+76px)] min-[1100px]:h-[calc(100dvh-87px)] ' +
-          'min-[1100px]:[@media(min-height:1121px)]:-mt-[34px]'
-        }
-      >
-        {/* ---------- 桌面：三栏 ---------- */}
-        <div className="hidden min-[1100px]:grid min-[1100px]:h-full min-[1100px]:grid-cols-[396px_minmax(0,1fr)_252px] min-[1100px]:overflow-hidden">
-          <ConversationPane className="min-h-0" />
-          <WorkbenchPane
-            task={current}
-            className="min-h-0 border-l border-r border-[var(--rule-strong)]"
-          />
-          <TaskSwitcher tasks={tasks} currentId={current.id} onSelect={setTaskId} className="min-h-0" />
+      {wide ? (
+        <div className="bench-grid">
+          <ConversationPane className="bench-conv" />
+          <WorkbenchPane task={current} className="bench-work" />
         </div>
-
-        {/* ---------- 移动：任务视图 ---------- */}
+      ) : (
         <MobileTaskView
           task={current}
-          tasks={tasks}
-          onSelect={setTaskId}
           assistantOpen={assistantOpen}
           onOpenAssistant={openAssistant}
           fabRef={fabRef}
         />
-      </div>
+      )}
 
       <AssistantSheet open={assistantOpen} onClose={closeAssistant} returnFocusRef={fabRef} />
     </>

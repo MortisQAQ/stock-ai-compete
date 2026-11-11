@@ -4,7 +4,11 @@ import { Slot } from 'radix-ui'
 
 import { cn } from '@/lib/utils'
 
-/** 小标签 —— 源自 shadcn/ui 的 badge，收成票据边角上的方章 */
+/**
+ * 小标签 —— 源自 shadcn/ui 的 badge。
+ * 默认是描边标签（中性信息不上色）；语义变体用 12% 同色底 + 同色字，
+ * 靠色相而不是靠填充面积表达状态。
+ */
 const badgeVariants = cva(
   [
     'inline-flex w-fit shrink-0 items-center justify-center gap-1 whitespace-nowrap',
@@ -14,14 +18,14 @@ const badgeVariants = cva(
   {
     variants: {
       variant: {
-        default: 'border-transparent bg-ink text-primary-foreground',
-        secondary: 'border-transparent bg-secondary text-secondary-foreground',
-        outline: 'border-border-strong bg-transparent text-ink-2',
+        default: 'border-border bg-transparent text-[var(--fg-2)]',
+        secondary: 'border-transparent bg-secondary text-[var(--fg-1)]',
+        outline: 'border-border bg-transparent text-[var(--fg-2)]',
         muted: 'border-transparent bg-muted text-muted-foreground',
-        ver: 'border-ver/30 bg-ver/8 text-ver-deep',
-        pine: 'border-pine/25 bg-pine/8 text-pine',
-        brass: 'border-brass/30 bg-brass/8 text-[#6f552b]',
-        instrument: 'border-instrument-border bg-transparent text-instrument-muted',
+        ver: 'border-transparent bg-[var(--up-soft)] text-[var(--up)]',
+        pine: 'border-transparent bg-[var(--down-soft)] text-[var(--down)]',
+        brass: 'border-transparent bg-[var(--warn-soft)] text-[var(--warn)]',
+        instrument: 'border-instrument-border bg-transparent text-[var(--fg-1)]',
       },
     },
     defaultVariants: {

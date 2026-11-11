@@ -3,9 +3,8 @@ import { MandateTicket } from '@/components/studio/MandateTicket'
 import mandateSource from '@/components/studio/MandateTicket.tsx?raw'
 import { ProposalTicket } from '@/components/proposal/ProposalTicket'
 import proposalSource from '@/components/proposal/ProposalTicket.tsx?raw'
-import { AccountLedger } from '@/components/run/AccountLedger'
-import { HoldingsList } from '@/components/run/HoldingsList'
-import holdingsSource from '@/components/run/HoldingsList.tsx?raw'
+import { WorkbenchTabs } from '@/components/run/WorkbenchTabs'
+import workbenchTabsSource from '@/components/run/WorkbenchTabs.tsx?raw'
 import { EquityChart } from '@/components/charts/EquityChart'
 import equitySource from '@/components/charts/EquityChart.tsx?raw'
 import { BENCH_SERIES, NAV_SERIES } from '@/data/market'
@@ -162,23 +161,22 @@ sequenceDiagram
   caption="可交互演示：点击加减号调整股数、点击「批准」提交提案，再点击「演示开盘撮合」，右侧平台账本与 T+1 可卖股数将实时联动更新，并保留原始提案与人工修改双轨记录。"
 >
   <div className="grid gap-4 lg:grid-cols-2">
-    <div className="[&>.perf]:mt-0">
+    <div className="[&>[data-slot=card]]:mt-0">
       <ProposalTicket />
     </div>
     <div className="flex flex-col gap-3">
-      <AccountLedger />
-      <HoldingsList />
+      <WorkbenchTabs />
     </div>
   </div>
 </CodeDemo>
 
 <CodeDemo
-  title="A 股 T+1 持仓与可卖份额列表"
-  file="src/components/run/HoldingsList.tsx"
-  code={holdingsSource}
-  caption="持仓组件独立展示总持仓与 T+1 当日可卖份额，数据由 RunStore 选择器统一派生。"
+  title="运行台账 · 一张卡四个页签"
+  file="src/components/run/WorkbenchTabs.tsx"
+  code={workbenchTabsSource}
+  caption="账户、持仓、成交与运行状态合并成同一张卡的四个页签：同类信息用页签切换，而不是竖着摞四张卡片。数据由 RunStore 选择器统一派生。"
 >
-  <HoldingsList />
+  <WorkbenchTabs />
 </CodeDemo>
 
 ### 受控研究与时点信息

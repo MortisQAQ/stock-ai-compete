@@ -32,7 +32,7 @@ export interface AppRoute {
 export const APP_ROUTES: AppRoute[] = [
   {
     path: '/studio',
-    nav: { n: '01', label: '新建训练', sub: 'New Training', short: '新建训练' },
+    nav: { n: '01', label: '委托台', sub: 'Training Desk', short: '委托台' },
     lazy: lazyPage(() => import('../routes/StudioPage'), 'StudioPage'),
   },
   {

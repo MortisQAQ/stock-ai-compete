@@ -1,0 +1,294 @@
+@layer components {
+/* ============================================================
+   几何层：分节头、角标、题头、节奏。
+   这一层的职责不是"装饰"，是**给版面建立坐标系**——
+   上一版被说"密、没有几何美感"，根因是每个盒子都长一样、
+   每一行都只隔 8px，眼睛找不到任何对齐的依据。
+   这里用三件事重建秩序：
+   ① 分节头（酸橙方点 + 一根横贯的线 + 右侧序号）
+   ② 卡片左上角的 L 形角标（工程图的定位角）
+   ③ 更大的纵向节奏（--sp-6 / --sp-7 起步）
+   ============================================================ */
+
+/* ---------- 内容页：更大的呼吸 ----------
+   顶栏去掉左侧栏后，正文独占整宽，但**不能**铺满：
+   阅读宽度收到 1280，两侧留白，视线才落得下来。
+   上下留白按「一屏只放 2.5 个区块」给。 */
+.page {
+  padding: 44px 56px 120px;
+  max-width: 1120px;
+  margin-inline: auto;
+}
+
+@media (max-width: 900px) {
+  .page {
+    padding: 22px 18px 72px;
+  }
+}
+
+/* ---------- 分节头 ----------
+   h2 在页面里是「区块标题」，不是「大标题」：
+   左边一颗 8px 酸橙方块，右边一根线拉满，末尾跟一枚窄体序号。
+   所有页面共用，所以不需要在每个 TSX 里加 class。 */
+.page h2,
+.sect-hd {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin: 0 0 var(--sp-6);
+  padding-bottom: 16px;
+  font: 600 var(--fs-h2) / 1.1 var(--sans);
+  letter-spacing: -0.01em;
+  color: var(--fg-0);
+  border-bottom: 1px solid var(--line);
+}
+
+.page h2::before,
+.sect-hd::before {
+  content: '';
+  flex: 0 0 auto;
+  width: 8px;
+  height: 8px;
+  background: var(--lime);
+  box-shadow: 0 0 14px var(--lime-glow);
+}
+
+/* 线尾的那颗小点，让横线有"起点" */
+.page h2::after,
+.sect-hd::after {
+  content: '';
+  position: absolute;
+  right: 0;
+  bottom: -3px;
+  width: 5px;
+  height: 5px;
+  background: var(--lime);
+  opacity: 0.55;
+}
+
+/* ---------- 题头 ---------- */
+.hero {
+  padding-top: var(--sp-2);
+}
+
+.hero h1 {
+  font: 600 var(--fs-display) / 1.06 var(--display);
+  letter-spacing: 0;
+  color: var(--fg-0);
+  margin-top: 14px;
+  /* 大标题只剩一点点绿晕，像屏幕反光；不是发光字 */
+  text-shadow: 0 0 40px rgba(180, 238, 131, 0.1);
+}
+
+.hero h1 em {
+  font-style: normal;
+  font-weight: 700;
+  color: var(--lime);
+}
+
+.hero .deck {
+  margin-top: var(--sp-4);
+  max-width: 62ch;
+  font-size: var(--fs-body);
+  line-height: var(--lh-body);
+  color: var(--fg-1);
+}
+
+.hero-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 320px;
+  gap: var(--sp-7);
+  align-items: start;
+}
+
+@media (max-width: 1080px) {
+  .hero-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+/* ---------- 卡片起点标尺 ----------
+   卡片本身没有描边了（靠抬一档的实心底 + 圆角分层），
+   于是在顶边上放一根 2rem × 2px 的酸橙短标尺——这是博客档案卡的同款母题，
+   作用是标出「这张卡从这里开始读」。
+   比原来的四角 L 形定位角轻，也不会和圆角打架。 */
+[data-slot='card'] {
+  position: relative;
+}
+
+[data-slot='card']:not([data-variant='ghost']):not([data-variant='dashed'])::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 18px;
+  width: 2rem;
+  height: 2px;
+  background: var(--lime);
+  opacity: 0.5;
+  border-radius: 0 0 2px 2px;
+  pointer-events: none;
+  transition: opacity 0.16s ease;
+}
+
+[data-slot='card']:hover::before {
+  opacity: 0.95;
+}
+
+/* 卡片头：窄体大写字距拉开，正文留白加大 */
+[data-slot='card-header'] {
+  padding: 20px 26px;
+  border-bottom: 1px solid var(--line-soft);
+  font: 500 var(--fs-micro) / 1 var(--cond);
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--fg-2);
+}
+
+[data-slot='card-content'] {
+  padding: 26px;
+}
+
+/* ---------- 数字带：四格之间用 1px 线分，格子内留白加大 ---------- */
+.band-cell {
+  padding: 26px 28px 28px;
+}
+
+.band-tags {
+  padding: 14px 28px;
+}
+
+/* ---------- 图表区 ---------- */
+.charts {
+  gap: var(--sp-7);
+  margin-top: var(--sp-7);
+}
+
+/* ---------- 页脚 ---------- */
+.foot {
+  margin-top: var(--sp-8);
+  padding-top: 18px;
+}
+
+/* ---------- 装饰件 ---------- */
+
+/* 旧的「四角 L 形定位角」已删除。
+   卡片现在是圆角实心块，直角括号压在圆角上会露出毛刺；
+   标记位置改由卡片顶边那根 2rem × 2px 的酸橙短标尺承担（见上方 [data-slot='card']）。
+   .frame 只保留定位上下文，不再画任何线。 */
+.frame {
+  position: relative;
+}
+
+/* 竖排铭牌：右侧栏那种旋转 90° 的小字 */
+.vlabel {
+  writing-mode: vertical-rl;
+  font: 500 var(--fs-micro) / 1 var(--cond);
+  letter-spacing: 0.32em;
+  text-transform: uppercase;
+  color: var(--fg-2);
+}
+}
+/* ---------- 数据着色 ----------
+   这套视觉里，**大的中性数字用酸橙**（博客里 13,698 / 15:09 就是酸的），
+   红绿只留给有方向的涨跌。这样一屏里"绿"是主角，"红"是信号，
+   而不是上一版那样：白字 + 一点红 = 冷淡又刺眼。 */
+.band-cell b {
+  color: var(--lime);
+}
+
+.band-cell b.up {
+  color: var(--up);
+}
+
+.band-cell b.dn {
+  color: var(--down);
+}
+
+.run-cell b,
+.run-line b {
+  color: var(--lime);
+}
+
+.run-cell b.pos,
+.run-line b.pos {
+  color: var(--up);
+}
+
+.run-cell b.neg,
+.run-line b.neg {
+  color: var(--down);
+}
+
+/* 顶部索引的序号着色在 chrome.css 的 .topnav a i；
+   原来的 .index 竖排侧栏已删除，这里不再重复声明。 */
+
+/* 分节标签前加一枚酸橙小方点：整页最频繁出现的几何标记 */
+.label::before {
+  content: '';
+  display: inline-block;
+  width: 5px;
+  height: 5px;
+  margin-right: 8px;
+  background: var(--lime);
+  vertical-align: middle;
+  transform: translateY(-1px);
+}
+
+/* ============================================================
+   补丁层（追加于本次深色重构第二阶段）
+   只追加、不改上面的令牌与几何骨架。
+   ============================================================ */
+
+/* ---------- 可点文字：电光青 + 25% 下划线 ----------
+   base.css 里 a 的下划线是 --accent-soft（14%），在墨绿底上几乎不可见，
+   读起来就是「一段普通文字」。这里只补下划线的浓度，颜色仍由 base 层给。 */
+.mdx-doc a,
+.foot a,
+.note a,
+.cols a {
+  color: var(--accent);
+  border-bottom-color: rgba(24, 209, 255, 0.25);
+}
+
+.mdx-doc a:hover,
+.foot a:hover,
+.note a:hover,
+.cols a:hover {
+  color: var(--accent-hover);
+  border-bottom-color: var(--accent);
+}
+
+/* ---------- 数字：全站等宽数字对齐 ----------
+   比例数字在滚动的台账里会左右跳；表格化的金融界面必须用 tabular-nums。
+   只在真正放数字的容器上开，不全局改，避免正文里的数字被拉宽。 */
+.band-cell b,
+.band-cell small,
+.run-cell b,
+.run-line b,
+.kv b,
+.holding-top em,
+.holding-sub,
+.ev-seq,
+.ev-time,
+.proposal-facts dd,
+.report-row b,
+.compare-table td.num,
+.ledger-foot,
+.tape-in span,
+.big-clock {
+  font-variant-numeric: tabular-nums;
+}
+
+/* ---------- 断行 ----------
+   中文没有词间空格，默认断行常把最后一两个字甩到下一行
+   （「…不是已上线接 / 口。」）。pretty 会让浏览器在段尾做一次平衡，
+   把孤字收回去 —— 不占任何垂直空间，纯粹是断行质量。 */
+.pagehead .deck,
+.hero .deck,
+.cols p,
+.note,
+.mdx-doc > p,
+.mdx-doc > blockquote {
+  text-wrap: pretty;
+}

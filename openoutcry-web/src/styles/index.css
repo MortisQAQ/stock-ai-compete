@@ -3,12 +3,12 @@
    分层顺序：theme（令牌）→ base（重置）→ components（既有版式）
    → utilities（Tailwind 原子类）。
    shadcn 组件全部落在 utilities 层，因此可以被 className 覆写；
-   旧的纸质版式样式落在 components 层，不会反压组件。
+   旧版式样式落在 components 层，不会反压组件。
    ============================================================ */
 @layer theme, base, components, utilities;
 
 /* Tailwind 只取 theme + utilities 两层：跳过 preflight，
-   避免重置本项目已有的纸质排版基础样式。 */
+   避免重置本项目已有的版式基础样式。 */
 @import 'tailwindcss/theme.css' layer(theme);
 @import 'tailwindcss/utilities.css' layer(utilities);
 @import 'tw-animate-css';
@@ -17,6 +17,7 @@
 
 @import './tokens.css' layer(theme);
 @import './base.css' layer(base);
+@import './geometry.css' layer(components);
 @import './chrome.css' layer(components);
 @import './ui.css' layer(components);
 @import './studio.css' layer(components);
@@ -26,46 +27,50 @@
 @import './docs.css' layer(components);
 
 /* ============================================================
-   shadcn 语义层：把「纸质大厅」色板映射到 shadcn 的语义变量，
+   shadcn 语义层：把「深色仪器」色板映射到 shadcn 的语义变量，
    components/ui/* 里的 bg-card / text-muted-foreground /
    border-input / ring 等因此自动继承我们的设计语言。
+
+   ⚠ 这里不能再定义 --accent：tokens.css 已经把它用作品牌蓝，
+   两个同名自定义属性会互相引用成环（值失效）。shadcn 的 accent
+   语义槽（bg-accent = 次级悬停底）改名 --surface-hover。
    ============================================================ */
 :root {
-  --background: var(--bone);
-  --foreground: var(--ink);
+  --background: var(--bg-0);
+  --foreground: var(--fg-0);
 
-  --card: var(--bone-hi);
-  --card-foreground: var(--ink);
+  --card: var(--bg-1);
+  --card-foreground: var(--fg-0);
 
-  --popover: var(--bone-hi);
-  --popover-foreground: var(--ink);
+  --popover: var(--bg-2);
+  --popover-foreground: var(--fg-0);
 
-  --primary: var(--ink);
-  --primary-foreground: var(--bone-hi);
+  --primary: var(--accent);
+  --primary-foreground: #04070d;
 
-  --secondary: var(--bone-lo);
-  --secondary-foreground: var(--ink-2);
+  --secondary: var(--bg-2);
+  --secondary-foreground: var(--fg-1);
 
-  --muted: var(--bone-mute);
-  --muted-foreground: var(--ink-3);
+  --muted: var(--bg-2);
+  --muted-foreground: var(--fg-2);
 
-  --accent: var(--accent-tone);
-  --accent-foreground: var(--ink);
+  --surface-hover: var(--bg-2);
+  --accent-foreground: var(--fg-0);
 
-  --destructive: var(--ver);
-  --destructive-foreground: #ffffff;
+  --destructive: var(--up);
+  --destructive-foreground: #04070d;
 
-  --border: var(--rule);
-  --border-strong: var(--rule-strong);
-  --input: rgba(22, 33, 28, 0.24);
-  --ring: var(--ver);
+  --border: var(--line);
+  --border-strong: var(--line-strong);
+  --input: var(--control-line);
+  --ring: var(--accent);
 
   /* 深色仪器面：数字带、代码块、运行卡 */
-  --instrument: var(--plate-1);
-  --instrument-2: var(--plate-2);
-  --instrument-foreground: var(--plate-ink);
-  --instrument-muted: var(--plate-dim);
-  --instrument-border: var(--plate-line);
+  --instrument: var(--bg-1);
+  --instrument-2: var(--bg-2);
+  --instrument-foreground: var(--fg-0);
+  --instrument-muted: var(--fg-1);
+  --instrument-border: var(--line);
 }
 
 @theme inline {
@@ -81,7 +86,7 @@
   --color-secondary-foreground: var(--secondary-foreground);
   --color-muted: var(--muted);
   --color-muted-foreground: var(--muted-foreground);
-  --color-accent: var(--accent);
+  --color-accent: var(--surface-hover);
   --color-accent-foreground: var(--accent-foreground);
   --color-destructive: var(--destructive);
   --color-destructive-foreground: var(--destructive-foreground);
@@ -95,7 +100,6 @@
   --color-instrument-foreground: var(--instrument-foreground);
   --color-instrument-muted: var(--instrument-muted);
   --color-instrument-border: var(--instrument-border);
-  --color-plate-0: var(--plate-0);
   --color-plate-1: var(--plate-1);
   --color-plate-2: var(--plate-2);
   --color-plate-line: var(--plate-line);
@@ -103,8 +107,17 @@
   --color-plate-dim: var(--plate-dim);
   --color-plate-faint: var(--plate-faint);
   --color-brass-hi: var(--brass-hi);
+  --color-ver-soft: var(--ver-soft);
+  --color-plate-ver: var(--plate-ver);
+  --color-plate-pine: var(--plate-pine);
+  --color-up: var(--up);
+  --color-down: var(--down);
+  --color-up-dark: var(--up-dark);
+  --color-down-dark: var(--down-dark);
 
-  /* 品牌色：只做映射，取值一律来自 tokens.css（唯一真源） */
+  /* 旧色名：只做映射，取值一律来自 tokens.css（唯一真源）。
+     它们现在全部指向深色令牌，既有 TSX 里的 bg-bone / text-ink
+     因此直接渲染成暗底浅字，不需要改调用方。 */
   --color-ver: var(--ver);
   --color-ver-deep: var(--ver-deep);
   --color-pine: var(--pine);
@@ -113,13 +126,11 @@
   --color-ink-2: var(--ink-2);
   --color-ink-3: var(--ink-3);
   --color-bone: var(--bone);
-  --color-bone-hi: var(--bone-hi);
   --color-bone-lo: var(--bone-lo);
   --color-bone-mute: var(--bone-mute);
 
   --font-sans: var(--sans);
   --font-mono: var(--mono);
-  --font-serif: var(--serif);
 
   /* 字号工具类：把流体标尺暴露成 text-micro / text-note / text-body /
      text-row / text-h2 / text-kpi / text-h1 / text-display。
@@ -135,16 +146,17 @@
   --text-h1: var(--fs-h1);
   --text-display: var(--fs-display);
 
-  /* 纸面印刷的直角美学：圆角只为收边，不做胶囊（唯一定义处） */
+  /* 圆角收紧：暗底 + 发丝线之下，大圆角会显得软，与仪器感冲突 */
   --radius-xs: 2px;
   --radius-sm: 3px;
   --radius-md: 4px;
   --radius-lg: 6px;
-  --radius-xl: 9px;
+  --radius-xl: 8px;
 
-  /* 三级「硬投影」：静止压 1px、悬停抬 2px、票据压 3px */
-  --shadow-press: 0 1px 0 rgba(18, 26, 21, 0.1);
-  --shadow-raise: 0 2px 0 rgba(18, 26, 21, 0.14);
-  --shadow-plate: 3px 3px 0 rgba(18, 26, 21, 0.08);
-  --shadow-plate-lg: 5px 5px 0 rgba(18, 26, 21, 0.1);
+  /* 投影归零：暗底上投影不可见，层次一律交给 --line*。
+     只留 --shadow-pop（弹层）与 --glow-accent（live 元素）。 */
+  --shadow-press: none;
+  --shadow-raise: none;
+  --shadow-plate: none;
+  --shadow-plate-lg: none;
 }

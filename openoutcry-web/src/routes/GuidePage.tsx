@@ -5,6 +5,10 @@ import { Stamp } from '../components/ui/Stamp'
 export function GuidePage() {
   return (
     <>
+      <div className="vlabel page-vlabel" aria-hidden="true">
+        OPENOUTCRY / PRODUCT SPEC / 2026
+      </div>
+
       <div className="pagehead">
         <div>
           <div className="label">№ 06 — Product Spec (MDX)</div>
@@ -13,10 +17,11 @@ export function GuidePage() {
             产品文档现已升级为 MDX 实时交互文档：正文中直接挂载当前工程的前端组件并同步读取源码。
           </p>
         </div>
-        <Stamp tone="pine">MDX · Live</Stamp>
+        <Stamp tone="lime">MDX · Live</Stamp>
       </div>
 
-      <div className="steps mt-0">
+      {/* 三步流程共用同一档底色 */}
+      <div className="steps frame mt-0">
         <Card className="step">
           <div className="step-no" aria-hidden="true">01</div>
           <h3>准备 Agent</h3>
@@ -36,7 +41,7 @@ export function GuidePage() {
         </Card>
       </div>
 
-      <article className="mdx-doc mt-10 border-t-2 border-[var(--ink)] pt-8">
+      <article className="mdx-doc mt-10 border-t border-[var(--line-lime-soft)] pt-8">
         <MvpDoc />
       </article>
 

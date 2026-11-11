@@ -14,12 +14,13 @@ export function ProposalTicket() {
   const { proposal } = state
   const decidable = canDecide(state)
 
+  // 审批卡是这一页唯一需要人动手的东西，所以给它一档更亮的底色。
   return (
-    <Card className="perf relative mt-3.5 border-ink shadow-plate">
-      <CardHeader className="items-start border-dashed px-4 py-3">
+    <Card>
+      <CardHeader className="items-start">
         <div className="min-w-0">
           <div className="label">Order Proposal</div>
-          <h3 className="mt-1.5 font-serif text-note font-bold leading-snug tracking-[-0.01em] text-ink">
+          <h3 className="mt-1.5 font-sans text-note font-semibold leading-snug tracking-[-0.02em] text-ink">
             卖出 公司-017 · {proposal.quantity} 股
           </h3>
         </div>

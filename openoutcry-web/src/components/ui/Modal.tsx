@@ -49,7 +49,7 @@ export function Modal({ open, kicker, title, onClose, children, footer, width }:
             aria-label="关闭"
             className={cn(
               'grid size-7 shrink-0 place-items-center rounded-xs border border-primary-foreground/35',
-              'text-primary-foreground/80 transition-colors hover:border-ver hover:bg-ver hover:text-white',
+              'text-primary-foreground/80 transition-colors hover:border-[var(--up)] hover:bg-[var(--up)] hover:text-[#04070d]',
             )}
           >
             <XIcon className="size-3.5" />

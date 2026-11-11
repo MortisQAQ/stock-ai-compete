@@ -1,108 +1,46 @@
 import type { RefObject } from 'react'
 
 import { useRun } from '../../store/RunProvider'
-import { agentOf } from '../../data/agents'
-import { cn } from '../../lib/utils'
-import { Stamp } from '../ui/Stamp'
+import { useTraining } from '../../store/TrainingProvider'
 import { StatBand } from '../run/StatBand'
 import { AssistantFab } from './AssistantSheet'
-import { WorkbenchActions, WorkbenchBody } from './WorkbenchPane'
-import { assigneeLabel, progressLabel } from '../../store/trainingTasks'
-import { bandItemsFor, TRAINING_STATUS_TEXT } from '../../store/selectors'
+import { WorkbenchBody } from './WorkbenchPane'
+import { bandItemsFor } from '../../store/selectors'
 import type { TrainingTask } from '../../types'
 
 interface Props {
   task: TrainingTask
-  tasks: TrainingTask[]
-  onSelect: (id: string) => void
   assistantOpen: boolean
   onOpenAssistant: () => void
   fabRef: RefObject<HTMLButtonElement | null>
 }
 
 /**
- * 移动端主屏 = 任务视图（表头 + 中栏核心内容）。
- * 右栏的「训练任务」折成一排可横滑的按钮，左栏的对话流收进右下角的助手页。
+ * 移动端主屏 = 任务视图。
+ *
+ * 任务切换不再在这里重复一遍：它已经在左侧抽屉的任务树里，
+ * 正文只放「四格表头 + 工作台」，对话收进右下角的助手页。
  */
-export function MobileTaskView({ task, tasks, onSelect, assistantOpen, onOpenAssistant, fabRef }: Props) {
+export function MobileTaskView({ task, assistantOpen, onOpenAssistant, fabRef }: Props) {
   const { state, totals } = useRun()
-  const agent = agentOf(state.agent)
+  const { conversation } = useTraining()
   const band = bandItemsFor(task, state, totals)
 
   return (
-    <div className="min-[1100px]:hidden pb-24 [&_[data-slot='button']]:min-h-11 [&_[role='tab']]:min-h-11 [&_.more-menu-list_button]:min-h-11 [&_.stepper_button]:min-h-11 [&_.stepper_button]:min-w-11">
-      <div className="flex items-start justify-between gap-3">
-        <div className="min-w-0">
-          <div className="flex items-center gap-2">
-            <span className="label">训练任务</span>
-            <Stamp tone={task.status === 'done' ? 'brass' : task.status === 'pending' ? 'ver' : 'pine'} size="sm">
-              {TRAINING_STATUS_TEXT[task.status]}
-            </Stamp>
-          </div>
-          <h2 className="mt-1.5 font-serif text-[length:var(--fs-h2)] font-bold leading-snug tracking-[-0.01em] text-[var(--ink)]">
-            {task.name}
-          </h2>
-          <p className="mt-1 font-mono text-[length:var(--fs-micro)] leading-relaxed tracking-[0.04em] text-[var(--ink-3)]">
-            {task.windowLabel} · {assigneeLabel(task)}
-          </p>
+    <div className="bench-mobile min-[1024px]:hidden">
+      <header className="bench-hd">
+        <div className="bench-hd-main">
+          <h2>{task.name}</h2>
+          <p className="bench-hd-meta">{conversation.name}</p>
         </div>
+      </header>
+
+      <div className="bench-band">
+        <StatBand items={band} />
       </div>
 
-      <nav aria-label="训练任务（切换）" className="-mx-4 mt-3 flex gap-2 overflow-x-auto px-4 pb-1.5">
-        {tasks.map((item) => {
-          const active = item.id === task.id
-          return (
-            <button
-              key={item.id}
-              type="button"
-              onClick={() => onSelect(item.id)}
-              aria-current={active ? 'page' : undefined}
-              className={cn(
-                'flex min-h-11 w-[196px] shrink-0 flex-col justify-center rounded-xs border px-2.5 py-1.5 text-left transition-colors',
-                active ? 'border-[var(--ink)] bg-[var(--bone-hi)]' : 'border-[var(--rule)] bg-transparent',
-              )}
-            >
-              <span className="truncate text-[length:var(--fs-sm)] font-semibold text-[var(--ink)]">{item.name}</span>
-              <span className="mt-0.5 truncate font-mono text-[length:var(--fs-micro)] tracking-[0.04em] text-[var(--ink-3)]">
-                {TRAINING_STATUS_TEXT[item.status]} · {progressLabel(item)}
-              </span>
-            </button>
-          )
-        })}
-      </nav>
-
-      <div className="mt-3 [&_.band-cell]:px-3.5 [&_.band-cell]:py-2.5">
-        <StatBand
-          items={band}
-          tags={
-            <>
-              <span>
-                资料时点 <b>2024-04-22 23:59:58</b>
-              </span>
-              <span>
-                轨迹完整性 <s>100%</s>
-              </span>
-            </>
-          }
-        />
-      </div>
-
-      <div className="mt-3 flex items-center justify-between gap-2">
-        <span className="font-mono text-[length:var(--fs-micro)] tracking-[0.08em] text-[var(--ink-3)]">
-          {state.clock} · {agent.source}
-        </span>
-        <WorkbenchActions />
-      </div>
-
-      <div className="mt-4">
+      <div className="bench-body">
         <WorkbenchBody task={task} />
-      </div>
-
-      <div className="foot">
-        <span>
-          <b>run_demo_001</b> · sess_demo_001 · {agent.name}
-        </span>
-        <span>全部数据虚构</span>
       </div>
 
       <AssistantFab expanded={assistantOpen} onOpen={onOpenAssistant} fabRef={fabRef} />

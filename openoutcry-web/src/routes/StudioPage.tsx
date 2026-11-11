@@ -24,7 +24,12 @@ export function StudioPage() {
 
   return (
     <>
-      <header className="hero hero-slim">
+      {/* 竖排铭牌：只在 ≥1440 显示，给页面右上角一枚「设备编号」 */}
+      <div className="vlabel page-vlabel" aria-hidden="true">
+        OPENOUTCRY / TRAINING DESK / 2026
+      </div>
+
+      <header className="hero hero-slim frame">
         <div className="hero-grid">
           <div>
             <span className="label">№ 01 — Training Desk</span>
@@ -35,35 +40,39 @@ export function StudioPage() {
             </p>
           </div>
 
-          <Card variant="instrument">
+          {/* 规则 5：这里只是 5 行数字，不是数据视窗 —— 回到纸面 */}
+          <Card variant="default">
             <CardHeader>
               <span className="min-w-0 truncate">当前训练 {current.no}</span>
             </CardHeader>
-            <CardContent className="py-3">
-              <div className="run-line">
-                <span>团队</span>
-                <b>{current.team.map((id) => agentOf(id).name.split(' · ')[0]).join(' + ')}</b>
+            <CardContent className="py-5">
+              <div className="run-grid">
+                <div className="run-cell">
+                  <span>团队</span>
+                  <b>{current.team.map((id) => agentOf(id).name.split(' · ')[0]).join(' + ')}</b>
+                </div>
+                <div className="run-cell">
+                  <span>模拟时钟</span>
+                  <b>{state.clock.slice(5)}</b>
+                </div>
+                <div className="run-cell">
+                  <span>账户净值</span>
+                  <b className="acc">{money(totals.equity)}</b>
+                </div>
+                <div className="run-cell">
+                  <span>累计净收益</span>
+                  <b className={totals.net >= 0 ? 'pos' : 'neg'}>{signedPct(netPct)}</b>
+                </div>
               </div>
-              <div className="run-line">
-                <span>模拟时钟</span>
-                <b>{state.clock.slice(5)}</b>
-              </div>
-              <div className="run-line">
-                <span>账户净值</span>
-                <b className="acc">{money(totals.equity)}</b>
-              </div>
-              <div className="run-line">
-                <span>累计净收益</span>
-                <b className={totals.net >= 0 ? 'pos' : 'neg'}>{signedPct(netPct)}</b>
-              </div>
-              <div className="mt-3 flex items-baseline justify-between">
-                <span className="font-mono text-micro tracking-[0.04em] text-[var(--slate-dim)]">进度</span>
-                <b className="font-mono text-micro text-[var(--plate-ink)]">
+              <div className="mt-4 flex items-baseline justify-between border-t border-[var(--line-soft)] pt-3.5">
+                <span className="cond text-micro text-[var(--fg-2)]">进度</span>
+                <b className="font-mono text-micro text-[var(--fg-0)]">
                   {current.day} / {current.days} 交易日
                 </b>
               </div>
-              <div className="mt-1.5 h-[3px] w-full bg-[var(--plate-0)]">
-                <div className="h-full bg-[var(--brass-hi)]" style={{ width: pct + '%' }} />
+              {/* 进度 = 系统在跑（结构色），不是可点的东西；轨道走圆角无框 */}
+              <div className="mt-2 h-[6px] w-full overflow-hidden rounded-full bg-[var(--bg-3)]">
+                <div className="h-full bg-[var(--lime)]" style={{ width: pct + '%' }} />
               </div>
             </CardContent>
           </Card>
@@ -73,8 +82,8 @@ export function StudioPage() {
       <MandateTicket />
       <TrainingLedger />
 
-      <div className="mt-10 flex flex-wrap items-center justify-between gap-3 border-t border-[var(--rule)] pt-4">
-        <p className="text-note leading-relaxed text-[var(--ink-2)]">
+      <div className="mt-12 flex flex-wrap items-center justify-between gap-4 border-t border-[var(--rule)] pt-6">
+        <p className="max-w-[68ch] text-note leading-relaxed text-[var(--fg-2)]">
           Agent 在「连接 Agent」里维护；一条训练可指派 1–3 位，角色按委托顺序分配（交易 / 研究 / 风控）。
         </p>
         <div className="flex items-center gap-2">

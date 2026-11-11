@@ -221,8 +221,8 @@ gantt
 截至 2026 年 10 月 31 日，本项目在代码仓库中已完成归档的核心交付物包括：
 
 1. **FYP 开题报告 (Planning Report)**：归档于 `exports/FYP-Planning-Report.docx` 与 `hitstory-doc/`；
-2. **产品功能需求文档 (PRD v0.3)**：`hitstory-doc/openOutcry-产品设计与功能-MVP.mdx`（配套离线可渲染 SVG 预览文件 `preview.html`）；
-3. **受控搜索工具设计规范 (v0.2)**：`hitstory-doc/openOutcry-受控搜索工具调研与设计-v0.2.md`；
+2. **产品功能需求文档 (PRD v0.3)**：`research/openOutcry-产品设计与功能-MVP.mdx`（配套离线可渲染 SVG 预览文件 `hitstory-doc/preview.html`）；
+3. **受控搜索工具设计规范 (v0.2)**：`research/openOutcry-受控搜索工具调研与设计-v0.2.md`；
 4. **高保真可交互 Web 原型系统**：完整工程代码见 `openoutcry-web/`（覆盖 6 大核心路由，自适应响应式布局与完备的状态模型）；
 5. **导师汇报演讲稿与答辩演练预案**：`hitstory-doc/导师周报与演播稿-openOutcry.md`；
 6. **线上飞书知识空间**：同步维护于 `https://bcnd63yb3pzy.feishu.cn/wiki/SYwXw5XH2iKfK5kXnqnc6nvknlf`。

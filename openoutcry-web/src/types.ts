@@ -157,9 +157,24 @@ export interface TaskArchive {
   note: string
 }
 
+/**
+ * 任务下的一个对话。
+ * 一个训练任务里可以和 AI 有多次会话（盘前研究 / 开盘撮合 / 复盘追问），
+ * 左栏的任务树就是「任务 → 对话」两级。
+ */
+export interface TrainingConversation {
+  id: string
+  name: string
+  /** 一行摘要：时间窗 / 条数 / 模型 */
+  meta: string
+  status: TrainingStatus
+}
+
 export interface TrainingTask {
   id: string
   name: string
+  /** 该任务下的会话列表，至少一条 */
+  conversations: TrainingConversation[]
   assignee: TrainingAssignee
   startAt: string
   endAt: string

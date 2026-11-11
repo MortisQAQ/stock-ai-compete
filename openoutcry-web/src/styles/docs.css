@@ -1,13 +1,13 @@
 @layer components {
 /* ============================================================
-   MDX 产品文档版式（纸质大厅：宋体标题 + 纸面正文 + 漆板代码/图表）
+   MDX 产品文档版式（深色仪器：无衬线标题 + 浅灰正文 + 凹槽代码/图表）
    所有后代选择器仅作用于文档直接子节点（.mdx-doc > ...），
    严禁污染 <CodeDemo> 舞台内挂载的真实业务组件样式！
    所有字号使用 tokens.css 流体变量，严格遵守 ≥ --fs-min (13px) 契约。
    ============================================================ */
 .mdx-doc {
   max-width: 960px;
-  color: var(--ink);
+  color: var(--fg-0);
   font-size: var(--fs-body);
   line-height: var(--lh-body);
 }
@@ -16,30 +16,34 @@
   margin-top: 16px;
 }
 
+/* 文档标题必须比页头低一档。
+   之前它和 .pagehead h1 用的是同一个 --fs-h1，两行等大的粗体叠在一起，
+   读者分不清「这是哪一页」和「这是哪一节」—— 层级就是这么糊掉的。 */
 .mdx-doc > h1 {
-  font: 700 var(--fs-h1) / 1.18 var(--serif);
-  letter-spacing: -0.02em;
-  color: var(--ink);
+  font: 600 var(--fs-h2) / 1.24 var(--display);
+  letter-spacing: 0;
+  color: var(--fg-0);
   margin-top: 8px;
 }
 
 .mdx-doc > h2 {
-  font: 700 var(--fs-h2) / 1.3 var(--serif);
+  font: 600 var(--fs-h2) / 1.3 var(--sans);
   letter-spacing: -0.01em;
-  color: var(--ink);
+  color: var(--fg-0);
   margin-top: 40px;
   padding-top: 18px;
-  border-top: 2px solid var(--ink);
+  /* 分节线用发丝线：暗底上 2px 墨线会变成一道亮白杠 */
+  border-top: 1px solid var(--line-strong);
 }
 
 .mdx-doc > h3 {
-  font: 700 var(--fs-body) / 1.4 var(--serif);
-  color: var(--ink);
+  font: 600 var(--fs-body) / 1.4 var(--sans);
+  color: var(--fg-0);
   margin-top: 24px;
 }
 
 .mdx-doc > p {
-  color: var(--ink-2);
+  color: var(--fg-1);
   font-size: var(--fs-body);
   line-height: 1.7;
 }
@@ -48,7 +52,7 @@
 .mdx-doc > ul strong,
 .mdx-doc > ol strong,
 .mdx-doc > blockquote strong {
-  color: var(--ink);
+  color: var(--fg-0);
   font-weight: 700;
 }
 
@@ -56,7 +60,7 @@
 .mdx-doc > ol {
   margin-top: 12px;
   padding-left: 22px;
-  color: var(--ink-2);
+  color: var(--fg-1);
   font-size: var(--fs-body);
   line-height: 1.68;
 }
@@ -74,25 +78,26 @@
   margin-top: 6px;
 }
 
+/* 引用块不是可点区域，左标用结构色（酸橙），青色只留给真能点的地方 */
 .mdx-doc > blockquote {
   margin: 18px 0;
   padding: 12px 16px;
-  border-left: 3px solid var(--ver);
-  background: var(--bone-hi);
-  color: var(--ink-2);
+  border-left: 2px solid var(--lime);
+  background: var(--bg-1);
+  color: var(--fg-1);
   font-size: var(--fs-sm);
   line-height: var(--lh-sm);
 }
 
 .mdx-doc > blockquote > p {
-  color: var(--ink-2);
+  color: var(--fg-1);
   font-size: var(--fs-sm);
   line-height: var(--lh-sm);
 }
 
 .mdx-doc > hr {
   border: 0;
-  border-top: 1px solid var(--rule-strong);
+  border-top: 1px solid var(--line-strong);
   margin: 28px 0;
 }
 
@@ -102,9 +107,9 @@
 .mdx-doc > blockquote code,
 .mdx-table-wrap code {
   padding: 2px 6px;
-  border: 1px solid var(--rule);
-  background: var(--bone-hi);
-  color: var(--ink);
+  border: 1px solid var(--line);
+  background: var(--well);
+  color: var(--fg-0);
   font-family: var(--mono);
   font-size: var(--fs-micro);
 }
@@ -118,8 +123,8 @@
 .mdx-table-wrap > table {
   width: 100%;
   border-collapse: collapse;
-  background: var(--bone-hi);
-  border: 1px solid var(--rule-strong);
+  background: var(--bg-1);
+  border: 1px solid var(--line);
   margin: 0;
 }
 
@@ -127,7 +132,7 @@
 .mdx-table-wrap td {
   padding: 10px 12px;
   text-align: left;
-  border-bottom: 1px solid var(--rule-soft);
+  border-bottom: 1px solid var(--line-soft);
   font-size: var(--fs-sm);
   line-height: var(--lh-sm);
   vertical-align: top;
@@ -137,18 +142,17 @@
   font: 600 var(--fs-micro) / 1.3 var(--mono);
   letter-spacing: 0.12em;
   text-transform: uppercase;
-  color: var(--ink-2);
-  background: var(--bone);
-  border-bottom: 1px solid var(--rule-strong);
+  color: var(--fg-2);
+  background: var(--bg-2);
+  border-bottom: 1px solid var(--line-strong);
 }
 
 /* ---------- Mermaid 图表框 ---------- */
 .mdx-diagram {
   margin: 20px 0;
   padding: 18px 16px;
-  border: 1px solid var(--rule-strong);
-  background: var(--bone-hi);
-  box-shadow: var(--hard);
+  border: 1px solid var(--line);
+  background: var(--bg-1);
   overflow-x: auto;
 }
 
@@ -159,8 +163,89 @@
   margin: 0 auto;
 }
 
+/* ---------- 预渲染流程图 ----------
+   scripts/build-diagrams.mjs 把 mermaid 的浅色主题烘进了 SVG 内部的 <style>
+   （ID 选择器 + 内联属性），改脚本不在本次范围内，所以在消费端改写。
+   这是全项目唯一允许 !important 的地方：
+   不这么做，流程图会变成暗底上的白色纸片，图里的字还会掉到 1.2:1。 */
+.mdx-diagram svg {
+  background: transparent;
+}
+
+.mdx-diagram svg text,
+.mdx-diagram svg tspan,
+.mdx-diagram svg .label,
+.mdx-diagram svg .nodeLabel,
+.mdx-diagram svg .labelText,
+.mdx-diagram svg .messageText,
+.mdx-diagram svg .loopText,
+.mdx-diagram svg .noteText,
+.mdx-diagram svg .sectionTitle,
+.mdx-diagram svg .sequenceNumber,
+.mdx-diagram svg .stateLabel,
+.mdx-diagram svg .cluster-label text,
+.mdx-diagram svg span {
+  fill: var(--fg-0) !important;
+  color: var(--fg-0) !important;
+}
+
+/* 节点 = 抬升一档的表面，靠 1px 线定形，与卡片同一套语言 */
+.mdx-diagram svg .node rect,
+.mdx-diagram svg .node circle,
+.mdx-diagram svg .node ellipse,
+.mdx-diagram svg .node polygon,
+.mdx-diagram svg .node path,
+.mdx-diagram svg rect.actor,
+.mdx-diagram svg .labelBox,
+.mdx-diagram svg .note,
+.mdx-diagram svg .stateLabel .box,
+.mdx-diagram svg .statediagram-state rect.basic,
+.mdx-diagram svg .statediagram-note rect {
+  fill: var(--bg-2) !important;
+  stroke: var(--line-strong) !important;
+}
+
+/* 分组框 = 凹槽 */
+.mdx-diagram svg .cluster rect,
+.mdx-diagram svg .statediagram-cluster rect,
+.mdx-diagram svg .statediagram-cluster .inner {
+  fill: var(--well) !important;
+  stroke: var(--line) !important;
+}
+
+.mdx-diagram svg .flowchart-link,
+.mdx-diagram svg .edgePaths .path,
+.mdx-diagram svg .transition,
+.mdx-diagram svg .messageLine0,
+.mdx-diagram svg .messageLine1,
+.mdx-diagram svg .actor-line,
+.mdx-diagram svg .loopLine,
+.mdx-diagram svg .note-edge,
+.mdx-diagram svg g.stateGroup line,
+.mdx-diagram svg line {
+  stroke: var(--line-strong) !important;
+}
+
+.mdx-diagram svg .marker,
+.mdx-diagram svg .arrowheadPath,
+.mdx-diagram svg [id$='-arrowhead'] path,
+.mdx-diagram svg [id$='-barbEnd'],
+.mdx-diagram svg .node .collapsed-indicator {
+  fill: var(--fg-2) !important;
+  stroke: var(--fg-2) !important;
+}
+
+/* 边标签：给一层底色，压在连线上才读得清 */
+.mdx-diagram svg .edgeLabel,
+.mdx-diagram svg .edgeLabel rect,
+.mdx-diagram svg .edgeLabel p,
+.mdx-diagram svg .labelBkg {
+  background-color: var(--bg-2) !important;
+  fill: var(--bg-2) !important;
+}
+
 .mdx-diagram-note {
-  color: var(--ink-2);
+  color: var(--fg-1);
   font-size: var(--fs-sm);
   line-height: var(--lh-sm);
   text-align: center;
@@ -169,22 +254,23 @@
 .mdx-diagram-note b {
   display: block;
   margin-bottom: 4px;
-  color: var(--ink);
-  font-family: var(--serif);
+  color: var(--fg-0);
+  font-family: var(--sans);
+  font-weight: 600;
   font-size: var(--fs-body);
 }
 
 .mdx-diagram-failed {
   border-style: dashed;
-  box-shadow: none;
 }
 
 /* ---------- Live Demo + 真实源码容器 ---------- */
 .doc-demo {
   margin: 24px 0;
-  border: 1px solid var(--ink);
-  background: var(--bone-hi);
-  box-shadow: var(--hard-lg);
+  border: 1px solid var(--line-soft);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  background: var(--bg-1);
   min-width: 0;
 }
 
@@ -194,9 +280,9 @@
   align-items: center;
   justify-content: space-between;
   gap: 10px;
-  padding: 10px 16px;
-  border-bottom: 1px solid var(--ink);
-  background: var(--bone);
+  padding: 12px 18px;
+  border-bottom: 1px solid var(--line-soft);
+  background: var(--bg-2);
 }
 
 .doc-demo-title {
@@ -208,27 +294,27 @@
 }
 
 .doc-demo-title b {
-  font: 700 var(--fs-sm) / 1.3 var(--serif);
-  color: var(--ink);
+  font: 600 var(--fs-sm) / 1.3 var(--sans);
+  color: var(--fg-0);
 }
 
 .doc-demo-path {
   font: 600 var(--fs-micro) / 1.3 var(--mono);
-  color: var(--ink-2);
+  color: var(--fg-2);
 }
 
 .doc-demo-stage {
   padding: 18px;
-  background: var(--bone);
+  background: var(--well);
   overflow-x: auto;
   min-width: 0;
 }
 
 .doc-demo-caption {
-  padding: 10px 16px;
-  border-top: 1px dashed var(--rule-strong);
-  background: var(--bone-hi);
-  color: var(--ink-2);
+  padding: 10px 18px;
+  border-top: 1px solid var(--line-soft);
+  background: var(--bg-1);
+  color: var(--fg-2);
   font-size: var(--fs-sm);
   line-height: var(--lh-sm);
 }
@@ -236,6 +322,6 @@
 .doc-demo pre.code {
   max-height: 440px;
   border: 0;
-  color: var(--plate-ink);
+  color: var(--fg-0);
 }
 }

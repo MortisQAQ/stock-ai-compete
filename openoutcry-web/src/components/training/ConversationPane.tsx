@@ -2,6 +2,7 @@ import { useEffect, useId, useRef, useState } from 'react'
 import { ArrowDown, ArrowUp, Check, Copy, Plus } from 'lucide-react'
 
 import { useRun } from '../../store/RunProvider'
+import { useTraining } from '../../store/TrainingProvider'
 import { useDialog } from '../../store/DialogProvider'
 import { agentOf } from '../../data/agents'
 import { seq } from '../../lib/format'
@@ -30,6 +31,7 @@ interface Props {
  */
 export function ConversationPane({ className, hideHeader = false }: Props) {
   const { state, actions } = useRun()
+  const { conversation } = useTraining()
   const { open } = useDialog()
   const agent = agentOf(state.agent)
   const [text, setText] = useState('')
@@ -92,33 +94,21 @@ export function ConversationPane({ className, hideHeader = false }: Props) {
   }
 
   return (
-    <section
-      aria-label="Agent 会话"
-      className={cn('flex min-h-0 min-w-0 flex-col bg-[var(--bone-lo)]', className)}
-    >
+    <section aria-label="Agent 会话" className={cn('conv-pane', className)}>
       {hideHeader ? null : (
-        <div className="flex shrink-0 items-center gap-2.5 border-b border-[var(--rule-strong)] px-4 py-3">
-          <span
-            aria-hidden
-            className="grid size-9 shrink-0 place-items-center rounded-full border border-[var(--rule-strong)] bg-[var(--bone-hi)] font-serif text-micro font-bold uppercase text-[var(--ink)]"
-          >
+        <header className="conv-hd">
+          <span aria-hidden className="conv-avatar">
             {agent.name.replace(/[^A-Za-z\u4e00-\u9fa5]/g, '').slice(0, 2)}
           </span>
-          <div className="min-w-0 flex-1">
-            <h2 className="truncate font-serif text-note font-bold leading-tight tracking-[-0.01em] text-[var(--ink)]">
-              {agent.name}
-            </h2>
-            <p className="mt-0.5 flex items-center gap-1.5 font-mono text-micro tracking-[0.05em] text-[var(--ink-2)]">
-              <i
-                aria-hidden
-                className="block size-[5px] rounded-full"
-                style={{ background: connected ? 'var(--pine)' : 'var(--ver)' }}
-              />
-              {connected ? '在线' : '断开'} · {state.mode === 'goal' ? '自主推进' : '逐案确认'} ·{' '}
-              {state.events.length} 条
+          <div className="conv-hd-main">
+            <h2 className="conv-title">{conversation.name}</h2>
+            <p className="conv-sub">
+              <i aria-hidden className="conv-dot" data-on={connected ? 'y' : 'n'} />
+              {agent.name} · {connected ? '在线' : '断开'} ·{' '}
+              {state.mode === 'goal' ? '自主推进' : '逐案确认'}
             </p>
           </div>
-        </div>
+        </header>
       )}
 
       <p className="sr-only" aria-live="polite">
@@ -131,7 +121,7 @@ export function ConversationPane({ className, hideHeader = false }: Props) {
           const el = e.currentTarget
           setAtBottom(el.scrollHeight - el.scrollTop - el.clientHeight < 60)
         }}
-        className="relative min-h-0 flex-1 space-y-4 overflow-y-auto overscroll-contain px-4 py-4"
+        className="conv-body"
       >
         {state.events.length === 0 ? (
           <p className="py-8 text-center text-note leading-relaxed text-[var(--ink-2)]">
@@ -149,7 +139,7 @@ export function ConversationPane({ className, hideHeader = false }: Props) {
           if (isMine) {
             return (
               <div key={e.id} className="flex flex-col items-end gap-1">
-                <div className="max-w-[88%] rounded-[16px] rounded-br-[6px] border border-[var(--rule-strong)] bg-[var(--bone-hi)] px-3.5 py-2.5 text-body leading-[1.6] text-[var(--ink)]">
+                <div className="max-w-[88%] rounded-[16px] rounded-br-[6px] bg-[var(--bg-3)] px-3.5 py-2.5 text-body leading-[1.6] text-[var(--ink)]">
                   {e.body || e.title}
                 </div>
                 <span className="pr-1 font-mono text-micro tabular-nums text-[var(--ink-2)]">{e.at}</span>
@@ -166,17 +156,17 @@ export function ConversationPane({ className, hideHeader = false }: Props) {
                   onClick={() => setExpanded((prev) => ({ ...prev, [e.id]: !openBody }))}
                   aria-expanded={openBody}
                   className={cn(
-                    'group flex w-full items-center gap-2 rounded-[10px] border px-2.5 py-2 text-left transition-colors',
+                    'group flex w-full items-center gap-2 rounded-[10px] px-2.5 py-2 text-left transition-colors',
                     isOrder
-                      ? 'border-[var(--ver)] bg-[var(--bone-hi)] hover:bg-[var(--bone)]'
-                      : 'border-[var(--rule)] bg-[var(--bone-hi)]/70 hover:bg-[var(--bone-hi)]',
+                      ? 'bg-[var(--up-soft)] hover:bg-[var(--bg-3)]'
+                      : 'bg-[var(--bg-1)] hover:bg-[var(--bg-3)]',
                   )}
                 >
                   <span
                     aria-hidden
                     className={cn(
                       'grid size-[18px] shrink-0 place-items-center rounded-full font-mono text-micro font-bold',
-                      isOrder ? 'bg-[var(--ver)] text-[var(--bone-hi)]' : 'bg-[var(--brass-hi)] text-[var(--ink)]',
+                      isOrder ? 'bg-[var(--ver)] text-[var(--bg-1)]' : 'bg-[var(--brass-hi)] text-[var(--ink)]',
                     )}
                   >
                     {isOrder ? '提' : '工'}
@@ -235,12 +225,12 @@ export function ConversationPane({ className, hideHeader = false }: Props) {
         })}
 
         {waitingHuman ? (
-          <div className="rounded-[12px] border border-dashed border-[var(--brass)] bg-[var(--bone-hi)]/80 px-3 py-2">
-            <span className="font-mono text-micro font-semibold uppercase tracking-[0.14em] text-[var(--ink-2)]">
+          <div className="rounded-[12px] bg-[var(--warn-soft)] px-3.5 py-3">
+            <span className="font-mono text-micro font-semibold uppercase tracking-[0.14em] text-[var(--warn)]">
               等待人工确认
             </span>
-            <p className="mt-1 text-note leading-relaxed text-[var(--ink-2)]">
-              提案在中栏工作台等待批准或拒绝，这里不再重复放按钮。
+            <p className="mt-1.5 text-note leading-relaxed text-[var(--fg-1)]">
+              提案在右侧工作台等待批准或拒绝，这里不再重复放按钮。
             </p>
           </div>
         ) : null}
@@ -250,7 +240,7 @@ export function ConversationPane({ className, hideHeader = false }: Props) {
             <button
               type="button"
               onClick={() => scrollToBottom()}
-              className="flex items-center gap-1 rounded-full border border-[var(--rule-strong)] bg-[var(--bone-hi)] px-2.5 py-1 font-mono text-micro uppercase tracking-[0.1em] text-[var(--ink-2)] shadow-[0_2px_6px_rgba(22,33,28,0.1)]"
+              className="flex items-center gap-1 rounded-full border border-[var(--line)] bg-[var(--bg-1)] px-2.5 py-1 font-mono text-micro uppercase tracking-[0.1em] text-[var(--ink-2)]"
             >
               <ArrowDown size={10} />
               最新
@@ -261,13 +251,13 @@ export function ConversationPane({ className, hideHeader = false }: Props) {
 
       {/* ---------- 输入区：一个圆角大框 ---------- */}
       <form
-        className="shrink-0 px-3 pb-3 pt-1"
+        className="conv-form"
         onSubmit={(event) => {
           event.preventDefault()
           send()
         }}
       >
-        <div className="rounded-[20px] border border-[var(--rule-strong)] bg-[var(--bone-hi)] px-2.5 pb-2 pt-2 transition-colors focus-within:border-[var(--ink)]">
+        <div className="conv-input">
           <label htmlFor={inputId} className="sr-only">
             人工插话
           </label>
@@ -288,12 +278,12 @@ export function ConversationPane({ className, hideHeader = false }: Props) {
             className="block max-h-[120px] w-full resize-none overflow-y-auto border-0 bg-transparent px-1.5 py-0.5 font-sans text-body leading-[1.6] text-[var(--ink)] placeholder:text-[var(--ink-3)] focus:outline-none disabled:opacity-60 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
           />
 
-          <div className="mt-1 flex items-center gap-1.5">
+          <div className="mt-2 flex items-center gap-2">
             <button
               type="button"
               onClick={() => open({ kind: 'goal' })}
               aria-label="切到自主推进"
-              className="grid size-7 shrink-0 place-items-center rounded-full border border-[var(--rule)] text-[var(--ink-2)] transition-colors hover:border-[var(--ink)] hover:text-[var(--ink)]"
+              className="grid size-7 shrink-0 place-items-center rounded-full bg-[var(--bg-2)] text-[var(--fg-2)] transition-colors hover:bg-[var(--bg-3)] hover:text-[var(--fg-0)]"
             >
               <Plus size={14} />
             </button>
@@ -304,7 +294,7 @@ export function ConversationPane({ className, hideHeader = false }: Props) {
               type="submit"
               disabled={aborted || !text.trim()}
               aria-label="发送插话"
-              className="grid size-8 shrink-0 place-items-center rounded-full bg-[var(--pine)] text-[var(--bone-hi)] transition-opacity hover:opacity-90 disabled:opacity-30"
+              className="grid size-8 shrink-0 place-items-center rounded-full bg-[var(--accent)] text-[#04070d] transition-opacity hover:opacity-90 disabled:opacity-30"
             >
               <ArrowUp size={15} />
             </button>

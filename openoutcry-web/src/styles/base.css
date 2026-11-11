@@ -5,31 +5,79 @@
   box-sizing: border-box;
 }
 
+/* fieldset 自带一圈 UA 边框。不重置的话，委托单的四格会各自套一个
+   灰白色的方框——读起来像「四张白边卡片」，是整页最刺眼的一处。
+   表单分组靠分节标题和底色分区，不靠框。 */
+fieldset {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  min-width: 0;
+}
+
+legend {
+  padding: 0;
+}
+
 html {
   -webkit-text-size-adjust: 100%;
+  background-color: #060907;
 }
 
 body {
   margin: 0;
-  color: var(--ink);
-  font: var(--fs-body)/1.62 var(--sans);
-  background-color: var(--bone);
-  background-image:
-    repeating-linear-gradient(90deg, rgba(18, 26, 21, 0.03) 0 1px, transparent 1px 104px),
-    radial-gradient(1100px 520px at 82% -8%, #f6f1e4 0%, transparent 62%);
+  min-height: 100dvh;
+  color: var(--fg-0);
+  font: var(--fs-body) / var(--lh-body) var(--sans);
+  letter-spacing: 0.005em;
+  background: transparent;
   -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
 }
 
-/* 纸张颗粒：固定覆盖，不吃点击 */
+/* ---------- 页面背景：三层叠出来的「设计背景」 ----------
+   ① 坐标纸：28px 点阵 + 每 6 格一根主网格线（工程图纸的读数面）
+   ② 光：左上冷青、右下酸橙，给平面一点纵深，避免「一整块死黑」
+   ③ 斜切：一道 104° 的细线划过全屏，是这套几何语言的主笔
+   固定层只画一次，滚动时不重绘（不用 background-attachment: fixed）。 */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: -2;
+  pointer-events: none;
+  background-color: #060907;
+  background-image:
+    radial-gradient(rgba(180, 238, 131, 0.1) 1px, transparent 1.3px),
+    linear-gradient(rgba(180, 238, 131, 0.045) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(180, 238, 131, 0.045) 1px, transparent 1px),
+    radial-gradient(1100px 720px at 12% -12%, rgba(24, 209, 255, 0.075), transparent 62%),
+    radial-gradient(900px 640px at 100% 108%, rgba(180, 238, 131, 0.065), transparent 62%);
+  background-size: 28px 28px, 168px 168px, 168px 168px, 100% 100%, 100% 100%;
+  background-position: center;
+}
+
 body::after {
   content: '';
   position: fixed;
   inset: 0;
-  z-index: 9000;
+  z-index: -1;
   pointer-events: none;
-  opacity: 0.16;
-  mix-blend-mode: multiply;
-  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.82' numOctaves='3' stitchTiles='stitch'/><feColorMatrix type='saturate' values='0'/></filter><rect width='160' height='160' filter='url(%23n)' opacity='.5'/></svg>");
+  background-image:
+    linear-gradient(
+      104deg,
+      transparent 0 67.7%,
+      rgba(180, 238, 131, 0.13) 67.7% calc(67.7% + 1px),
+      transparent calc(67.7% + 1px)
+    ),
+    linear-gradient(
+      104deg,
+      transparent 0 67.95%,
+      rgba(24, 209, 255, 0.06) 67.95% calc(67.95% + 1px),
+      transparent calc(67.95% + 1px)
+    ),
+    radial-gradient(135% 105% at 50% -10%, transparent 38%, rgba(2, 4, 3, 0.55) 100%);
 }
 
 h1,
@@ -71,9 +119,15 @@ button:disabled {
 }
 
 a {
-  color: var(--ver);
+  color: var(--accent);
   text-decoration: none;
-  border-bottom: 1px solid rgba(194, 53, 42, 0.35);
+  border-bottom: 1px solid var(--accent-soft);
+  transition: color 0.14s ease, border-color 0.14s ease;
+}
+
+a:hover {
+  color: var(--accent-hover);
+  border-bottom-color: var(--accent);
 }
 
 code,
@@ -82,11 +136,12 @@ pre {
 }
 
 ::selection {
-  background: rgba(194, 53, 42, 0.18);
+  background: var(--lime);
+  color: #08110a;
 }
 
 :focus-visible {
-  outline: 2px solid var(--ver);
+  outline: 2px solid var(--accent);
   outline-offset: 3px;
 }
 
@@ -95,15 +150,17 @@ pre {
   font-family: var(--mono);
 }
 
+/* 分节标签：窄体大写 + 大字距，是这套界面里最常出现的「仪器铭牌」 */
 .label {
-  font: 600 var(--fs-micro)/1 var(--mono);
-  letter-spacing: 0.22em;
+  display: inline-block;
+  font: 500 var(--fs-micro) / 1 var(--cond);
+  letter-spacing: 0.26em;
   text-transform: uppercase;
-  color: var(--brass);
+  color: var(--fg-2);
 }
 
 .dim {
-  color: var(--ink-3);
+  color: var(--fg-2);
 }
 
 .pos {
@@ -115,14 +172,23 @@ pre {
 }
 
 .flat {
-  color: var(--ink-2);
+  color: var(--fg-1);
 }
 
 .dots {
   flex: 1;
-  margin: 0 8px;
-  border-bottom: 1px dotted rgba(18, 26, 21, 0.3);
+  margin: 0 10px;
+  border-bottom: 1px solid var(--line);
   transform: translateY(-4px);
+}
+
+/* 小方点：全站的「标记」统一用 6px 实心方块，不用圆点 */
+.tick {
+  display: inline-block;
+  width: 6px;
+  height: 6px;
+  background: var(--lime);
+  vertical-align: middle;
 }
 
 /* 跳转到主内容（键盘可见） */
@@ -132,9 +198,9 @@ pre {
   top: -60px;
   z-index: 9500;
   padding: 10px 16px;
-  background: var(--ink);
-  color: var(--bone-hi);
-  font: 600 var(--fs-micro)/1 var(--mono);
+  background: var(--lime);
+  color: #08110a;
+  font: 600 var(--fs-micro) / 1 var(--mono);
   letter-spacing: 0.14em;
   border: 0;
   transition: top 0.16s ease;
@@ -144,9 +210,7 @@ pre {
   top: 12px;
 }
 
-/* ---------- 光标语义 ----------
-   跳过 preflight 后，原生 <button> 不会自动带 pointer 光标；
-   这里补回来，并让禁用态统一给出 not-allowed。 */
+/* ---------- 光标语义 ---------- */
 button:not(:disabled),
 [role='button']:not([aria-disabled='true']),
 summary,
@@ -159,14 +223,13 @@ button:disabled,
   cursor: not-allowed;
 }
 
-/* ---------- 触屏：最小点按尺寸 ----------
-   指针粗糙（手机/平板）时，任何可交互控件都不低于 36px 高；
-   桌面保持紧凑密度，不为此牺牲信息量。 */
+/* ---------- 触屏：最小点按尺寸 ---------- */
 @media (pointer: coarse) {
   [data-slot='button'],
   .stepper button,
   .ledger-filters button,
-  .mnav a,
+  .rail-nav a,
+  .rail-conv,
   .replay-item,
   .agent-add {
     min-height: 36px;
@@ -178,10 +241,10 @@ button:disabled,
   }
 }
 
-/* 滚动条 */
+/* 滚动条：绿底上默认滚动条是一道白光，压到 14% */
 * {
   scrollbar-width: thin;
-  scrollbar-color: rgba(18, 26, 21, 0.28) transparent;
+  scrollbar-color: rgba(180, 238, 131, 0.16) transparent;
 }
 
 *::-webkit-scrollbar {
@@ -190,7 +253,7 @@ button:disabled,
 }
 
 *::-webkit-scrollbar-thumb {
-  background: rgba(18, 26, 21, 0.22);
+  background: rgba(180, 238, 131, 0.16);
 }
 
 *::-webkit-scrollbar-track {
@@ -208,4 +271,3 @@ button:disabled,
   }
 }
 }
-

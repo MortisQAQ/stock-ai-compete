@@ -1,29 +1,42 @@
 @layer components {
 /* ---------- 新建训练页头 ---------- */
 .hero {
-  padding-bottom: 22px;
-  margin-bottom: 26px;
-  border-bottom: 1px solid var(--ink);
+  padding-bottom: var(--sp-7);
+  margin-bottom: var(--sp-8);
+  border-bottom: 1px solid var(--line-strong);
 }
 
 .hero-grid {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) 296px;
-  gap: 36px;
+  grid-template-columns: minmax(0, 1fr) 340px;
+  gap: var(--sp-8);
   align-items: start;
 }
 
+/* 中文大标题 = 无衬线 600。层级来自字号和留白，不靠换字体。
+   注意不要写负字距：负字距是为拉丁字母设计的，中文方块字压紧会发糊。 */
 .hero h1 {
-  font: 700 var(--fs-display)/1.12 var(--serif);
-  letter-spacing: -1.6px;
-  margin-top: 14px;
+  font: 600 var(--fs-display) / 1.06 var(--display);
+  letter-spacing: 0;
+  margin-top: var(--sp-4);
+}
+
+/* 标题里的强调词（英文 / 数字为主）。
+   衬线斜体已整体弃用：改用字重 + 字距做强调，不引入第二种字体材质。 */
+.hero h1 em {
+  font-family: var(--sans);
+  font-style: normal;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  color: var(--fg-0);
 }
 
 .hero .deck {
-  margin-top: 12px;
-  max-width: 54ch;
+  margin-top: var(--sp-4);
+  max-width: 56ch;
   font-size: var(--fs-body);
-  color: var(--ink-2);
+  line-height: var(--lh-body);
+  color: var(--fg-1);
 }
 
 .hero-stamps {
@@ -33,45 +46,61 @@
   flex-wrap: wrap;
 }
 
-/* 当前运行卡里的键值行（卡体由 Card variant="instrument" 提供） */
-.run-line {
+/* 当前运行卡里的 2×2 读数格與键值行：标签压到 --fg-2，数字留在 --fg-0 */
+.run-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px 20px;
+}
+
+.run-cell {
   display: flex;
-  align-items: baseline;
-  justify-content: space-between;
-  gap: 10px;
-  padding: 7px 0;
-  border-bottom: 1px solid rgba(214, 226, 203, 0.1);
+  flex-direction: column;
+  gap: 6px;
+  min-width: 0;
 }
 
-.run-line:last-of-type {
-  border-bottom: 0;
-  padding-bottom: 2px;
-}
-
+.run-cell span,
 .run-line span {
-  color: var(--slate-dim);
+  color: var(--fg-2);
   font-size: var(--fs-micro);
   letter-spacing: 0.04em;
 }
 
+.run-cell b,
 .run-line b {
-  font: 600 var(--fs-micro)/1 var(--mono);
-  color: var(--plate-ink);
+  font: 600 var(--fs-micro)/1.2 var(--mono);
+  color: var(--lime);
   font-variant-numeric: tabular-nums;
 }
 
+.run-cell b.acc,
 .run-line b.acc {
-  font-family: var(--serif);
+  font-family: var(--mono);
   font-size: var(--fs-body);
-  letter-spacing: -0.4px;
+  letter-spacing: -0.02em;
 }
 
+.run-cell b.pos,
 .run-line b.pos {
-  color: var(--up-dark);
+  color: var(--up);
 }
 
+.run-cell b.neg,
 .run-line b.neg {
-  color: var(--down-dark);
+  color: var(--down);
+}
+
+.run-line {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 15px 0;
+}
+
+.run-line + .run-line {
+  border-top: 1px solid var(--line-soft);
 }
 
 /* ---------- 区块标题 ---------- */
@@ -80,10 +109,10 @@
   flex-wrap: wrap;
   align-items: baseline;
   justify-content: space-between;
-  gap: 8px 14px;
-  margin: 34px 0 12px;
-  padding-bottom: 9px;
-  border-bottom: 1px solid var(--ink);
+  gap: 10px 18px;
+  margin: var(--sp-7) 0 var(--sp-5);
+  padding-bottom: 14px;
+  border-bottom: 1px solid var(--line-strong);
 }
 
 /* 右侧路径/计数在窄屏折行，别把整页撑宽 */
@@ -97,7 +126,7 @@
 }
 
 .section-hd h2 {
-  font: 700 var(--fs-h2)/1.3 var(--serif);
+  font: 600 var(--fs-h2)/1.3 var(--sans);
   letter-spacing: -0.4px;
 }
 
@@ -114,7 +143,7 @@
 
 /* ---------- Agent 列表 ---------- */
 .hero-slim {
-  padding-bottom: 18px;
+  padding-bottom: var(--sp-5);
   margin-bottom: 0;
   border-bottom: 0;
 }
@@ -132,12 +161,12 @@
 .section-hd-side .count {
   font: 600 var(--fs-sm) / 1 var(--mono);
   letter-spacing: 0.06em;
-  color: var(--ink-3);
+  color: var(--fg-2);
 }
 
 .agent-list {
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 14px;
 }
 }

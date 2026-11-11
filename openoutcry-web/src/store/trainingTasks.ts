@@ -29,7 +29,23 @@ export function trainingTasksOf(state: RunState): TrainingTask[] {
 
   const live: TrainingTask = {
     id: LIVE_TASK_ID,
-    name: state.proposal.status === 'pending' ? '减仓 公司-017 · 盘前研究' : '减仓 公司-017 · 开盘撮合',
+    name: '减仓 公司-017 · 当日',
+    // 一次训练里可以和 AI 有多次会话：盘前研究、开盘撮合。
+    // 两条都指向同一个实时事件流，区分的是「这次对话在谈什么」。
+    conversations: [
+      {
+        id: 'conv-pre',
+        name: '盘前研究',
+        meta: '09:15 · 资料检索与候选筛选',
+        status,
+      },
+      {
+        id: 'conv-open',
+        name: '开盘撮合',
+        meta: '09:30 · 提案与审批',
+        status,
+      },
+    ],
     assignee: { kind: 'agent', name: agent.name },
     startAt: '2024-04-23 09:15',
     endAt: '2024-04-23 15:00',

@@ -1,0 +1,1345 @@
+{
+ "label": "before",
+ "fileUrl": "file:///D:/projects/playground/stock-ai-compete/research/fyp-2026-term1/slides-part1-swiss/index.html",
+ "failures": [],
+ "fonts": [
+  {
+   "family": "Inter",
+   "loaded": true
+  },
+  {
+   "family": "Noto Sans SC",
+   "loaded": true
+  },
+  {
+   "family": "JetBrains Mono",
+   "loaded": true
+  },
+  {
+   "family": "Microsoft YaHei",
+   "loaded": true
+  },
+  {
+   "family": "Segoe UI",
+   "loaded": true
+  }
+ ],
+ "styleEvidence": [
+  {
+   "slide": 1,
+   "sel": "h1.h-hero",
+   "text": "openOutcry",
+   "fontFamily": "Inter, \"Noto Sans SC\", \"PingFang SC\", \"Hiragino Sans GB\", \"Microsoft YaHei\", system-ui, sans-serif, \"Noto Sans SC\", \"PingFang SC\", \"Hiragino Sans GB\", \"Microsoft YaHei\", sans-serif",
+   "fontWeight": "200",
+   "letterSpacing": "-5.28px",
+   "fontSize": "176px",
+   "lineHeight": "158.4px"
+  },
+  {
+   "slide": 1,
+   "sel": ".lead",
+   "text": "让 Agent 试炼可见。",
+   "fontFamily": "Inter, \"Noto Sans SC\", \"PingFang SC\", \"Hiragino Sans GB\", \"Microsoft YaHei\", system-ui, sans-serif, \"Noto Sans SC\", \"PingFang SC\", \"Hiragino Sans GB\", \"Microsoft YaHei\", sans-serif",
+   "fontWeight": "300",
+   "letterSpacing": "-0.184px",
+   "fontSize": "36.8px",
+   "lineHeight": "47.84px"
+  },
+  {
+   "slide": 1,
+   "sel": ".t-meta",
+   "text": "MULTI-AGENT A-SHARE TRIA",
+   "fontFamily": "\"JetBrains Mono\", \"Noto Sans SC\", ui-monospace, \"SF Mono\", Menlo, monospace",
+   "fontWeight": "500",
+   "letterSpacing": "3.08px",
+   "fontSize": "14px",
+   "lineHeight": "20.3px"
+  },
+  {
+   "slide": 2,
+   "sel": "[data-anim=\"title-block\"] > div",
+   "text": "金融 Agent已走进桌面",
+   "fontFamily": "Inter, \"Noto Sans SC\", \"PingFang SC\", \"Hiragino Sans GB\", \"Microsoft YaHei\", system-ui, sans-serif, \"Noto Sans SC\", \"PingFang SC\", \"Hiragino Sans GB\", \"Microsoft YaHei\", sans-serif",
+   "fontWeight": "300",
+   "letterSpacing": "-1.62px",
+   "fontSize": "54px",
+   "lineHeight": "57.24px"
+  },
+  {
+   "slide": 2,
+   "sel": ".image-hero-stats .kpi-hero",
+   "text": "2026",
+   "fontFamily": "Inter, \"Noto Sans SC\", \"PingFang SC\", \"Hiragino Sans GB\", \"Microsoft YaHei\", system-ui, sans-serif",
+   "fontWeight": "300",
+   "letterSpacing": "-2.196px",
+   "fontSize": "54.9px",
+   "lineHeight": "52.155px"
+  },
+  {
+   "slide": 3,
+   "sel": "h2",
+   "text": "注意力，已经先到了",
+   "fontFamily": "Inter, \"Noto Sans SC\", \"PingFang SC\", \"Hiragino Sans GB\", \"Microsoft YaHei\", system-ui, sans-serif, \"Noto Sans SC\", \"PingFang SC\", \"Hiragino Sans GB\", \"Microsoft YaHei\", sans-serif",
+   "fontWeight": "300",
+   "letterSpacing": "-2.912px",
+   "fontSize": "83.2px",
+   "lineHeight": "79.872px"
+  },
+  {
+   "slide": 3,
+   "sel": ".ledger-num",
+   "text": "118.2K",
+   "fontFamily": "Inter, \"Noto Sans SC\", \"PingFang SC\", \"Hiragino Sans GB\", \"Microsoft YaHei\", system-ui, sans-serif",
+   "fontWeight": "200",
+   "letterSpacing": "-3.96px",
+   "fontSize": "99px",
+   "lineHeight": "87.12px"
+  },
+  {
+   "slide": 3,
+   "sel": ".ledger-desc",
+   "text": "12 角色多智能体交易框架登顶社区现象级项目，团",
+   "fontFamily": "Inter, \"Noto Sans SC\", \"PingFang SC\", \"Hiragino Sans GB\", \"Microsoft YaHei\", system-ui, sans-serif, \"Noto Sans SC\", \"PingFang SC\", \"Hiragino Sans GB\", \"Microsoft YaHei\", sans-serif",
+   "fontWeight": "400",
+   "letterSpacing": "normal",
+   "fontSize": "16px",
+   "lineHeight": "24px"
+  },
+  {
+   "slide": 3,
+   "sel": ".ledger-label",
+   "text": "GITHUB STARS / TAURASAI-",
+   "fontFamily": "\"JetBrains Mono\", \"Noto Sans SC\", ui-monospace, \"SF Mono\", Menlo, monospace",
+   "fontWeight": "500",
+   "letterSpacing": "1.82px",
+   "fontSize": "14px",
+   "lineHeight": "normal"
+  },
+  {
+   "slide": 4,
+   "sel": ".col-ttl",
+   "text": "单点回答已经足够快",
+   "fontFamily": "Inter, \"Noto Sans SC\", \"PingFang SC\", \"Hiragino Sans GB\", \"Microsoft YaHei\", system-ui, sans-serif, \"Noto Sans SC\", \"PingFang SC\", \"Hiragino Sans GB\", \"Microsoft YaHei\", sans-serif",
+   "fontWeight": "200",
+   "letterSpacing": "-1.728px",
+   "fontSize": "57.6px",
+   "lineHeight": "57.6px"
+  },
+  {
+   "slide": 4,
+   "sel": ".col-list li",
+   "text": "秒级完成条件选股、公告提炼与长篇财报精读",
+   "fontFamily": "Inter, \"Noto Sans SC\", \"PingFang SC\", \"Hiragino Sans GB\", \"Microsoft YaHei\", system-ui, sans-serif, \"Noto Sans SC\", \"PingFang SC\", \"Hiragino Sans GB\", \"Microsoft YaHei\", sans-serif",
+   "fontWeight": "400",
+   "letterSpacing": "normal",
+   "fontSize": "16px",
+   "lineHeight": "24px"
+  },
+  {
+   "slide": 5,
+   "sel": ".gap-title",
+   "text": "不是工具不好用，而是训练结果在黑盒里不可见。",
+   "fontFamily": "Inter, \"Noto Sans SC\", \"PingFang SC\", \"Hiragino Sans GB\", \"Microsoft YaHei\", system-ui, sans-serif, \"Noto Sans SC\", \"PingFang SC\", \"Hiragino Sans GB\", \"Microsoft YaHei\", sans-serif",
+   "fontWeight": "200",
+   "letterSpacing": "-1.296px",
+   "fontSize": "43.2px",
+   "lineHeight": "48.384px"
+  },
+  {
+   "slide": 5,
+   "sel": ".force-num",
+   "text": "01",
+   "fontFamily": "Inter, \"Noto Sans SC\", \"PingFang SC\", \"Hiragino Sans GB\", \"Microsoft YaHei\", system-ui, sans-serif",
+   "fontWeight": "200",
+   "letterSpacing": "-2.16px",
+   "fontSize": "54px",
+   "lineHeight": "48.6px"
+  },
+  {
+   "slide": 5,
+   "sel": ".force-card h4",
+   "text": "闭源投研助手",
+   "fontFamily": "Inter, \"Noto Sans SC\", \"PingFang SC\", \"Hiragino Sans GB\", \"Microsoft YaHei\", system-ui, sans-serif, \"Noto Sans SC\", \"PingFang SC\", \"Hiragino Sans GB\", \"Microsoft YaHei\", sans-serif",
+   "fontWeight": "400",
+   "letterSpacing": "-0.41175px",
+   "fontSize": "27.45px",
+   "lineHeight": "32.94px"
+  },
+  {
+   "slide": 5,
+   "sel": ".force-card p",
+   "text": "强在单轮问答与深度报告，但没有连续账户状态与撮合",
+   "fontFamily": "Inter, \"Noto Sans SC\", \"PingFang SC\", \"Hiragino Sans GB\", \"Microsoft YaHei\", system-ui, sans-serif, \"Noto Sans SC\", \"PingFang SC\", \"Hiragino Sans GB\", \"Microsoft YaHei\", sans-serif",
+   "fontWeight": "400",
+   "letterSpacing": "normal",
+   "fontSize": "16px",
+   "lineHeight": "24.8px"
+  },
+  {
+   "slide": 5,
+   "sel": ".gap-note",
+   "text": "现有产品交付的是「单点观点」或「官方秀场」，唯独",
+   "fontFamily": "Inter, \"Noto Sans SC\", \"PingFang SC\", \"Hiragino Sans GB\", \"Microsoft YaHei\", system-ui, sans-serif, \"Noto Sans SC\", \"PingFang SC\", \"Hiragino Sans GB\", \"Microsoft YaHei\", sans-serif",
+   "fontWeight": "400",
+   "letterSpacing": "normal",
+   "fontSize": "16px",
+   "lineHeight": "24.8px"
+  },
+  {
+   "slide": 6,
+   "sel": "h2",
+   "text": "把黑盒结论，变成可见试炼。",
+   "fontFamily": "Inter, \"Noto Sans SC\", \"PingFang SC\", \"Hiragino Sans GB\", \"Microsoft YaHei\", system-ui, sans-serif, \"Noto Sans SC\", \"PingFang SC\", \"Hiragino Sans GB\", \"Microsoft YaHei\", sans-serif",
+   "fontWeight": "300",
+   "letterSpacing": "-2.36px",
+   "fontSize": "94.4px",
+   "lineHeight": "90.624px"
+  },
+  {
+   "slide": 6,
+   "sel": ".tk-num",
+   "text": "01",
+   "fontFamily": "Inter, \"Noto Sans SC\", \"PingFang SC\", \"Hiragino Sans GB\", \"Microsoft YaHei\", system-ui, sans-serif",
+   "fontWeight": "200",
+   "letterSpacing": "-1.512px",
+   "fontSize": "50.4px",
+   "lineHeight": "45.36px"
+  },
+  {
+   "slide": 6,
+   "sel": ".takeaway-list h4",
+   "text": "潮流已至",
+   "fontFamily": "Inter, \"Noto Sans SC\", \"PingFang SC\", \"Hiragino Sans GB\", \"Microsoft YaHei\", system-ui, sans-serif, \"Noto Sans SC\", \"PingFang SC\", \"Hiragino Sans GB\", \"Microsoft YaHei\", sans-serif",
+   "fontWeight": "400",
+   "letterSpacing": "-0.3888px",
+   "fontSize": "25.92px",
+   "lineHeight": "31.104px"
+  },
+  {
+   "slide": 6,
+   "sel": ".takeaway-list p",
+   "text": "金融 Agent 的商业供给与散户自建热情已全面",
+   "fontFamily": "Inter, \"Noto Sans SC\", \"PingFang SC\", \"Hiragino Sans GB\", \"Microsoft YaHei\", system-ui, sans-serif, \"Noto Sans SC\", \"PingFang SC\", \"Hiragino Sans GB\", \"Microsoft YaHei\", sans-serif",
+   "fontWeight": "400",
+   "letterSpacing": "normal",
+   "fontSize": "16px",
+   "lineHeight": "24.8px"
+  }
+ ],
+ "report": [
+  {
+   "slide": 1,
+   "maxBottom": 823,
+   "lowest": {
+    "label": ".cover-row \"让 Agent 试炼可见。 面向投资者的多智能体 A 股历史试炼、人机协同风控与逐笔归因\"",
+    "bottom": 823
+   },
+   "lowestText": {
+    "label": ".t-meta \"FINAL YEAR PROJECT · PRODUCT PITCH\"",
+    "bottom": 823
+   },
+   "overCount": 0,
+   "over": [],
+   "orphans": [],
+   "slideTop": 0,
+   "slideH": 900,
+   "scrollOverflow": 0,
+   "blocks": [
+    {
+     "label": ".l \"OPENOUTCRY · FYP 2026 TERM 1\"",
+     "top": 50,
+     "bottom": 71,
+     "w": 290,
+     "h": 21,
+     "fs": 14,
+     "fw": "500",
+     "ls": "1.96px",
+     "ff": "JetBrains Mono"
+    },
+    {
+     "label": ".r \"ACT 01 / 06 · BACKGROUND\"",
+     "top": 50,
+     "bottom": 71,
+     "w": 249,
+     "h": 21,
+     "fs": 14,
+     "fw": "500",
+     "ls": "1.96px",
+     "ff": "JetBrains Mono"
+    },
+    {
+     "label": ".t-meta \"MULTI-AGENT A-SHARE TRIAL & WHITE-BOX REVIEW\"",
+     "top": 111,
+     "bottom": 132,
+     "w": 1440,
+     "h": 20,
+     "fs": 14,
+     "fw": "500",
+     "ls": "3.08px",
+     "ff": "JetBrains Mono"
+    },
+    {
+     "label": ".h-hero \"openOutcry\"",
+     "top": 312,
+     "bottom": 470,
+     "w": 1440,
+     "h": 158,
+     "fs": 176,
+     "fw": "200",
+     "ls": "-5.28px",
+     "ff": "Inter"
+    },
+    {
+     "label": ".lead \"让 Agent 试炼可见。\"",
+     "top": 673,
+     "bottom": 720,
+     "w": 1273,
+     "h": 48,
+     "fs": 36.8,
+     "fw": "300",
+     "ls": "-0.184px",
+     "ff": "Inter"
+    },
+    {
+     "label": "em \"可见\"",
+     "top": 674,
+     "bottom": 719,
+     "w": 73,
+     "h": 45,
+     "fs": 36.8,
+     "fw": "300",
+     "ls": "-0.184px",
+     "ff": "Inter"
+    },
+    {
+     "label": "div \"面向投资者的多智能体 A 股历史试炼、人机协同风控与逐笔归因复盘平台 —— 解决闭源竞品\"",
+     "top": 747,
+     "bottom": 775,
+     "w": 1440,
+     "h": 28,
+     "fs": 18,
+     "fw": "400",
+     "ls": "normal",
+     "ff": "Inter"
+    },
+    {
+     "label": ".t-meta \"FINAL YEAR PROJECT · PRODUCT PITCH\"",
+     "top": 802,
+     "bottom": 823,
+     "w": 352,
+     "h": 20,
+     "fs": 14,
+     "fw": "500",
+     "ls": "1.96px",
+     "ff": "JetBrains Mono"
+    },
+    {
+     "label": ".t-meta \"2026.11\"",
+     "top": 802,
+     "bottom": 823,
+     "w": 73,
+     "h": 20,
+     "fs": 14,
+     "fw": "500",
+     "ls": "1.96px",
+     "ff": "JetBrains Mono"
+    }
+   ]
+  },
+  {
+   "slide": 2,
+   "maxBottom": 770,
+   "lowest": {
+    "label": "div \"从机构投研套件到 C 端技能市场，金融 Agent 已经完成商业化落地。真正稀缺的不再是\"",
+    "bottom": 770
+   },
+   "lowestText": {
+    "label": "div \"从机构投研套件到 C 端技能市场，金融 Agent 已经完成商业化落地。真正稀缺的不再是\"",
+    "bottom": 770
+   },
+   "overCount": 0,
+   "over": [],
+   "orphans": [
+    {
+     "cls": "div",
+     "lines": 3,
+     "lastLine": "判断」。",
+     "lastCoreChars": 2,
+     "lastWidth": 71,
+     "text": "从机构投研套件到 C 端技能市场，金融 Agent 已经完成商业化落地。真正稀缺的不再是「会不会用 AI 选股」，而是「"
+    }
+   ],
+   "slideTop": 0,
+   "slideH": 900,
+   "scrollOverflow": 0,
+   "blocks": [
+    {
+     "label": ".l \"FIN AGENT WAVE · COMMERCIAL LANDSCAPE\"",
+     "top": 50,
+     "bottom": 71,
+     "w": 383,
+     "h": 21,
+     "fs": 14,
+     "fw": "500",
+     "ls": "1.96px",
+     "ff": "JetBrains Mono"
+    },
+    {
+     "label": ".r \"ACT 01 / 06 · 02\"",
+     "top": 50,
+     "bottom": 71,
+     "w": 166,
+     "h": 21,
+     "fs": 14,
+     "fw": "500",
+     "ls": "1.96px",
+     "ff": "JetBrains Mono"
+    },
+    {
+     "label": "div \"金融 Agent已走进桌面\"",
+     "top": 122,
+     "bottom": 237,
+     "w": 262,
+     "h": 114,
+     "fs": 54,
+     "fw": "200",
+     "ls": "-1.62px",
+     "ff": "Inter"
+    },
+    {
+     "label": "div \"从机构投研套件到 C 端技能市场，金融 Agent 已经完成商业化落地。真正稀缺的不再是\"",
+     "top": 596,
+     "bottom": 770,
+     "w": 620,
+     "h": 174,
+     "fs": 20.5,
+     "fw": "400",
+     "ls": "-0.1024px",
+     "ff": "Inter"
+    },
+    {
+     "label": ".t-meta \"COMMERCIAL SHIP\"",
+     "top": 603,
+     "bottom": 623,
+     "w": 211,
+     "h": 20,
+     "fs": 14,
+     "fw": "500",
+     "ls": "1.96px",
+     "ff": "JetBrains Mono"
+    },
+    {
+     "label": ".kpi-hero \"2026\"",
+     "top": 630,
+     "bottom": 682,
+     "w": 211,
+     "h": 52,
+     "fs": 54.9,
+     "fw": "200",
+     "ls": "-2.196px",
+     "ff": "Inter"
+    },
+    {
+     "label": ".body-sm \"从 OpenAI 机构投研套件到 Kimi K3.1 Pro 金融深度研究同步落地\"",
+     "top": 695,
+     "bottom": 770,
+     "w": 211,
+     "h": 74,
+     "fs": 16,
+     "fw": "400",
+     "ls": "normal",
+     "ff": "Inter"
+    },
+    {
+     "label": ".t-meta \"C-END READY\"",
+     "top": 603,
+     "bottom": 623,
+     "w": 211,
+     "h": 20,
+     "fs": 14,
+     "fw": "500",
+     "ls": "1.96px",
+     "ff": "JetBrains Mono"
+    },
+    {
+     "label": ".kpi-hero \"SkillHub\"",
+     "top": 630,
+     "bottom": 671,
+     "w": 211,
+     "h": 42,
+     "fs": 39.6,
+     "fw": "200",
+     "ls": "-1.782px",
+     "ff": "Inter"
+    },
+    {
+     "label": ".body-sm \"同花顺问财上线本地 Agent 金融技能广场，一段提示词即可挂载\"",
+     "top": 695,
+     "bottom": 770,
+     "w": 211,
+     "h": 74,
+     "fs": 16,
+     "fw": "400",
+     "ls": "normal",
+     "ff": "Inter"
+    },
+    {
+     "label": ".t-meta \"ZERO SETUP\"",
+     "top": 603,
+     "bottom": 623,
+     "w": 211,
+     "h": 20,
+     "fs": 14,
+     "fw": "500",
+     "ls": "1.96px",
+     "ff": "JetBrains Mono"
+    },
+    {
+     "label": ".kpi-hero \"1 句指令\"",
+     "top": 630,
+     "bottom": 671,
+     "w": 211,
+     "h": 42,
+     "fs": 39.6,
+     "fw": "200",
+     "ls": "-1.782px",
+     "ff": "Inter"
+    },
+    {
+     "label": ".body-sm \"普通投资者复制一段提示词，即可给 Agent 装上行情与财务工具\"",
+     "top": 695,
+     "bottom": 770,
+     "w": 211,
+     "h": 74,
+     "fs": 16,
+     "fw": "400",
+     "ls": "normal",
+     "ff": "Inter"
+    }
+   ]
+  },
+  {
+   "slide": 3,
+   "maxBottom": 823,
+   "lowest": {
+    "label": ".ledger-row \"4.7W+ BILIBILI · A-SHARE RETAIL 国内 B 站多支散户实盘\"",
+    "bottom": 823
+   },
+   "lowestText": {
+    "label": ".ledger-num \"4.7W+\"",
+    "bottom": 797
+   },
+   "overCount": 0,
+   "over": [],
+   "orphans": [],
+   "slideTop": 0,
+   "slideH": 900,
+   "scrollOverflow": 0,
+   "blocks": [
+    {
+     "label": ".l \"ACT 01 · MARKET HEAT\"",
+     "top": 50,
+     "bottom": 71,
+     "w": 207,
+     "h": 21,
+     "fs": 14,
+     "fw": "500",
+     "ls": "1.96px",
+     "ff": "JetBrains Mono"
+    },
+    {
+     "label": ".r \"03 / 06\"",
+     "top": 50,
+     "bottom": 71,
+     "w": 73,
+     "h": 21,
+     "fs": 14,
+     "fw": "500",
+     "ls": "1.96px",
+     "ff": "JetBrains Mono"
+    },
+    {
+     "label": ".t-meta \"COMMUNITY & RETAIL SIGNAL · 2026.10 SAMPLED\"",
+     "top": 111,
+     "bottom": 132,
+     "w": 1440,
+     "h": 20,
+     "fs": 14,
+     "fw": "500",
+     "ls": "1.96px",
+     "ff": "JetBrains Mono"
+    },
+    {
+     "label": "h2 \"注意力，已经先到了\"",
+     "top": 144,
+     "bottom": 224,
+     "w": 1440,
+     "h": 80,
+     "fs": 83.2,
+     "fw": "300",
+     "ls": "-2.912px",
+     "ff": "Inter"
+    },
+    {
+     "label": ".ledger-num \"118.2K\"",
+     "top": 298,
+     "bottom": 385,
+     "w": 293,
+     "h": 87,
+     "fs": 99,
+     "fw": "200",
+     "ls": "-3.96px",
+     "ff": "Inter"
+    },
+    {
+     "label": ".ledger-label \"GITHUB STARS / TAURASAI-TRADINGAGENTS\"",
+     "top": 317,
+     "bottom": 335,
+     "w": 1045,
+     "h": 18,
+     "fs": 14,
+     "fw": "500",
+     "ls": "1.82px",
+     "ff": "JetBrains Mono"
+    },
+    {
+     "label": ".ledger-desc \"12 角色多智能体交易框架登顶社区现象级项目，团队化协作决策成为技术共识。\"",
+     "top": 343,
+     "bottom": 367,
+     "w": 747,
+     "h": 24,
+     "fs": 16,
+     "fw": "400",
+     "ls": "normal",
+     "ff": "Inter"
+    },
+    {
+     "label": ".ledger-num \"845K+\"",
+     "top": 436,
+     "bottom": 523,
+     "w": 293,
+     "h": 87,
+     "fs": 99,
+     "fw": "200",
+     "ls": "-3.96px",
+     "ff": "Inter"
+    },
+    {
+     "label": ".ledger-label \"YOUTUBE · RETAIL LIVE TEST\"",
+     "top": 454,
+     "bottom": 472,
+     "w": 1045,
+     "h": 18,
+     "fs": 14,
+     "fw": "500",
+     "ls": "1.82px",
+     "ff": "JetBrains Mono"
+    },
+    {
+     "label": ".ledger-desc \"海外散户实测「把真金白银交给 AI 交易」单条播放破 84.5 万，次高单条 53.5 \"",
+     "top": 480,
+     "bottom": 504,
+     "w": 747,
+     "h": 24,
+     "fs": 16,
+     "fw": "400",
+     "ls": "normal",
+     "ff": "Inter"
+    },
+    {
+     "label": ".ledger-num \"655K+\"",
+     "top": 573,
+     "bottom": 660,
+     "w": 293,
+     "h": 87,
+     "fs": 99,
+     "fw": "200",
+     "ls": "-3.96px",
+     "ff": "Inter"
+    },
+    {
+     "label": ".ledger-label \"CNBC · FINANCE PRIMETIME\"",
+     "top": 591,
+     "bottom": 609,
+     "w": 1045,
+     "h": 18,
+     "fs": 14,
+     "fw": "500",
+     "ls": "1.82px",
+     "ff": "JetBrains Mono"
+    },
+    {
+     "label": ".ledger-desc \"华尔街权威媒体连续专题拆解 AI 交易员的真实胜率与风控边界（另一支 41.6 万）。\"",
+     "top": 617,
+     "bottom": 641,
+     "w": 747,
+     "h": 24,
+     "fs": 16,
+     "fw": "400",
+     "ls": "normal",
+     "ff": "Inter"
+    },
+    {
+     "label": ".ledger-num \"4.7W+\"",
+     "top": 710,
+     "bottom": 797,
+     "w": 293,
+     "h": 87,
+     "fs": 99,
+     "fw": "200",
+     "ls": "-3.96px",
+     "ff": "Inter"
+    },
+    {
+     "label": ".ledger-label \"BILIBILI · A-SHARE RETAIL\"",
+     "top": 728,
+     "bottom": 746,
+     "w": 1045,
+     "h": 18,
+     "fs": 14,
+     "fw": "500",
+     "ls": "1.82px",
+     "ff": "JetBrains Mono"
+    },
+    {
+     "label": ".ledger-desc \"国内 B 站多支散户实盘/模拟测试视频突破 2.5 万至 4.7 万播放，自建交易 Ag\"",
+     "top": 755,
+     "bottom": 779,
+     "w": 747,
+     "h": 24,
+     "fs": 16,
+     "fw": "400",
+     "ls": "normal",
+     "ff": "Inter"
+    }
+   ]
+  },
+  {
+   "slide": 4,
+   "maxBottom": 821,
+   "lowest": {
+    "label": ".col-list \"秒级完成条件选股、公告提炼与长篇财报精读 闭源看台直观展示大厂预设模型的静态收益排位 交\"",
+    "bottom": 821
+   },
+   "lowestText": {
+    "label": "li \"交付物是一份「当下读起来逻辑通顺的分析文本」\"",
+    "bottom": 821
+   },
+   "overCount": 0,
+   "over": [],
+   "orphans": [],
+   "slideTop": 0,
+   "slideH": 900,
+   "scrollOverflow": 0,
+   "blocks": [
+    {
+     "label": ".l \"ACT 01 · THE REAL QUESTION\"",
+     "top": 50,
+     "bottom": 71,
+     "w": 269,
+     "h": 21,
+     "fs": 14,
+     "fw": "500",
+     "ls": "1.96px",
+     "ff": "JetBrains Mono"
+    },
+    {
+     "label": ".r \"04 / 06\"",
+     "top": 50,
+     "bottom": 71,
+     "w": 73,
+     "h": 21,
+     "fs": 14,
+     "fw": "500",
+     "ls": "1.96px",
+     "ff": "JetBrains Mono"
+    },
+    {
+     "label": ".col-tag \"CLOSED-SOURCE STRENGTH\"",
+     "top": 165,
+     "bottom": 183,
+     "w": 652,
+     "h": 18,
+     "fs": 14,
+     "fw": "400",
+     "ls": "2.24px",
+     "ff": "JetBrains Mono"
+    },
+    {
+     "label": ".col-ttl \"单点回答已经足够快\"",
+     "top": 198,
+     "bottom": 313,
+     "w": 652,
+     "h": 115,
+     "fs": 57.6,
+     "fw": "200",
+     "ls": "-1.728px",
+     "ff": "Inter"
+    },
+    {
+     "label": "li \"秒级完成条件选股、公告提炼与长篇财报精读\"",
+     "top": 731,
+     "bottom": 755,
+     "w": 652,
+     "h": 24,
+     "fs": 16,
+     "fw": "400",
+     "ls": "normal",
+     "ff": "Inter"
+    },
+    {
+     "label": "li \"闭源看台直观展示大厂预设模型的静态收益排位\"",
+     "top": 764,
+     "bottom": 788,
+     "w": 652,
+     "h": 24,
+     "fs": 16,
+     "fw": "400",
+     "ls": "normal",
+     "ff": "Inter"
+    },
+    {
+     "label": "li \"交付物是一份「当下读起来逻辑通顺的分析文本」\"",
+     "top": 797,
+     "bottom": 821,
+     "w": 652,
+     "h": 24,
+     "fs": 16,
+     "fw": "400",
+     "ls": "normal",
+     "ff": "Inter"
+    },
+    {
+     "label": ".col-tag \"INVESTOR'S REAL ASK\"",
+     "top": 165,
+     "bottom": 183,
+     "w": 652,
+     "h": 18,
+     "fs": 14,
+     "fw": "400",
+     "ls": "2.24px",
+     "ff": "JetBrains Mono"
+    },
+    {
+     "label": ".col-ttl \"真正上场前只问两件事\"",
+     "top": 198,
+     "bottom": 313,
+     "w": 652,
+     "h": 115,
+     "fs": 57.6,
+     "fw": "200",
+     "ls": "-1.728px",
+     "ff": "Inter"
+    },
+    {
+     "label": ".t-cat \"追问 01 · 连续生存结果可见吗？\"",
+     "top": 594,
+     "bottom": 612,
+     "w": 652,
+     "h": 18,
+     "fs": 14,
+     "fw": "600",
+     "ls": "2.1px",
+     "ff": "JetBrains Mono"
+    },
+    {
+     "label": "p \"把我调好的这套 Agent 放进真实 A 股（T+1、涨跌停、整手、税费）连续跑三个月，\"",
+     "top": 622,
+     "bottom": 699,
+     "w": 444,
+     "h": 77,
+     "fs": 16,
+     "fw": "400",
+     "ls": "normal",
+     "ff": "Inter"
+    },
+    {
+     "label": ".t-cat \"追问 02 · 调优前后差异可见吗？\"",
+     "top": 742,
+     "bottom": 760,
+     "w": 652,
+     "h": 18,
+     "fs": 14,
+     "fw": "600",
+     "ls": "2.1px",
+     "ff": "JetBrains Mono"
+    },
+    {
+     "label": "p \"当我改了一句风控提示词、或增减了一个搜索工具，它在同一段历史行情里的训练结果到底是变稳健\"",
+     "top": 770,
+     "bottom": 821,
+     "w": 444,
+     "h": 51,
+     "fs": 16,
+     "fw": "400",
+     "ls": "normal",
+     "ff": "Inter"
+    }
+   ]
+  },
+  {
+   "slide": 5,
+   "maxBottom": 823,
+   "lowest": {
+    "label": ".card-ink.hero-ink-col \"THE GAP 不是工具不好用，而是训练结果在黑盒里不可见。 现有产品交付的是「单点观点\"",
+    "bottom": 823
+   },
+   "lowestText": {
+    "label": ".gap-note \"现有产品交付的是「单点观点」或「官方秀场」，唯独缺少面向 C 端自家 Agent 的透明\"",
+    "bottom": 794
+   },
+   "overCount": 0,
+   "over": [],
+   "orphans": [],
+   "slideTop": 0,
+   "slideH": 900,
+   "scrollOverflow": 0,
+   "blocks": [
+    {
+     "label": ".l \"ACT 01 · SUPPLY-SIDE DIAGNOSIS\"",
+     "top": 50,
+     "bottom": 71,
+     "w": 311,
+     "h": 21,
+     "fs": 14,
+     "fw": "500",
+     "ls": "1.96px",
+     "ff": "JetBrains Mono"
+    },
+    {
+     "label": ".r \"05 / 06\"",
+     "top": 50,
+     "bottom": 71,
+     "w": 73,
+     "h": 21,
+     "fs": 14,
+     "fw": "500",
+     "ls": "1.96px",
+     "ff": "JetBrains Mono"
+    },
+    {
+     "label": ".t-cat \"THE GAP\"",
+     "top": 140,
+     "bottom": 158,
+     "w": 370,
+     "h": 18,
+     "fs": 14,
+     "fw": "600",
+     "ls": "2.1px",
+     "ff": "JetBrains Mono"
+    },
+    {
+     "label": ".gap-title \"不是工具不好用，而是训练结果在黑盒里不可见。\"",
+     "top": 185,
+     "bottom": 379,
+     "w": 370,
+     "h": 194,
+     "fs": 43.2,
+     "fw": "200",
+     "ls": "-1.296px",
+     "ff": "Inter"
+    },
+    {
+     "label": ".gap-note \"现有产品交付的是「单点观点」或「官方秀场」，唯独缺少面向 C 端自家 Agent 的透明\"",
+     "top": 719,
+     "bottom": 794,
+     "w": 303,
+     "h": 74,
+     "fs": 16,
+     "fw": "400",
+     "ls": "normal",
+     "ff": "Inter"
+    },
+    {
+     "label": ".force-num \"01\"",
+     "top": 201,
+     "bottom": 249,
+     "w": 134,
+     "h": 49,
+     "fs": 54,
+     "fw": "200",
+     "ls": "-2.16px",
+     "ff": "Inter"
+    },
+    {
+     "label": "h4 \"闭源投研助手\"",
+     "top": 168,
+     "bottom": 201,
+     "w": 746,
+     "h": 33,
+     "fs": 27.5,
+     "fw": "400",
+     "ls": "-0.41175px",
+     "ff": "Inter"
+    },
+    {
+     "label": ".force-sub \"问财 / Kimi / OpenAI\"",
+     "top": 207,
+     "bottom": 227,
+     "w": 746,
+     "h": 20,
+     "fs": 14,
+     "fw": "500",
+     "ls": "1.68px",
+     "ff": "JetBrains Mono"
+    },
+    {
+     "label": "p \"强在单轮问答与深度报告，但没有连续账户状态与撮合账本——一句「建议关注」说完即止，用户看\"",
+     "top": 233,
+     "bottom": 283,
+     "w": 746,
+     "h": 50,
+     "fs": 16,
+     "fw": "400",
+     "ls": "normal",
+     "ff": "Inter"
+    },
+    {
+     "label": ".force-num \"02\"",
+     "top": 443,
+     "bottom": 491,
+     "w": 134,
+     "h": 49,
+     "fs": 54,
+     "fw": "200",
+     "ls": "-2.16px",
+     "ff": "Inter"
+    },
+    {
+     "label": "h4 \"闭源官方竞技榜单\"",
+     "top": 409,
+     "bottom": 442,
+     "w": 746,
+     "h": 33,
+     "fs": 27.5,
+     "fw": "400",
+     "ls": "-0.41175px",
+     "ff": "Inter"
+    },
+    {
+     "label": ".force-sub \"Alpha Arena 等\"",
+     "top": 449,
+     "bottom": 469,
+     "w": 746,
+     "h": 20,
+     "fs": 14,
+     "fw": "500",
+     "ls": "1.68px",
+     "ff": "JetBrains Mono"
+    },
+    {
+     "label": "p \"好看、有话题度，但测试环境与参赛席位对 C 端封闭——只能看官方预设模型跑分，接不进自己\"",
+     "top": 475,
+     "bottom": 525,
+     "w": 746,
+     "h": 50,
+     "fs": 16,
+     "fw": "400",
+     "ls": "normal",
+     "ff": "Inter"
+    },
+    {
+     "label": ".force-num \"03\"",
+     "top": 685,
+     "bottom": 733,
+     "w": 134,
+     "h": 49,
+     "fs": 54,
+     "fw": "200",
+     "ls": "-2.16px",
+     "ff": "Inter"
+    },
+    {
+     "label": "h4 \"开源框架与传统回测\"",
+     "top": 651,
+     "bottom": 684,
+     "w": 746,
+     "h": 33,
+     "fs": 27.5,
+     "fw": "400",
+     "ls": "-0.41175px",
+     "ff": "Inter"
+    },
+    {
+     "label": ".force-sub \"TradingAgents 等\"",
+     "top": 691,
+     "bottom": 711,
+     "w": 746,
+     "h": 20,
+     "fs": 14,
+     "fw": "500",
+     "ls": "1.68px",
+     "ff": "JetBrains Mono"
+    },
+    {
+     "label": "p \"代码虽开源，却缺乏面向 C 端的免基建试炼台与白盒归因界面——普通投资者难自建防前视污染\"",
+     "top": 717,
+     "bottom": 766,
+     "w": 746,
+     "h": 50,
+     "fs": 16,
+     "fw": "400",
+     "ls": "normal",
+     "ff": "Inter"
+    }
+   ]
+  },
+  {
+   "slide": 6,
+   "maxBottom": 824,
+   "lowest": {
+    "label": "div \"openOutcry · FYP 2026 2026.11\"",
+    "bottom": 824
+   },
+   "lowestText": {
+    "label": ".t-meta \"openOutcry · FYP 2026\"",
+    "bottom": 824
+   },
+   "overCount": 0,
+   "over": [],
+   "orphans": [
+    {
+     "cls": "h2",
+     "lines": 2,
+     "lastLine": "变成。",
+     "lastCoreChars": 2,
+     "lastWidth": 276,
+     "text": "把黑盒结论，变成可见试炼。"
+    },
+    {
+     "cls": "p",
+     "lines": 2,
+     "lastLine": "型」。",
+     "lastCoreChars": 1,
+     "lastWidth": 40,
+     "text": "金融 Agent 的商业供给与散户自建热情已全面成熟，市场不再缺「会聊股票的模型」。"
+    }
+   ],
+   "slideTop": 0,
+   "slideH": 900,
+   "scrollOverflow": 0,
+   "blocks": [
+    {
+     "label": ".l \"06 / 06\"",
+     "top": 50,
+     "bottom": 71,
+     "w": 73,
+     "h": 21,
+     "fs": 14,
+     "fw": "500",
+     "ls": "1.96px",
+     "ff": "JetBrains Mono"
+    },
+    {
+     "label": ".r \"CLOSING · ACT 01\"",
+     "top": 50,
+     "bottom": 71,
+     "w": 166,
+     "h": 21,
+     "fs": 14,
+     "fw": "500",
+     "ls": "1.96px",
+     "ff": "JetBrains Mono"
+    },
+    {
+     "label": ".t-meta \"OUR POSITIONING · TOC SERVICE\"",
+     "top": 267,
+     "bottom": 287,
+     "w": 685,
+     "h": 20,
+     "fs": 14,
+     "fw": "500",
+     "ls": "3.08px",
+     "ff": "JetBrains Mono"
+    },
+    {
+     "label": "h2 \"把黑盒结论，变成可见试炼。\"",
+     "top": 316,
+     "bottom": 497,
+     "w": 685,
+     "h": 181,
+     "fs": 94.4,
+     "fw": "300",
+     "ls": "-2.36px",
+     "ff": "Inter"
+    },
+    {
+     "label": "span \"可见试炼\"",
+     "top": 395,
+     "bottom": 509,
+     "w": 368,
+     "h": 114,
+     "fs": 94.4,
+     "fw": "400",
+     "ls": "-2.36px",
+     "ff": "Inter"
+    },
+    {
+     "label": "div \"openOutcry 不重复造单轮问答的轮子，而是为 C 端投资者提供「可接入、可试炼、\"",
+     "top": 539,
+     "bottom": 590,
+     "w": 464,
+     "h": 51,
+     "fs": 16,
+     "fw": "400",
+     "ls": "normal",
+     "ff": "Inter"
+    },
+    {
+     "label": ".t-meta \"openOutcry · FYP 2026\"",
+     "top": 804,
+     "bottom": 824,
+     "w": 218,
+     "h": 20,
+     "fs": 14,
+     "fw": "500",
+     "ls": "1.96px",
+     "ff": "JetBrains Mono"
+    },
+    {
+     "label": ".t-meta \"2026.11\"",
+     "top": 804,
+     "bottom": 824,
+     "w": 73,
+     "h": 20,
+     "fs": 14,
+     "fw": "500",
+     "ls": "1.96px",
+     "ff": "JetBrains Mono"
+    },
+    {
+     "label": ".l \"TAKEAWAYS\"",
+     "top": 50,
+     "bottom": 71,
+     "w": 93,
+     "h": 21,
+     "fs": 14,
+     "fw": "500",
+     "ls": "1.96px",
+     "ff": "JetBrains Mono"
+    },
+    {
+     "label": ".r \"03 RULES\"",
+     "top": 50,
+     "bottom": 71,
+     "w": 83,
+     "h": 21,
+     "fs": 14,
+     "fw": "500",
+     "ls": "1.96px",
+     "ff": "JetBrains Mono"
+    },
+    {
+     "label": ".tk-num \"01\"",
+     "top": 134,
+     "bottom": 179,
+     "w": 62,
+     "h": 45,
+     "fs": 50.4,
+     "fw": "200",
+     "ls": "-1.512px",
+     "ff": "Inter"
+    },
+    {
+     "label": "h4 \"潮流已至\"",
+     "top": 134,
+     "bottom": 165,
+     "w": 597,
+     "h": 31,
+     "fs": 25.9,
+     "fw": "400",
+     "ls": "-0.3888px",
+     "ff": "Inter"
+    },
+    {
+     "label": "p \"金融 Agent 的商业供给与散户自建热情已全面成熟，市场不再缺「会聊股票的模型」。\"",
+     "top": 173,
+     "bottom": 223,
+     "w": 597,
+     "h": 50,
+     "fs": 16,
+     "fw": "400",
+     "ls": "normal",
+     "ff": "Inter"
+    },
+    {
+     "label": ".tk-num \"02\"",
+     "top": 267,
+     "bottom": 312,
+     "w": 62,
+     "h": 45,
+     "fs": 50.4,
+     "fw": "200",
+     "ls": "-1.512px",
+     "ff": "Inter"
+    },
+    {
+     "label": "h4 \"定位清晰\"",
+     "top": 267,
+     "bottom": 298,
+     "w": 597,
+     "h": 31,
+     "fs": 25.9,
+     "fw": "400",
+     "ls": "-0.3888px",
+     "ff": "Inter"
+    },
+    {
+     "label": "p \"作为 ToC 服务，我们专攻「闭源竞品训练结果不可见」这一核心断层：连续净值、制度拒单与\"",
+     "top": 306,
+     "bottom": 356,
+     "w": 597,
+     "h": 50,
+     "fs": 16,
+     "fw": "400",
+     "ls": "normal",
+     "ff": "Inter"
+    },
+    {
+     "label": ".tk-num \"03\"",
+     "top": 400,
+     "bottom": 445,
+     "w": 62,
+     "h": 45,
+     "fs": 50.4,
+     "fw": "200",
+     "ls": "-1.512px",
+     "ff": "Inter"
+    },
+    {
+     "label": "h4 \"走进真实用户\"",
+     "top": 400,
+     "bottom": 431,
+     "w": 597,
+     "h": 31,
+     "fs": 25.9,
+     "fw": "400",
+     "ls": "-0.3888px",
+     "ff": "Inter"
+    },
+    {
+     "label": "p \"当一位普通股民或 Agent 玩家真正动手试炼时，具体被哪四道痛点死死卡住？进入第二部分\"",
+     "top": 439,
+     "bottom": 489,
+     "w": 597,
+     "h": 50,
+     "fs": 16,
+     "fw": "400",
+     "ls": "normal",
+     "ff": "Inter"
+    },
+    {
+     "label": ".t-meta \"→ NEXT · ACT 02 / USER PAIN POINTS\"",
+     "top": 804,
+     "bottom": 824,
+     "w": 685,
+     "h": 20,
+     "fs": 14,
+     "fw": "500",
+     "ls": "1.96px",
+     "ff": "JetBrains Mono"
+    }
+   ]
+  }
+ ]
+}
