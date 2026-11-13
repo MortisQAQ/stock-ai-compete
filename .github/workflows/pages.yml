@@ -32,6 +32,13 @@ jobs:
       - run: npm ci --legacy-peer-deps
       - run: npm run build
 
+      - name: Bundle defense slides into dist/slides
+        working-directory: ${{ github.workspace }}
+        run: |
+          mkdir -p openoutcry-web/dist/slides/images
+          cp final-report/slides-merged-swiss/index.html openoutcry-web/dist/slides/index.html
+          cp final-report/slides-merged-swiss/images/* openoutcry-web/dist/slides/images/
+
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v3
         with:
