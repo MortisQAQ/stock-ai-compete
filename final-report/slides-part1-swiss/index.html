@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>openOutcry · 让 Agent 试炼可见 · FYP 2026 Term 1 · Act 01</title>
+<title>openOutcry · 任意投资 Agent 的评测与训练场 · 2026 秋 毕业设计 · 第一幕</title>
 <!-- GZ:FONTS:START · 字体由 guizang-design 字体清单生成；需要把字体内置进 HTML 时用 gz-fonts.mjs embed（卡片 skill 的 render.mjs 会自动内置） -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -15,7 +15,7 @@
   --font-display:"Inter","Segoe UI","Microsoft YaHei","PingFang SC","Hiragino Sans GB","Noto Sans SC",system-ui,sans-serif;
   --font-sans:"Inter","Segoe UI","Microsoft YaHei","PingFang SC","Hiragino Sans GB","Noto Sans SC",system-ui,sans-serif;
   --font-zh:"Microsoft YaHei","PingFang SC","Hiragino Sans GB","Noto Sans SC",sans-serif;
-  --font-mono:"JetBrains Mono","Cascadia Mono",Consolas,ui-monospace,SFMono-Regular,monospace;
+  --font-mono:"JetBrains Mono","Cascadia Mono","Consolas","Microsoft YaHei",ui-monospace,SFMono-Regular,monospace;
   --sp-1:2px;
   --sp-2:4px;
   --sp-3:8px;
@@ -1666,174 +1666,182 @@
     .grid-2-7-5,.grid-2-6-6,.grid-2-8-4,.grid-2-4-8{grid-template-columns:1fr}
     .grid-12{grid-template-columns:repeat(6,1fr)}
   }
-
   /* ============================================================
-     DECK · FYP 2026 TERM 1 · PART 1 (Swiss / IKB)
-     Additive structure classes only.
-     S01 cover rows · S13 Three Forces · S20 Stacked Ledger ·
-     P9 takeaway list. No template base class is redefined here.
+     DECK · PART 1（Swiss / IKB）· 5 页 · 证据卡版
+     ------------------------------------------------------------
+     版式：01 封面 / 02 文字+证据卡 / 03 数字+证据卡 / 04 深色对照 / 05 时间线
+     截图不再是满屏网页切片，而是白底细框的「证据卡」：小、可读、有图注。
      ============================================================ */
 
-  /* ---------- S01 · 封面三行索引 ---------- */
-  .cover-row{display:block;min-width:0}
+  /* ---------- 通用：证据卡 ---------- */
+  .plate{display:flex;flex-direction:column;gap:1.3vh;margin:0;min-width:0}
+  .plate-frame{
+    background:var(--paper);border:1px solid var(--line);
+    padding:1.1vh 1vw;min-width:0;overflow:hidden
+  }
+  .plate-frame img{display:block;width:100%;height:auto;border:0}
+  .plate-cap{
+    display:flex;align-items:center;gap:.6vw;
+    font-family:var(--font-sans);font-size:max(20px,1.25vw);font-weight:400;
+    line-height:1.4;letter-spacing:0;color:var(--text-helper)
+  }
+  .plate-tag{display:inline-block;width:.6em;height:.6em;background:var(--accent);flex:0 0 auto}
 
-  /* ---------- S13 · Three Forces ---------- */
-  .three-forces{display:grid;grid-template-columns:5fr 11fr;gap:0 2vw;flex:1;min-height:0;align-items:stretch}
-  .hero-ink-col{display:flex;flex-direction:column;padding:3.2vh 2.2vw;position:relative;overflow:hidden;min-width:0}
-  .hero-ink-col .gap-title{
-    font-family:var(--font-sans);font-weight:300;
-    font-size:min(2.7vw,4.85vh);line-height:1.12;letter-spacing:0;
-    color:var(--text-primary);margin-top:auto;margin-bottom:auto
-  }
-  .hero-ink-col .gap-note{
-    font-family:var(--font-sans);font-size:max(16px,.98vw);
-    line-height:1.55;font-weight:400;color:rgba(var(--paper-rgb),.7);
-    max-width:30ch;position:absolute;left:2.2vw;right:2.2vw;bottom:3.2vh;z-index:1
-  }
-  .hero-ink-col .dots{
-    position:absolute;right:-1.6vw;bottom:21vh;width:8vw;height:11vh;
-    color:var(--paper);opacity:.16;pointer-events:none
-  }
-  .force-stack{display:grid;grid-template-rows:repeat(3,minmax(0,1fr));gap:1.6vh;min-width:0}
-  .force-card{
-    display:grid;grid-template-columns:8.4em minmax(0,1fr);gap:0 1.5vw;
-    align-items:center;padding:2.4vh 2vw;min-width:0;overflow:hidden
-  }
-  .force-num{
-    font-family:var(--sans);font-weight:200;font-size:min(3.4vw,6vh);
-    line-height:.9;letter-spacing:-.04em;color:var(--accent-display);
-    font-feature-settings:"tnum"
-  }
-  .force-copy{display:flex;flex-direction:column;gap:.7vh;min-width:0}
-  .force-card h4{
-    font-family:var(--sans);font-weight:400;
-    font-size:min(1.72vw,3.05vh);line-height:1.2;letter-spacing:-.015em;
-    color:var(--text-primary)
-  }
-  .force-card .force-sub{
-    font-family:var(--mono);font-size:min(14px,1.944vh);font-weight:500;
-    letter-spacing:.12em;text-transform:uppercase;color:var(--text-helper)
-  }
-  .force-card p{
-    font-family:var(--sans);font-size:max(16px,.98vw);
-    line-height:1.55;font-weight:400;color:var(--text-body)
-  }
-
-  /* ---------- S20 · Stacked KPI Ledger ---------- */
-  .stacked-ledger{flex:1;min-height:0;display:flex;flex-direction:column;justify-content:center}
-  .ledger-row{
+  /* ---------- 02 · 文字 + 证据卡 ---------- */
+  .ev-spread{display:flex;flex-direction:column}
+  .spread-grid{
     flex:1;min-height:0;display:grid;
-    grid-template-columns:minmax(0,.28fr) minmax(0,1fr) auto;
-    gap:0 2.2vw;align-items:center;padding:1.6vh 0;
-    border-bottom:1px solid var(--border-subtle)
+    grid-template-columns:minmax(0,1.18fr) minmax(0,.82fr);
+    gap:0 4.5vw;align-items:center;padding-top:2.2vh
   }
-  .ledger-row:first-child{border-top:1px solid var(--border-subtle)}
-  .ledger-num{
-    font-family:var(--sans);font-weight:200;font-size:min(6.2vw,11vh);
-    line-height:.88;letter-spacing:-.04em;white-space:nowrap;
+  .spread-copy{display:flex;flex-direction:column;gap:2.4vh;min-width:0}
+  .prod-list{display:flex;flex-direction:column;border-top:1px solid var(--line);min-width:0}
+  .prod-row{
+    display:grid;grid-template-columns:auto minmax(0,1fr);gap:0 1.6vw;
+    align-items:baseline;padding:1.7vh 0;border-bottom:1px solid var(--line);min-width:0
+  }
+  .prod-row.is-evi{border-bottom:2px solid var(--accent)}
+  .prod-no{
+    font-family:var(--font-mono);font-size:max(20px,1.25vw);font-weight:500;
+    letter-spacing:.06em;color:var(--text-helper)
+  }
+  .prod-row.is-evi .prod-no{color:var(--accent-ink)}
+  .prod-name{
+    font-family:var(--font-sans);font-size:max(28px,1.75vw);font-weight:400;
+    line-height:1.25;letter-spacing:0;color:var(--text-primary)
+  }
+  .prod-desc{
+    font-family:var(--font-sans);font-size:max(22px,1.375vw);font-weight:400;
+    line-height:1.5;letter-spacing:0;color:var(--text-secondary);margin-top:.4vh
+  }
+
+  /* ---------- 03 · 数字 + 证据卡 ---------- */
+  .attn{display:flex;flex-direction:column}
+  .attn-grid{
+    flex:1;min-height:0;display:grid;
+    grid-template-columns:minmax(0,1.22fr) minmax(0,.78fr);
+    gap:0 4.5vw;align-items:center;padding-top:2vh
+  }
+  .attn-copy{display:flex;flex-direction:column;gap:2.2vh;min-width:0}
+  .attn-hero{display:flex;flex-direction:column;gap:.4vh;min-width:0;margin-top:2.6vh}
+  .attn-num{
+    font-family:var(--font-sans);font-weight:200;
+    font-size:min(8.6vw,15vh);line-height:.86;letter-spacing:-.045em;
     color:var(--text-primary);font-feature-settings:"tnum","ss01"
   }
-  .ledger-label{
-    font-family:var(--mono);font-size:min(14px,1.944vh);font-weight:500;
-    letter-spacing:.13em;text-transform:uppercase;color:var(--text-helper);
-    margin-bottom:.9vh
+  .attn-unit{
+    font-family:var(--font-sans);font-size:max(24px,1.5vw);font-weight:400;
+    letter-spacing:0;color:var(--text-secondary)
   }
-  .ledger-desc{
-    font-family:var(--sans);font-size:max(16px,1vw);
-    line-height:1.5;font-weight:400;color:var(--text-body);max-width:74ch
+  .attn-sub{
+    display:flex;gap:0 3.4vw;align-items:flex-start;
+    border-top:1px solid var(--line);margin-top:1.4vh;padding-top:1.6vh
   }
-  .ledger-icon{display:flex;align-items:center;justify-content:flex-end;color:var(--text-helper)}
-  .ledger-icon svg{width:max(26px,2vw);height:max(26px,2vw);stroke-width:1.1}
-
-  /* ---------- P9 · takeaway list (closing right half) ---------- */
-  .takeaway-list{list-style:none;margin:0;padding:0;display:flex;flex-direction:column}
-  .takeaway-list li{
-    display:grid;grid-template-columns:auto minmax(0,1fr);gap:0 1.6vw;
-    align-items:start;padding:2.4vh 0;border-top:1px solid var(--border-subtle)
-  }
-  .takeaway-list li:last-child{border-bottom:2px solid var(--accent)}
-  .takeaway-list .tk-num{
-    font-family:var(--sans);font-weight:200;font-size:min(3.2vw,5.6vh);
-    line-height:.9;letter-spacing:-.03em;color:var(--text-primary);
+  .attn-sub-item{display:flex;flex-direction:column;gap:.2vh;min-width:0}
+  .attn-sub-num{
+    font-family:var(--font-sans);font-weight:300;font-size:max(32px,2vw);
+    line-height:1.1;letter-spacing:-.01em;color:var(--text-primary);
     font-feature-settings:"tnum"
   }
-  .takeaway-list h4{
-    font-family:var(--sans);font-weight:400;
-    font-size:min(1.62vw,2.9vh);line-height:1.2;letter-spacing:-.015em;
-    color:var(--text-primary);margin-bottom:.9vh
+  .attn-sub-label{
+    font-family:var(--font-sans);font-size:max(20px,1.25vw);font-weight:400;
+    letter-spacing:0;color:var(--text-helper)
   }
-  .takeaway-list p{
-    font-family:var(--sans);font-size:max(16px,.98vw);
-    line-height:1.55;font-weight:400;color:var(--text-secondary)
-  }
-  .takeaway-list li.is-accent .tk-num,.takeaway-list li.is-accent h4{color:var(--accent)}
 
-  /* ---------- P9 · 左半 IKB 底色作为背景层 ----------
-     面板底色交给 .panel-fill::before 铺,CSS 背景色仍然保持纯色直角;
-     这样 IKB 面板是"背景"而不是参与版式测量的内容块。 */
-  .split-half > .half.b-accent.panel-fill{background:transparent}
-  .split-half > .half.panel-fill::before{
-    content:"";position:absolute;inset:0;background:var(--accent);z-index:0
+  /* ---------- 04 · 左右对照（深色） ---------- */
+  .slide.dark .duo-compare .vrule{background:rgba(var(--paper-rgb),.22)}
+  .slide.dark .duo-compare .col-tag{color:rgba(var(--paper-rgb),.6)}
+  .slide.dark .duo-compare .col-tag.is-accent{color:var(--accent-ink-inverse)}
+  .slide.dark .duo-compare .col-list{border-top-color:rgba(var(--paper-rgb),.18);gap:1.4vh;margin-top:0;padding-top:1.8vh}
+  .q-stack{display:flex;flex-direction:column;gap:0;margin-top:1.2vh;min-width:0}
+  .q-item{
+    display:grid;grid-template-columns:auto minmax(0,1fr);gap:0 1.4vw;
+    align-items:start;padding:.7vh 0;border-top:1px solid rgba(var(--paper-rgb),.18)
+  }
+  .q-item:last-child{padding-bottom:0}
+  .q-no{
+    font-family:var(--font-mono);font-size:max(20px,1.25vw);font-weight:600;
+    letter-spacing:.06em;color:var(--accent-ink-inverse);padding-top:.5vh
+  }
+  .q-title{
+    font-family:var(--font-sans);font-weight:300;
+    font-size:min(1.85vw,3.3vh);line-height:1.38;letter-spacing:0;
+    color:var(--text-primary)
+  }
+  .q-note{
+    font-family:var(--font-sans);font-weight:400;
+    font-size:max(24px,1.5vw);line-height:1.45;letter-spacing:0;
+    color:var(--text-secondary);margin-top:.5vh;max-width:46ch
+  }
+  .ev-foot{
+    margin-top:.6vh;padding-top:.9vh;border-top:1px solid rgba(var(--paper-rgb),.18);
+    font-family:var(--font-sans);font-size:max(24px,1.5vw);font-weight:500;
+    line-height:1.35;letter-spacing:0;color:rgba(var(--paper-rgb),.78)
+  }
+
+  /* ---------- 05 · 横向时间线 ---------- */
+  .timeline-h .th-node .label{width:16vw}
+  .timeline-h .th-node .yr{font-size:min(20px,1.25vw);letter-spacing:.1em}
+  .timeline-h .th-node .name{font-size:max(24px,1.5vw);line-height:1.3}
+  .timeline-h .th-node .desc{font-size:max(22px,1.375vw);margin-top:.35vh}
+
+  /* ---------- 字重 ---------- */
+  .h-hero,.h-xl{font-weight:200}
+  .h-md{font-weight:300}
+  .duo-compare .col-ttl{font-weight:200}
+  .h-hero[data-latin]{letter-spacing:-.035em}
+
+  /* ============================================================
+     演讲者视图 · 预览 iframe（构建补丁配套）
+     ============================================================ */
+  #ppt-presenter .ppt-frame{
+    position:absolute;top:0;left:0;
+    width:1600px;height:900px;
+    max-width:none;max-height:none;
+    aspect-ratio:auto;transform-origin:top left
   }
 
   /* ============================================================
-     FONT PASS · 中文优先微软雅黑 / 中文大字报字距归零 / 字重阶梯上移
-     ------------------------------------------------------------
-     字体栈（--font-sans / --font-zh / --font-mono）只在 :root 令牌区
-     有一份权威定义，由 _build.mjs 写入；本段只做字距与字重的排版覆盖，
-     不重复声明 font-family，也不使用 !important。
-     ------------------------------------------------------------
-      判定口径：元素文本含中日韩字符（正则 \u4e00-\u9fff / \u3000-\u303f / \uff00-\uffef）
-     且字号 >= 1.8vw 的标题 / 大字报 → letter-spacing:0；纯拉丁标题保留负字距。
-     带内联 style 的标题无法被样式表覆盖，其内联值已在 _slides.partial.html
-     里逐个改过（见该文件内 letter-spacing:0 / font-weight 的内联声明）。
+     中文主稿 · 字号 / 字距（可投影）
      ============================================================ */
+  html[lang="zh-CN"] .zh-title{
+    font-family:var(--font-sans);font-weight:200;
+    letter-spacing:0;color:var(--text-primary)
+  }
+  html[lang="zh-CN"] .zh-title--58{font-size:min(5.8vw,10.2vh);line-height:1.1}
+  html[lang="zh-CN"] .zh-title--52{font-size:min(5.2vw,9.2vh);line-height:1.14}
 
-  /* ---------- 1 · 中文标题字距归零 ----------
-     负字距是给拉丁字母设计的收紧；方块汉字被压紧会互相咬边、糊成一团。 */
-  .h-hero-zh,.h-xl-zh,.h-md,.h-sub,
-  .lead,
-  .duo-compare .col-ttl,
-  .hero-ink-col .gap-title,
-  .force-card h4,
-  .takeaway-list h4{letter-spacing:0}
+  html[lang="zh-CN"] .chrome-min,
+  html[lang="zh-CN"] .canvas-card .chrome-min,
+  html[lang="zh-CN"] .t-meta,
+  html[lang="zh-CN"] .t-cat,
+  html[lang="zh-CN"] .q-no,
+  html[lang="zh-CN"] .prod-no{
+    font-size:max(20px,1.25vw);letter-spacing:.06em
+  }
+  html[lang="zh-CN"] .canvas-card .chrome-min{letter-spacing:.08em}
 
-  /* 纯拉丁标题保留拉丁负字距（封面 openOutcry 等）：
-     用 [data-latin] 显式标记，权重 0-2-0 高于上面的 0-1-0，无需 !important。 */
-  .h-hero[data-latin],.h-xl[data-latin],.h-hero-zh[data-latin]{letter-spacing:-.03em}
+  html[lang="zh-CN"] .lead,
+  html[lang="zh-CN"] .t-body,
+  html[lang="zh-CN"] .t-body-sm,
+  html[lang="zh-CN"] .t-helper,
+  html[lang="zh-CN"] .prod-name,
+  html[lang="zh-CN"] .prod-desc,
+  html[lang="zh-CN"] .attn-unit,
+  html[lang="zh-CN"] .attn-sub-label,
+  html[lang="zh-CN"] .duo-compare .col-ttl,
+  html[lang="zh-CN"] .duo-compare .col-list li,
+  html[lang="zh-CN"] .q-title,
+  html[lang="zh-CN"] .q-note,
+  html[lang="zh-CN"] .timeline-h .th-node .name,
+  html[lang="zh-CN"] .timeline-h .th-node .desc{letter-spacing:0}
 
-  /* ---------- 2 · 字重阶梯整体上移 ----------
-     微软雅黑只有 Light(300) / Regular(400) / Bold(700) 三个面；
-     原来给 Inter 用的 200 落到雅黑上会被就近匹配成 Light，笔画过细。 */
-  /* 超大标题 >= 8vw：200 → 300 */
-  .h-hero,.h-hero-zh{font-weight:300}
-  /* 大标题 4 ~ 7.9vw：200 ~ 300 → 300 */
-  .h-xl,.h-xl-zh,.num-mega,
-  .ledger-num,
-  .duo-compare .col-ttl,
-  .hero-ink-col .gap-title{font-weight:300}
-  /* 中标题 1.8 ~ 3.9vw：300 ~ 400 → 400 */
-  .h-md,
-  .force-num,
-  .takeaway-list .tk-num{font-weight:400}
-  /* 正文 16~20px 保持 400~500；元信息 13~15px 保持 500~600（不动） */
-
-  /* ---------- 3 · 孤字修正 ----------
-     06 页右侧第 1 条结论换字体后尾行只剩「型」。两个字；text-wrap:pretty
-     让浏览器在断行时避开孤字，只影响行尾，不改盒子、不改文案、不改结构。
-     不支持该属性的浏览器自动退回普通断行。 */
-  .takeaway-list p{text-wrap:pretty}
-
-
-
-  /* ============================================================
-     LAYOUT REPAIR · 04 页对偶栏不再被 auto margin 推到底
-     ------------------------------------------------------------
-     模板 .col-list 自带 margin-top:auto，右栏追问容器也用了内联
-     margin-top:auto，两者把内容全推到栏底，中间留出大片空洞。
-     这里统一改为固定间距，让内容从标题下方自然展开。
-     ============================================================ */
-  .duo-compare .col-list{margin-top:2.4vh;padding-top:2.4vh}
+  html[lang="zh-CN"] .duo-compare .col-ttl{line-height:1.16;font-size:min(3vw,5.2vh)}
+  html[lang="zh-CN"] .duo-compare .col-tag{font-size:max(20px,1.25vw);letter-spacing:.06em}
+  html[lang="zh-CN"] .duo-compare .col-list li{
+    font-size:max(26px,1.62vw);line-height:1.55
+  }
+  html[lang="zh-CN"] .slide.dark .duo-compare .col-list li{color:rgba(var(--paper-rgb),.82)}
 
 </style>
 </head>
@@ -1884,289 +1892,247 @@
      主题色配置参考 references/themes-swiss.md
      ============================================================ -->
 <!-- ============================================================
-     PART 1 · 背景与缺口 · 6 页
-     01 SWISS-COVER-ASCII / 02 S22 / 03 S20 / 04 S08 / 05 S13 / 06 SWISS-CLOSING-ASCII
+     PART 1 · 时代背景与潮流引入 · 5 页（中文主稿）
+     01 SWISS-COVER-ASCII · 02 S22（文字 + 证据卡） · 03 S20（数字 + 证据卡）
+     04 S08 duo-compare（dark） · 05 S11 horizontal timeline
+     证据以「小卡片」形式出现：白底、细边框、图注，不做满屏网页切片。
      ============================================================ -->
 
-<!-- ============ 01 · COVER · IKB 满屏 + ASCII 呼吸场 ============ -->
-<section class="slide accent" data-slide-id="s01-cover" data-layout="SWISS-COVER-ASCII" data-animate="hero">
+<!-- ============ 01 · 封面 ============ -->
+<section class="slide accent" data-slide-id="cover-evaluation-ground" data-layout="SWISS-COVER-ASCII" data-animate="hero">
   <div class="canvas-card" style="padding-bottom:8.6vh">
     <canvas class="ascii-bg" aria-hidden="true"></canvas>
     <div class="chrome-min">
-      <div class="l">OPENOUTCRY · FYP 2026 TERM 1</div>
-      <div class="r">ACT 01 / 06 · BACKGROUND</div>
+      <div class="l">OPENOUTCRY · 2026 秋 毕业设计</div>
+      <div class="r">ACT 01 / 05 · 时代背景</div>
     </div>
 
     <div style="flex:1;padding:0;display:grid;grid-template-rows:auto 1fr auto;gap:2.6vh;min-height:0">
       <div class="cover-row" data-anim="kicker">
-        <div class="t-meta" style="color:rgba(var(--accent-on-rgb),.78);letter-spacing:.22em">EVALUATION &amp; TRAINING GROUND FOR INVESTMENT AGENTS</div>
+        <div class="t-meta" style="color:rgba(var(--accent-on-rgb),.78);letter-spacing:.1em;text-transform:none">面向任意投资 Agent 的评测与训练场</div>
       </div>
 
       <div class="cover-row" data-anim="title" style="align-self:center">
         <h1 class="h-hero" data-latin style="color:var(--accent-on);line-height:.9;letter-spacing:-.03em">openOutcry</h1>
       </div>
 
-      <div class="cover-row" data-anim="bottom" style="display:grid;grid-template-rows:auto auto auto;gap:3vh;border-top:1px solid rgba(var(--accent-on-rgb),.24);padding-top:2.4vh">
-        <div class="lead" style="max-width:56ch;color:rgba(var(--accent-on-rgb),.92);font-weight:400;font-size:min(2.3vw,4.2vh);line-height:1.3">与 Agent 一起挑战股市。</div>
-        <div style="font-family:var(--sans);font-size:max(18px,1.06vw);line-height:1.55;font-weight:400;color:rgba(var(--accent-on-rgb),.8)">面向任意投资 Agent 的评测与训练场 —— 在历史股市的模拟中亲眼见证 Agent 的交易决策，并与它一起进步。</div>
+      <div class="cover-row" data-anim="bottom" style="display:grid;grid-template-rows:auto auto auto;gap:2.4vh;border-top:1px solid rgba(var(--accent-on-rgb),.24);padding-top:2.4vh">
+        <div class="lead" style="max-width:24em;color:rgba(var(--accent-on-rgb),.92);font-weight:400;font-size:min(2.2vw,3.9vh);line-height:1.35">让任意投资 Agent 在真实历史行情里跑给你看。</div>
+        <div style="font-family:var(--font-sans);font-size:max(24px,1.5vw);line-height:1.6;font-weight:400;color:rgba(var(--accent-on-rgb),.84);max-width:30em">回看它的每一笔交易与依据，迭代它的配置——不是模型权重。</div>
         <div style="display:flex;justify-content:space-between;align-items:end;gap:2vw">
-          <div class="t-meta" style="color:rgba(var(--accent-on-rgb),.62)">FINAL YEAR PROJECT · PRODUCT PITCH</div>
-          <div class="t-meta" style="color:rgba(var(--accent-on-rgb),.62)">2026.11</div>
+          <div class="t-meta" style="color:rgba(var(--accent-on-rgb),.66)">毕业设计 · 产品答辩</div>
+          <div class="t-meta" style="color:rgba(var(--accent-on-rgb),.66)">2026.11</div>
         </div>
       </div>
     </div>
   </div>
 </section>
 
-<!-- ============ 02 · S22 · Image Hero ============ -->
-<section class="slide light" data-slide-id="s02-wave" data-layout="S22" data-animate="image-hero">
-  <div class="canvas-card" style="padding:0;display:flex;flex-direction:column;overflow:hidden">
-    <div data-anim="img" style="position:relative;flex:0 0 60%;overflow:hidden;background:var(--grey-1)">
-      <img src="images/02-fin-agent-wave.png"
-           data-image-slot="s22-hero-21x9"
-           alt="金融 Agent 商业化落地：Alpha Arena 多模型实盘排行榜与同花顺问财 SkillHub 技能广场界面"
-           loading="eager"
-           style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center center">
-      <div class="chrome-min" style="position:absolute;top:0;left:0;right:0;margin-bottom:0;padding:5.6vh 5vw 0;color:var(--text-secondary)">
-        <div class="l">FIN AGENT WAVE · COMMERCIAL LANDSCAPE</div>
-        <div class="r">ACT 01 / 06 · 02</div>
-      </div>
-      <div data-anim="title-block" style="position:absolute;left:5vw;top:11vh;background:var(--paper);padding:2.6vh 2.6vw;max-width:31vw">
-        <div style="font-family:var(--sans);font-weight:400;font-size:min(3.4vw,6vh);line-height:1.06;letter-spacing:0;color:var(--text-primary)">金融 Agent<br>已走进桌面</div>
-      </div>
+<!-- ============ 02 · 商业浪潮：三条产品线 + 一张证据卡 ============ -->
+<section class="slide light" data-slide-id="commercial-wave" data-layout="S22" data-animate="image-hero">
+  <div class="canvas-card ev-spread">
+    <div class="chrome-min">
+      <div class="l">ACT 01 · 时代背景</div>
+      <div class="r">02 / 05 · 商业浪潮</div>
     </div>
 
-    <div data-anim="kpi" class="image-hero-body" style="padding:6.2vh 5vw 8.6vh;min-height:0">
-      <div style="max-width:48ch;font-family:var(--sans);font-size:max(18px,1.28vw);line-height:1.55;font-weight:400;color:var(--text-primary);letter-spacing:-.005em">从机构投研套件到 C 端技能市场，金融 Agent 已经完成商业化落地。真正稀缺的不再是「会不会用 AI 选股」，而是「凭什么相信它的判断」。</div>
+    <div class="spread-grid">
+      <div class="spread-copy" data-anim="line">
+        <div class="t-meta">商业产品 · 2026</div>
+        <h2 class="zh-title zh-title--52">金融 Agent，<br>已经走进日常工具。</h2>
 
-      <div class="image-hero-stats" style="gap:0 2vw;align-items:stretch">
-        <div style="display:flex;flex-direction:column;gap:.7vh;min-width:0">
-          <div style="height:1px;background:var(--ink)"></div>
-          <div class="t-meta">COMMERCIAL SHIP</div>
-          <div class="kpi-hero" style="font-weight:400;font-size:min(3.6vw,6.1vh);line-height:.95;letter-spacing:-.04em;white-space:nowrap">2026</div>
-          <div style="height:1px;background:var(--border-subtle);margin-top:auto"></div>
-          <p class="body-sm">从 OpenAI 机构投研套件到 Kimi K3.1 Pro 金融深度研究同步落地</p>
-        </div>
-
-        <div style="display:flex;flex-direction:column;gap:.7vh;min-width:0">
-          <div style="height:1px;background:var(--ink)"></div>
-          <div class="t-meta">C-END READY</div>
-          <div class="kpi-hero" style="font-weight:400;font-size:min(2.6vw,4.4vh);line-height:1.05;letter-spacing:-.045em;white-space:nowrap">SkillHub</div>
-          <div style="height:1px;background:var(--border-subtle);margin-top:auto"></div>
-          <p class="body-sm">同花顺问财上线本地 Agent 金融技能广场，一段提示词即可挂载</p>
-        </div>
-
-        <div style="display:flex;flex-direction:column;gap:.7vh;min-width:0">
-          <div style="height:1px;background:var(--ink)"></div>
-          <div class="t-meta">ZERO SETUP</div>
-          <div class="kpi-hero" style="font-weight:400;font-size:min(2.6vw,4.4vh);line-height:1.05;letter-spacing:0;white-space:nowrap;color:var(--accent-display)">1 句指令</div>
-          <div style="height:1px;background:var(--border-subtle);margin-top:auto"></div>
-          <p class="body-sm">普通投资者复制一段提示词，即可给 Agent 装上行情与财务工具</p>
+        <div class="prod-list">
+          <div class="prod-row" data-anim="card">
+            <div class="prod-no">01</div>
+            <div>
+              <div class="prod-name">ChatGPT for Financial Services</div>
+              <div class="prod-desc">面向金融机构：读财报、建财务模型、写研究笔记。</div>
+            </div>
+          </div>
+          <div class="prod-row" data-anim="card">
+            <div class="prod-no">02</div>
+            <div>
+              <div class="prod-name">Kimi K3.1 Pro</div>
+              <div class="prod-desc">金融研究与财务建模，直接放进对话。</div>
+            </div>
+          </div>
+          <div class="prod-row is-evi" data-anim="card">
+            <div class="prod-no">03</div>
+            <div>
+              <div class="prod-name">问财 SkillHub</div>
+              <div class="prod-desc">把金融技能装进你正在用的 AI 助手。</div>
+            </div>
+          </div>
         </div>
       </div>
+
+      <figure class="plate" data-anim="img">
+        <div class="plate-frame">
+          <img src="images/02-iwencai-skillhub.png" data-image-slot="s22-hero-21x9" loading="eager"
+               alt="同花顺问财 SkillHub 页面：标题「全球最大的金融投资AI技能库」与技能货架">
+        </div>
+        <figcaption class="plate-cap"><span class="plate-tag"></span>问财 SkillHub · 本机实测 2026-10</figcaption>
+      </figure>
     </div>
   </div>
 </section>
 
-<!-- ============ 03 · S20 · Stacked KPI Ledger ============ -->
-<section class="slide light" data-slide-id="s03-heat" data-layout="S20" data-animate="stacked-ledger">
+<!-- ============ 03 · 社区热度：一个数字 + 一张证据卡 ============ -->
+<section class="slide light" data-slide-id="attention-first" data-layout="S20" data-animate="stacked-ledger">
+  <div class="canvas-card attn">
+    <div class="chrome-min">
+      <div class="l">ACT 01 · 开源与大众热度</div>
+      <div class="r">03 / 05 · 注意力</div>
+    </div>
+
+    <div class="attn-grid">
+      <div class="attn-copy" data-anim="line">
+        <div class="t-meta">开源社区 · 2026</div>
+        <h2 class="zh-title zh-title--58">注意力，<br>先到了。</h2>
+
+        <div class="attn-hero">
+          <div class="attn-num" data-anim="num">122,167</div>
+          <div class="attn-unit">GitHub Stars · TradingAgents</div>
+        </div>
+
+        <div class="attn-sub">
+          <div class="attn-sub-item">
+            <div class="attn-sub-num">41.9 万</div>
+            <div class="attn-sub-label">CNBC 视频观看</div>
+          </div>
+          <div class="attn-sub-item">
+            <div class="attn-sub-num">9.4 万</div>
+            <div class="attn-sub-label">B 站实测播放</div>
+          </div>
+        </div>
+      </div>
+
+      <figure class="plate" data-anim="img">
+        <div class="plate-frame">
+          <img src="images/03-github-tradingagents.png" data-image-slot="s22-hero-21x9" loading="eager"
+               alt="GitHub 仓库页 TauricResearch/TradingAgents，页面显示 Star 约 122k">
+        </div>
+        <figcaption class="plate-cap"><span class="plate-tag"></span>GitHub · 2026-11-12 实拍</figcaption>
+      </figure>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 04 · 两个追问（深色） ============ -->
+<section class="slide dark" data-slide-id="two-questions" data-layout="S08" data-animate="duo-mirror">
   <div class="canvas-card" style="padding-bottom:8.6vh">
     <div class="chrome-min">
-      <div class="l">ACT 01 · MARKET HEAT</div>
-      <div class="r">03 / 06</div>
+      <div class="l">ACT 01 · 真正的追问</div>
+      <div class="r">04 / 05 · 断层</div>
     </div>
 
-    <div style="display:flex;flex-direction:column;gap:1.4vh;flex:0 0 auto">
-      <div class="t-meta">COMMUNITY &amp; RETAIL SIGNAL · 2026.10 SAMPLED</div>
-      <h2 style="font-family:var(--sans);font-weight:300;font-size:min(5.2vw,9.6vh);line-height:.96;letter-spacing:0;color:var(--text-primary)">注意力，已经先到了</h2>
+    <div data-anim="line" style="display:flex;flex-direction:column;gap:1.4vh">
+      <div class="t-meta">在真金白银进场之前</div>
+      <h2 class="zh-title zh-title--58">还剩两个追问。</h2>
     </div>
 
-    <div data-anim="ledger" class="stacked-ledger" style="margin-top:5.4vh">
-      <div class="ledger-row">
-        <div class="ledger-num">118.2K</div>
-        <div style="min-width:0">
-          <div class="ledger-label">GITHUB STARS / TAURASAI-TRADINGAGENTS</div>
-          <p class="ledger-desc">12 角色多智能体交易框架登顶社区现象级项目，团队化协作决策成为技术共识。</p>
-        </div>
-        <div class="ledger-icon"><i data-lucide="star"></i></div>
-      </div>
-
-      <div class="ledger-row">
-        <div class="ledger-num">845K+</div>
-        <div style="min-width:0">
-          <div class="ledger-label">YOUTUBE · RETAIL LIVE TEST</div>
-          <p class="ledger-desc">海外散户实测「把真金白银交给 AI 交易」单条播放破 84.5 万，次高单条 53.5 万。</p>
-        </div>
-        <div class="ledger-icon"><i data-lucide="play"></i></div>
-      </div>
-
-      <div class="ledger-row">
-        <div class="ledger-num">655K+</div>
-        <div style="min-width:0">
-          <div class="ledger-label">CNBC · FINANCE PRIMETIME</div>
-          <p class="ledger-desc">华尔街权威媒体连续专题拆解 AI 交易员的真实胜率与风控边界（另一支 41.6 万）。</p>
-        </div>
-        <div class="ledger-icon"><i data-lucide="tv"></i></div>
-      </div>
-
-      <div class="ledger-row">
-        <div class="ledger-num" style="color:var(--accent-display)">4.7W+</div>
-        <div style="min-width:0">
-          <div class="ledger-label">BILIBILI · A-SHARE RETAIL</div>
-          <p class="ledger-desc">国内 B 站多支散户实盘/模拟测试视频突破 2.5 万至 4.7 万播放，自建交易 Agent 正走向大众。</p>
-        </div>
-        <div class="ledger-icon"><i data-lucide="flame"></i></div>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- ============ 04 · S08 · Duo Compare ============ -->
-<section class="slide light" data-slide-id="s04-questions" data-layout="S08" data-animate="duo-mirror">
-  <div class="canvas-card" style="padding-bottom:7.4vh">
-    <div class="chrome-min">
-      <div class="l">ACT 01 · THE REAL QUESTION</div>
-      <div class="r">04 / 06</div>
-    </div>
-
-    <div class="duo-compare" style="margin-top:3.2vh;margin-bottom:0">
+    <div class="duo-compare" style="margin-top:2vh">
       <div class="col">
-        <div class="col-tag" style="color:var(--text-secondary)">CLOSED-SOURCE STRENGTH</div>
-        <div class="col-ttl" style="color:var(--text-primary)">单点回答<br>已经足够快</div>
+        <div class="col-tag">已经做得很好的</div>
+        <div class="col-ttl">单点投研<br>已经很好。</div>
         <ul class="col-list">
-          <li>秒级完成条件选股、公告提炼与长篇财报精读</li>
-          <li>闭源看台直观展示大厂预设模型的静态收益排位</li>
-          <li>交付物是一份「当下读起来逻辑通顺的分析文本」</li>
+          <li>查行情、读财报，秒级响应。</li>
+          <li>长报告能从头读到尾，结论通顺。</li>
+          <li>一个问题、一个时点，答案很漂亮。</li>
         </ul>
       </div>
 
       <span class="vrule"></span>
 
       <div class="col">
-        <div class="col-tag" style="color:var(--accent-ink)">INVESTOR'S REAL ASK</div>
-        <div class="col-ttl" style="color:var(--text-primary)">真正上场前<br>只问两件事</div>
+        <div class="col-tag is-accent">真正要验证的</div>
+        <div class="col-ttl">进场之前<br>还有两问。</div>
 
-        <div style="margin-top:2.4vh;display:flex;flex-direction:column;gap:0">
-          <div style="border-top:1px solid var(--line);padding-top:2.2vh">
-            <div class="t-cat" style="color:var(--accent-ink)">追问 01 · 连续生存结果可见吗？</div>
-            <p style="margin-top:1.1vh;font-family:var(--sans);font-size:max(16px,1vw);line-height:1.6;font-weight:400;color:var(--text-body);max-width:44ch">把我调好的这套 Agent 放进真实 A 股（T+1、涨跌停、整手、税费）连续跑三个月，净值怎么走？最大回撤多少？具体亏在哪一笔？</p>
+        <div class="q-stack">
+          <div class="q-item" data-anim="q">
+            <div class="q-no">Q1</div>
+            <div style="min-width:0">
+              <h3 class="q-title">放进真实的 A 股规则连跑三个月，盈亏与最大回撤看得见吗？</h3>
+              <p class="q-note">T+1、涨跌停、手数、费用——要的是一条连续曲线，不是一次回答。</p>
+            </div>
           </div>
-          <div style="border-top:1px solid var(--line);padding-top:2.2vh;margin-top:2.4vh">
-            <div class="t-cat" style="color:var(--accent-ink)">追问 02 · 调优前后差异可见吗？</div>
-            <p style="margin-top:1.1vh;font-family:var(--sans);font-size:max(16px,1vw);line-height:1.6;font-weight:400;color:var(--text-body);max-width:44ch">当我改了一句风控提示词、或增减了一个搜索工具，它在同一段历史行情里的训练结果到底是变稳健了，还是更激进了？</p>
+          <div class="q-item" data-anim="q">
+            <div class="q-no">Q2</div>
+            <div style="min-width:0">
+              <h3 class="q-title">改一句风控提示词、换一套工具，前后差异能诚实对比吗？</h3>
+              <p class="q-note">同一段历史、同一套规则：它是变稳了，还是只是更激进了？</p>
+            </div>
           </div>
         </div>
       </div>
     </div>
 
-    <div style="margin-top:2.4vh;padding-top:2.2vh;border-top:1px solid var(--grey-2);font-family:var(--font-sans);font-size:max(min(16px,2.222vh),.94vw);font-weight:500;line-height:1.5;color:var(--text-secondary);letter-spacing:0">→ 我们要回答的不是「它答得好不好」，而是「结果到底看不看得见」</div>
+    <div class="ev-foot">→ 问题不是“它够不够聪明”，而是“结果看不看得见”。</div>
   </div>
 </section>
 
-<!-- ============ 05 · S13 · Three Forces ============ -->
-<section class="slide light" data-slide-id="s05-gap" data-layout="S13" data-animate="three-forces">
+<!-- ============ 05 · 答辩结构 ============ -->
+<section class="slide light" data-slide-id="presentation-roadmap" data-layout="S11" data-animate="timeline-walk">
   <div class="canvas-card" style="padding-bottom:8.6vh">
     <div class="chrome-min">
-      <div class="l">ACT 01 · SUPPLY-SIDE DIAGNOSIS</div>
-      <div class="r">05 / 06</div>
+      <div class="l">ACT 01 · 答辩结构</div>
+      <div class="r">05 / 05 · 引入收束</div>
     </div>
 
-    <div data-anim="up" class="three-forces">
-      <div class="card-ink hero-ink-col">
-        <div class="t-cat">THE GAP</div>
-        <h3 class="gap-title">不是工具不好用，<br>而是训练结果<br>在黑盒里<br>不可见。</h3>
-        <div class="dots" aria-hidden="true"></div>
-        <div class="gap-note">现有产品交付的是「单点观点」或「官方秀场」，唯独缺少面向 C 端自家 Agent 的透明试炼账本。</div>
-      </div>
-
-      <div class="force-stack">
-        <article class="card-fill force-card">
-          <div class="force-num">01</div>
-          <div class="force-copy">
-            <h4>闭源投研助手</h4>
-            <div class="force-sub">问财 / Kimi / OpenAI</div>
-            <p>强在单轮问答与深度报告，但没有连续账户状态与撮合账本——一句「建议关注」说完即止，用户看不见连续持仓后的真实盈亏与风控后果。</p>
-          </div>
-        </article>
-
-        <article class="card-fill force-card">
-          <div class="force-num">02</div>
-          <div class="force-copy">
-            <h4>闭源官方竞技榜单</h4>
-            <div class="force-sub">Alpha Arena 等</div>
-            <p>好看、有话题度，但测试环境与参赛席位对 C 端封闭——只能看官方预设模型跑分，接不进自己的 Agent，也看不见个人调参后的训练变化。</p>
-          </div>
-        </article>
-
-        <article class="card-accent force-card">
-          <div class="force-num">03</div>
-          <div class="force-copy">
-            <h4>开源框架与传统回测</h4>
-            <div class="force-sub">TradingAgents 等</div>
-            <p>代码虽开源，却缺乏面向 C 端的免基建试炼台与白盒归因界面——普通投资者难自建防前视污染的 A 股撮合环境，也无法从回测数字倒查回具体工具证据与决策漏洞。</p>
-          </div>
-        </article>
+    <div data-anim="line" style="display:grid;grid-template-columns:minmax(0,1fr) auto;gap:3vw;align-items:end">
+      <div style="display:flex;flex-direction:column;gap:1.4vh;min-width:0">
+        <div class="t-meta">答辩结构 · 五个部分</div>
+        <h2 class="zh-title zh-title--52">五个部分，一条主线。</h2>
       </div>
     </div>
-  </div>
-</section>
+    <div class="lead" style="margin-top:2vh;max-width:30em;color:var(--text-secondary);font-size:max(24px,1.5vw);line-height:1.5">接下来，按这五个部分展开。</div>
 
-<!-- ============ 06 · CLOSING · 左 IKB+ASCII / 右白底 takeaway ============ -->
-<section class="slide split" data-slide-id="s06-bridge" data-layout="SWISS-CLOSING-ASCII" data-animate="split-statement">
-  <div class="canvas-card">
-    <div class="split-half">
-      <div class="half b-accent panel-fill" style="padding:5.6vh 3.6vw 8.4vh;justify-content:space-between;position:relative;overflow:hidden">
-        <canvas class="ascii-bg" aria-hidden="true"></canvas>
-        <div class="chrome-min" style="margin-bottom:0;position:relative;z-index:1">
-          <div class="l">06 / 06</div>
-          <div class="r">CLOSING · ACT 01</div>
+    <div class="timeline-h" data-anim="up" style="margin-top:1.4vh">
+      <div class="tl-row">
+        <div class="th-node up accent" data-anim="node">
+          <span class="dot"></span>
+          <span class="label">
+            <span class="yr">01 · 现在</span>
+            <span class="name">引入：背景与动机</span>
+            <span class="desc">为什么是现在</span>
+          </span>
         </div>
-
-        <div data-anim="manifesto" style="display:flex;flex-direction:column;gap:2vh;position:relative;z-index:1">
-          <div class="t-meta" style="color:rgba(var(--accent-on-rgb),.78);letter-spacing:.22em;margin-bottom:1.2vh">OUR POSITIONING · TOC SERVICE</div>
-          <h2 style="font-family:var(--sans);font-size:min(5.9vw,10.5vh);line-height:.96;letter-spacing:0;font-weight:300;color:var(--accent-on)">把黑盒结论，<br>变成<span style="font-weight:400">可见试炼</span>。</h2>
-          <div style="font-family:var(--sans);font-size:max(16px,1vw);line-height:1.6;color:rgba(var(--accent-on-rgb),.82);font-weight:400;max-width:46ch;margin-top:2.6vh">openOutcry 不重复造单轮问答的轮子，而是为 C 端投资者提供「可接入、可试炼、可穿透复盘」的透明训练场。</div>
+        <div class="th-node down" data-anim="node">
+          <span class="dot"></span>
+          <span class="label">
+            <span class="yr">02</span>
+            <span class="name">用户痛点与核心需求</span>
+            <span class="desc">谁被卡住</span>
+          </span>
         </div>
-
-        <div data-anim="signature" style="display:flex;justify-content:space-between;align-items:end;border-top:1px solid rgba(var(--accent-on-rgb),.24);padding-top:2vh;position:relative;z-index:1">
-          <div class="t-meta" style="color:rgba(var(--accent-on-rgb),.64)">openOutcry · FYP 2026</div>
-          <div class="t-meta" style="color:rgba(var(--accent-on-rgb),.64)">2026.11</div>
+        <div class="th-node up" data-anim="node">
+          <span class="dot"></span>
+          <span class="label">
+            <span class="yr">03</span>
+            <span class="name">方案与系统设计</span>
+            <span class="desc">怎么设计</span>
+          </span>
         </div>
-      </div>
-
-      <div class="half" style="padding:5.6vh 3.6vw 8.4vh;justify-content:flex-start">
-        <div class="chrome-min">
-          <div class="l">TAKEAWAYS</div>
-          <div class="r">03 RULES</div>
+        <div class="th-node down" data-anim="node">
+          <span class="dot"></span>
+          <span class="label">
+            <span class="yr">04</span>
+            <span class="name">实现、演示与验证</span>
+            <span class="desc">做到了什么</span>
+          </span>
         </div>
-
-        <ul data-anim="rules" class="takeaway-list">
-          <li>
-            <div class="tk-num">01</div>
-            <div>
-              <h4>潮流已至</h4>
-              <p>金融 Agent 的商业供给与散户自建热情已全面成熟，市场不再缺「会聊股票的模型」。</p>
-            </div>
-          </li>
-          <li>
-            <div class="tk-num">02</div>
-            <div>
-              <h4>定位清晰</h4>
-              <p>作为 ToC 服务，我们专攻「闭源竞品训练结果不可见」这一核心断层：连续净值、制度拒单与调优差异全链路透明。</p>
-            </div>
-          </li>
-          <li class="is-accent">
-            <div class="tk-num">03</div>
-            <div>
-              <h4>走进真实用户</h4>
-              <p>当一位普通股民或 Agent 玩家真正动手试炼时，具体被哪四道痛点死死卡住？进入第二部分。</p>
-            </div>
-          </li>
-        </ul>
-
-        <div class="t-meta" style="color:var(--text-helper);margin-top:auto;text-align:right">→ NEXT · ACT 02 / USER PAIN POINTS</div>
+        <div class="th-node up" data-anim="node">
+          <span class="dot"></span>
+          <span class="label">
+            <span class="yr">05</span>
+            <span class="name">结论与后续工作</span>
+            <span class="desc">下一步做什么</span>
+          </span>
+        </div>
       </div>
     </div>
+
+    <div class="t-meta" style="margin-top:1.4vh;padding-top:1.6vh;border-top:1px solid var(--line);color:var(--text-secondary)">→ 下一部分 · 02 用户痛点与核心需求</div>
   </div>
 </section>
 </div>
@@ -2177,74 +2143,70 @@
 <script>
 const SPEAKER_NOTES = [
   {
-    id: 's01-cover', title: '答辩开场封面', section: '开场', minutes: 0.25,
-    purpose: '建立主题与产品定位预期',
+    id: 'cover-evaluation-ground', title: '答辩开场封面：项目立意与定位破题', section: '01 引入', minutes: 0.25,
+    purpose: '建立主题与产品定位预期，并把注意力交给行业变化',
     talk: [
-      '各位老师好，今天汇报并推介毕业设计产品 openOutcry —— 与 Agent 一起挑战股市',
-      '一句话定位：面向任意投资 Agent 的评测与训练场',
-      '在历史股市的模拟中亲眼见证 Agent 的交易决策，并与它一起进步'
+      '各位老师好！今天向大家汇报并推介我们的毕业设计项目——openOutcry。',
+      '它是一个面向任意投资 Agent 的评测与训练场：让投资者在历史股市的真实模拟中，亲眼见证 Agent 的交易决策，并与它一起进步。',
+      '在展开系统细节之前，我想先带大家看一眼今天金融 AI 领域正在发生的真实变化。'
     ],
     transition: '在展开产品细节前，先看今天金融 AI 正在发生的真实变化',
-    cue: '开场停顿一秒，确认观众屏已同步，再读副标题'
+    cue: '开场停顿一秒，确认观众屏已同步，再读副标题',
+    advance: '念完“真实变化”后翻页'
   },
   {
-    id: 's02-wave', title: '商业产品浪潮', section: '01 背景', minutes: 0.45,
-    purpose: '证明金融 Agent 已完成商业化落地',
+    id: 'commercial-wave', title: '商业产品浪潮：金融 Agent 已走进主流桌面与 C 端终端', section: '01 引入', minutes: 0.45,
+    purpose: '证明金融 Agent 已完成商业化落地；主画面用一张本机实测截图，其余两项只作简短对照',
     talk: [
-      'OpenAI 推出面向金融机构的专属智能体套件',
-      'Kimi K3.1 Pro 把深度研究打进财报与估值建模',
-      '同花顺问财直接上线 SkillHub 技能广场，散户复制一段提示词就能挂上全套投研技能',
-      '强调：卖的不是概念，而是已经能装进日常工作的工具'
+      '过去一年，AI 在金融领域已经跨过了“陪聊写摘要”的初级阶段，真正演变成触手可及的商业化产品。',
+      '在海外，OpenAI 推出的是 ChatGPT for Financial Services——面向金融机构的专属 ChatGPT 方案，用来研究公司、分析财报、做可编辑的财务模型、写研究笔记和 pitchbook。',
+      '国内的 Kimi K3.1 Pro 把金融研究与财务建模放进了对话；官方给出的提升幅度是厂商自测，不是独立验证，我不在页面上引用具体数值。',
+      '更贴近普通股民的是同花顺问财的 SkillHub：官方展示多项金融技能，复制一段 Prompt 就能装进兼容的 AI 助手，安装需要登录。这一项是本地实测过的，所以本页唯一的截图就是它。'
     ],
     transition: '商业侧落地之后，看社区与散户侧的热度',
-    cue: '手指图片左侧排行榜与右侧技能广场，各停留一秒'
+    cue: '先指截图里的“兼容主流平台”，再依次点三列；只有第三列有本机截图',
+    advance: '念完 SkillHub 这一句后翻页',
+    fallback: '来源：OpenAI 公告 https://openai.com/index/introducing-chatgpt-financial-services/ 与帮助中心 https://help.openai.com/en/articles/20001517-chatgpt-for-financial-services；Kimi K3.1 Pro https://www.kimi.com/blog/kimi-k3-1-pro；问财 SkillHub https://www.iwencai.com/skillhub（本机调研 2026-10-29，原始截图 1440×950）。Kimi 数据为厂商自测，不构成独立验证。'
   },
   {
-    id: 's03-heat', title: '注意力已经先到了', section: '01 背景', minutes: 0.40,
-    purpose: '用量化热度证明需求真实存在',
+    id: 'attention-first', title: '开源与大众热度：注意力已被点燃，但热度不等于效果证据', section: '01 引入', minutes: 0.40,
+    purpose: '用开源与大众热度证明注意力真实存在，同时说明热度不等于产品效果',
     talk: [
-      'GitHub TradingAgents 突破 11.8 万 Star',
-      'YouTube 散户实测 AI 炒股单条 84.5 万播放，CNBC 专题 65.5 万',
-      '国内 B 站散户自测视频 2.5 万到 4.7 万播放',
-      '说明：注意力已经到位，但注意力不等于可信度'
+      '与商业终端同步爆发的，是开源社区和普通投资者的注意力。',
+      'GitHub 上主打多角色协作的 TradingAgents，今天页面上的 Star 是 12.2 万——这是 11 月 12 日实拍的截图；本地 10 月 29 日的采样是 118,241，两周涨了近 4 千。',
+      '海外，CNBC 关于 AI 交易的视频有 41.9 万次观看；国内 B 站，AI 自动交易实测的视频有 9.4 万次播放。这两个数是 11 月 12 日的采样值，会随时间变化。',
+      '但我要说清楚：这些数字只证明“项目和社区确实存在、注意力已经到位”，它不证明任何算法效果，更不证明我们产品的效果。'
     ],
     transition: '热闹之下，投资者真正在追问什么',
-    cue: '四行数据自上而下读完，最后一行放慢语速'
+    cue: 'Star 数字只念一次，然后停在“不等于效果”这句上；不要报第二遍播放量',
+    advance: '讲完“不证明效果”后翻页',
+    fallback: '来源：GitHub 仓库 https://github.com/TauricResearch/TradingAgents（2026-11-12 实拍，页面显示 Star 122k；同日 API 122,167）；CNBC 视频 https://www.youtube.com/watch?v=1zW6Uu21Q40（采样约 41.9 万次观看）；B 站 https://www.bilibili.com/video/BV12DFhzUEKU（采样 94,321 次播放）。播放量随时间变化。'
   },
   {
-    id: 's04-questions', title: '真正上场前的两个追问', section: '01 背景', minutes: 0.45,
-    purpose: '承认闭源工具的单点优势，抛出结果可见性需求',
+    id: 'two-questions', title: '热潮之下的冷静追问：从看单次回答到验连续试炼', section: '01 引入', minutes: 0.45,
+    purpose: '承认单点投研已经很好，只抛出结果可见性的两个追问',
     talk: [
-      '先肯定：闭源工具在单点投研效率上已经做得很好',
-      '追问一：放进真实 A 股规则连跑三个月，净值与回撤看得见吗',
-      '追问二：改一句风控提示词之后，训练结果的前后差异对比得出来吗',
-      '落到关键词：不是聪明不聪明，而是可见不可见'
+      '但越是热闹，真正想要把 Agent 用在实际投资中的用户，心里反而越冷静。',
+      '平心而论，现有的工具在单点投研效率上已经做得非常好——查行情、读财报秒级响应。可一旦我们想把自己的 Agent 真正派上用场，马上就会撞上两个最核心的追问：',
+      '第一，把它放进真实的 A 股规则里连续运行三个月，盈亏曲线与最大回撤究竟如何，这套实战结果看得见、算得清吗？',
+      '第二，当我改了一句风控提示词、换了一套分析工具，它在完全相同的历史行情下，到底是变稳了还是更激进了，前后的差异能被诚实对比出来吗？'
     ],
-    transition: '既然是可见性缺口，那现有供给为什么填不上',
-    cue: '先看左栏，再转向右栏，中线作为分界'
+    transition: '这两个追问就是项目的起点，于是有了今天这五个部分',
+    cue: '先看左栏再转向右栏，中线作为分界；两个追问各停半秒',
+    advance: '第二个追问念完后停顿，再翻页'
   },
   {
-    id: 's05-gap', title: '供给侧结构性断层', section: '01 背景', minutes: 0.50,
-    purpose: '诊断三类现有供给的共同盲区',
+    id: 'presentation-roadmap', title: '答辩结构导引：从问题剖析到系统实现', section: '01 引入', minutes: 0.50,
+    purpose: '用五个部分交代全场结构，并把话筒交给第二部分',
     talk: [
-      '结论先行：不是工具不好用，而是训练结果在黑盒里不可见',
-      '第一类闭源投研助手：给完单次观点就结束，没有连续账户账本',
-      '第二类闭源官方榜单：预设模型的封闭秀场，C 端挂不进自己的 Agent',
-      '第三类开源框架：把搭环境、接行情、对齐 A 股制度的成本全甩给用户'
-    ],
-    transition: '缺口清楚了，我们的切口就清楚了',
-    cue: '右侧三张卡逐张点过去，第三张（蓝底）语速放慢'
-  },
-  {
-    id: 's06-bridge', title: '第一幕收束与承接', section: '收束/交接', minutes: 0.35,
-    purpose: '确立 ToC 白盒试炼定位并切入第二幕',
-    talk: [
-      'openOutcry 不重复造单次问答的轮子',
-      '我们做的是面向 C 端的白盒试炼服务，让连续净值、制度拒单与调优差异全链路透明',
-      '把话筒交给第二幕：真实用户究竟卡在哪四道痛点上'
+      '这两个看似朴素的追问，正是我们开展这一项目的核心起点。',
+      '为了系统地向大家展示我们是如何理解并解决这个问题的，今天的答辩将按屏幕上的五个部分展开：',
+      '在刚刚的第一部分引入背景之后，我们接下来将深入剖析用户的真实痛点与核心需求；第三部分，我将介绍 openOutcry 的系统架构与设计取舍；第四部分，我们将通过实机演示和测试数据展示具体实现与验证结果；最后，总结我们的成果并展望后续工作。',
+      '下面，让我们正式进入第二部分，看一看真实投资者在想要验证 Agent 时，究竟被哪些难题卡住了脚步。'
     ],
     transition: '进入第二部分：用户痛点与核心需求',
-    cue: '念完 03 条后停顿，再翻页'
+    cue: '五个节点自左向右点过去，念到“第二部分”时加重',
+    advance: '念完最后一句直接翻页进入 Part 02'
   }
 ];
 window.__SPEAKER_NOTES__ = SPEAKER_NOTES;
@@ -2799,7 +2761,7 @@ window.__pptPresenter=(()=>{
     const availableWidth=viewport.clientWidth,availableHeight=viewport.clientHeight;
     if(!availableWidth||!availableHeight)return;
     const width=Math.min(availableWidth,availableHeight*(16/9)),height=width*(9/16);
-    frame.style.width=`${width}px`;frame.style.height=`${height}px`;
+    frame.style.width='1600px';frame.style.height='900px';frame.style.transform='translate('+((availableWidth-width)/2)+'px,'+((availableHeight-height)/2)+'px) scale('+(width/1600)+')';
     if(frame.id==='ppt-current-frame')sizeInk(document.getElementById('ppt-presenter-ink'),width,height);
   }
   function fitPresenterFrames(){
@@ -3232,7 +3194,7 @@ go(Number.isFinite(initialSlide) ? initialSlide : 0);
 window.__pptPresenter?.initMode();
 </script>
 <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
-<script>lucide.createIcons();</script>
+<script>if(window.lucide&&lucide.createIcons)lucide.createIcons();</script>
 
 <!-- Motion One 动效引擎 (与原模板一致) -->
 <script type="module">

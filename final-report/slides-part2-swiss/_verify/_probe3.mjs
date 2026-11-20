@@ -1,0 +1,21 @@
+import { createRequire } from 'node:module';
+const require = createRequire('D:/agents/skills/playwright-skill/node_modules/playwright-core/index.js');
+const { chromium } = require('D:/agents/skills/playwright-skill/node_modules/playwright-core');
+const path = require('node:path');
+const root = 'D:/projects/playground/stock-ai-compete/final-report/slides-part2-swiss';
+const fileUrl = 'file:///' + path.join(root, 'index.html').replace(/\\/g, '/');
+const browser = await chromium.launch({ executablePath: 'C:\\Users\\J\\AppData\\Local\\ms-playwright\\chromium-1243\\chrome-win64\\chrome.exe', args: ['--allow-file-access-from-files'] });
+const ctx = await browser.newContext({ viewport: { width: 1600, height: 900 } });
+const page = await ctx.newPage();
+await page.route('**/*', (r) => (r.request().url().startsWith('file://') || r.request().url().startsWith('data:')) ? r.continue() : r.abort());
+await page.goto(fileUrl + '?slide=4', { waitUntil: 'load' });
+await page.waitForTimeout(2200);
+const m = await page.evaluate(() => {
+  const sec = [...document.querySelectorAll('section.slide')][3];
+  const g = (sel) => { const e = sec.querySelector(sel); if (!e) return null; const b = e.getBoundingClientRect(); return { top: Math.round(b.top), bottom: Math.round(b.bottom), left: Math.round(b.left), h: Math.round(b.height) }; };
+  const dots = [...sec.querySelectorAll('.th-node .dot')].map(d => { const b = d.getBoundingClientRect(); return { x: Math.round(b.left), y: Math.round(b.top) }; });
+  const labels = [...sec.querySelectorAll('.th-node .label')].map(d => { const b = d.getBoundingClientRect(); return { top: Math.round(b.top), bottom: Math.round(b.bottom) }; });
+  return { wrap: g('.tl-wrap'), tl: g('.timeline-h'), row: g('.tl-row'), dots, labels, foot: g('.ev-foot-l'), para: g('.body-zh') };
+});
+console.log(JSON.stringify(m));
+await browser.close();

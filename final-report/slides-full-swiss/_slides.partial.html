@@ -1,0 +1,1110 @@
+<!-- ============================================================
+     openOutcry · FYP 期末答辩 · 完整 23 页（瑞士国际主义 · IKB）
+
+     ACT 01 · 时代背景与潮流引入 · 5 页（原版移植，01–05）
+       01 SWISS-COVER-ASCII · 02 S22（文字 + 证据卡） · 03 S20（数字 + 证据卡）
+       04 S08 duo-compare（dark） · 05 S11 horizontal timeline
+     ACT 02 · 用户痛点与核心需求 · 7 页（原版移植，06–12）
+       06 SWISS-COVER-ASCII 封面 · 07 S03 分屏陈述 · 08 S08 双轨对照(dark)
+       09 S16 多卡对照 · 10 S19 四列卡 · 11 S12 宣言+通栏 · 12 S10 收束
+     ACT 03–05 · 方案 / 实现 / 结论 · 11 页（13–23）
+     一、二幕的版式、观众文案、图片与备注直接移植自 slides-merged-swiss
+     （= slides-part1-swiss + slides-part2-swiss 原版），未重写；页码统一为 NN / 23。
+     ============================================================ -->
+
+<!-- ============ 01 · 封面 ============ -->
+<section data-act="1" class="slide accent" data-slide-id="cover-evaluation-ground" data-layout="SWISS-COVER-ASCII" data-animate="hero">
+  <div class="canvas-card" style="padding-bottom:8.6vh">
+    <canvas class="ascii-bg" aria-hidden="true"></canvas>
+    <div class="chrome-min">
+      <div class="l">OPENOUTCRY · 2026 秋 毕业设计</div>
+      <div class="r">01 / 23 · 时代背景</div>
+    </div>
+
+    <div style="flex:1;padding:0;display:grid;grid-template-rows:auto 1fr auto;gap:2.6vh;min-height:0">
+      <div class="cover-row" data-anim="kicker">
+        <div class="t-meta" style="color:rgba(var(--accent-on-rgb),.78);letter-spacing:.1em;text-transform:none">面向任意投资 Agent 的评测与训练场</div>
+      </div>
+
+      <div class="cover-row" data-anim="title" style="align-self:center">
+        <h1 class="h-hero" data-latin style="color:var(--accent-on);line-height:.9;letter-spacing:-.03em">openOutcry</h1>
+      </div>
+
+      <div class="cover-row" data-anim="bottom" style="display:grid;grid-template-rows:auto auto auto;gap:2.4vh;border-top:1px solid rgba(var(--accent-on-rgb),.24);padding-top:2.4vh">
+        <div class="lead" style="max-width:24em;color:rgba(var(--accent-on-rgb),.92);font-weight:400;font-size:min(2.2vw,3.9vh);line-height:1.35">让任意投资 Agent 在真实历史行情里跑给你看。</div>
+        <div style="font-family:var(--font-sans);font-size:max(24px,1.5vw);line-height:1.6;font-weight:400;color:rgba(var(--accent-on-rgb),.84);max-width:30em">回看它的每一笔交易与依据，迭代它的配置。</div>
+        <div style="display:flex;justify-content:space-between;align-items:end;gap:2vw">
+          <div class="t-meta" style="color:rgba(var(--accent-on-rgb),.66)">毕业设计 · 产品答辩</div>
+          <div class="t-meta" style="color:rgba(var(--accent-on-rgb),.66)">2026.11</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 02 · 商业浪潮：三个产品化例子 + 一张问财实拍证据（方案A） ============ -->
+<section data-act="1" class="slide light" data-slide-id="commercial-wave" data-layout="S22" data-animate="image-hero">
+  <div class="canvas-card cw">
+    <div class="chrome-min">
+      <div class="l">ACT 01 · 时代背景</div>
+      <div class="r">02 / 23 · 商业浪潮</div>
+    </div>
+
+    <div class="cw-head" data-anim="line">
+      <div class="cw-head-main">
+        <div class="t-meta">商业化 · 2026</div>
+        <h2 class="zh-title zh-title--52 cw-title">金融 Agent 正在崛起，<br>一个新市场正在打开。</h2>
+      </div>
+      <p class="cw-sub">从金融研究、估值建模到投资决策辅助，AI Agent 正在进入真实的投资工作流。</p>
+    </div>
+
+    <div class="cw-body">
+      <div class="cw-left">
+        <div class="cw-list">
+          <div class="prod-row" data-anim="card">
+            <div class="prod-no">01</div>
+            <div class="cw-cell">
+              <div class="cw-name"><span class="prod-name">OpenAI</span><span class="cw-dash">—</span><span class="cw-tag">专业投研</span></div>
+              <div class="prod-desc">AI 深入金融研究与财务建模。</div>
+            </div>
+          </div>
+          <div class="prod-row" data-anim="card">
+            <div class="prod-no">02</div>
+            <div class="cw-cell">
+              <div class="cw-name"><span class="prod-name">Kimi</span><span class="cw-dash">—</span><span class="cw-tag">智能分析</span></div>
+              <div class="prod-desc">深度研究与估值能力加速普及。</div>
+            </div>
+          </div>
+          <div class="prod-row is-evi" data-anim="card">
+            <div class="prod-no">03</div>
+            <div class="cw-cell">
+              <div class="cw-name"><span class="prod-name">同花顺问财</span><span class="cw-dash">—</span><span class="cw-tag">投资工具化</span></div>
+              <div class="prod-desc">金融 Skills 开始走向普通投资者。</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="cw-concl" data-anim="up">投资 AI 的商业化，正在从概念走向产品。</div>
+      </div>
+
+      <figure class="plate cw-plate" data-anim="img">
+        <div class="plate-frame">
+          <img src="images/02-iwencai-skillhub.png" data-image-slot="s22-hero-21x9" loading="eager"
+               alt="同花顺问财 SkillHub 页面：标题「全球最大的金融投资AI技能库」、用户技能卡与官方出品技能货架">
+        </div>
+        <figcaption class="plate-cap cw-cap"><span class="plate-tag"></span>同花顺问财 SkillHub · 本机实测 2026-10</figcaption>
+      </figure>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 03 · 社区热度：开源 + YouTube + B站三维实证 ============ -->
+<section data-act="1" class="slide light" data-slide-id="attention-first" data-layout="S16" data-animate="stacked-ledger">
+  <div class="canvas-card at-wrap">
+    <div class="chrome-min">
+      <div class="l">ACT 01 · 开源与大众热度</div>
+      <div class="r">03 / 23 · 破圈热度</div>
+    </div>
+
+    <div class="at-head" data-anim="line">
+      <div class="at-head-main">
+        <div class="t-meta">开源与大众热度 · 2026</div>
+        <h2 class="zh-title zh-title--52 at-title">不止开发者在写，<br>散户也在亲自下场。</h2>
+      </div>
+      <p class="at-sub">从 GitHub 开源框架、YouTube 实测到 B 站爆款，AI 投资已经彻底破圈。</p>
+    </div>
+
+    <div class="at-grid">
+      <article class="at-card" data-anim="img">
+        <div class="at-card-head">
+          <span class="at-tag">01 · GITHUB 开源社区</span>
+        </div>
+        <div class="at-shot">
+          <img src="images/03-github-tradingagents.png" data-image-slot="s16-evidence-4x3" loading="eager"
+               alt="GitHub 仓库 TauricResearch/TradingAgents 页面实拍，显示 Star 122k">
+        </div>
+        <div class="at-kpi-row">
+          <span class="at-num" data-anim="num">12.2 万+</span>
+          <span class="at-unit">Stars</span>
+        </div>
+        <p class="at-desc">TradingAgents · 多角色金融 Agent 框架</p>
+      </article>
+
+      <article class="at-card" data-anim="img">
+        <div class="at-card-head">
+          <span class="at-tag">02 · YOUTUBE 海外实测</span>
+        </div>
+        <div class="at-shot">
+          <img src="images/03-youtube-ai-trading.png" data-image-slot="s16-evidence-4x3" loading="eager"
+               alt="YouTube 搜索 AI 炒股实测视频页面，TradingLab 实盘测试达 448 万次观看">
+        </div>
+        <div class="at-kpi-row">
+          <span class="at-num" data-anim="num">448 万</span>
+          <span class="at-unit">最高单条观看</span>
+        </div>
+        <p class="at-desc">散户 AI 实盘挑战 · CNBC 专题 42.2 万</p>
+      </article>
+
+      <article class="at-card is-evi" data-anim="img">
+        <div class="at-card-head">
+          <span class="at-tag">03 · B 站国内社区</span>
+        </div>
+        <div class="at-shot">
+          <img src="images/03-bilibili-ai-stock.png" data-image-slot="s16-evidence-4x3" loading="eager"
+               alt="B 站搜索 AI 炒股按最多播放排序实拍，头部实测视频播放量达 153.7 万">
+        </div>
+        <div class="at-kpi-row">
+          <span class="at-num" data-anim="num">153.8 万</span>
+          <span class="at-unit">最高单条播放</span>
+        </div>
+        <p class="at-desc">「AI 炒股」破千条 · 实测持续霸榜</p>
+      </article>
+    </div>
+
+    <div class="at-concl" data-anim="line">越来越多投资者不再只围观演示，而是想让 AI 真正下场——但实盘到底靠不靠谱？</div>
+  </div>
+</section>
+
+<!-- ============ 04 · 热潮之下，投资者心中的顾虑（深色） ============ -->
+<section data-act="1" class="slide dark" data-slide-id="two-questions" data-layout="S08" data-animate="duo-mirror">
+  <div class="canvas-card" style="padding-bottom:8.6vh">
+    <div class="chrome-min">
+      <div class="l">ACT 01 · 投资者的顾虑</div>
+      <div class="r">04 / 23 · 破除幻觉</div>
+    </div>
+
+    <div data-anim="line" style="display:flex;flex-direction:column;gap:1.1vh">
+      <div class="t-meta">热潮之下 · REALITY CHECK</div>
+      <h2 class="zh-title tq-title">热潮之下，投资者心中的顾虑是什么？</h2>
+    </div>
+
+    <div class="duo-compare tq-duo">
+      <div class="col tq-left">
+        <div class="col-tag">公开实盘基准 · TRADERANK（11 赛季）</div>
+
+        <div class="tq-kpi">
+          <span class="tq-kpi-num">38.9%</span>
+          <span class="tq-kpi-unit">模型-赛季最终盈利</span>
+        </div>
+        <p class="tq-kpi-meta">11 个完整赛季 · 78 个模型 · 3,131 笔交易 · 冠军几乎每季换人</p>
+
+        <div class="tq-regimes">
+          <div class="tq-row">
+            <span class="tq-badge">牛市顺风</span>
+            <p class="tq-txt">8 月 / 10 月行情走强，榜首可跑出 <strong>+12%</strong> 左右收益。</p>
+          </div>
+          <div class="tq-row is-bear">
+            <span class="tq-badge">熊市回调</span>
+            <p class="tq-txt">第 3 赛季连冠军都亏 <strong>-0.63%</strong>；11 月回调 <strong>22 个模型仅 1 个盈利</strong>。</p>
+          </div>
+        </div>
+
+        <p class="tq-verdict">AI 绝非无所不能的股神，“vibe trading” 靠不住。</p>
+      </div>
+
+      <span class="vrule"></span>
+
+      <div class="col tq-right">
+        <div class="col-tag is-accent">唯一的核心顾虑</div>
+
+        <div class="tq-fear">不敢拿真金白银，<br>去赌一个没上过场的 AI。</div>
+
+        <p class="tq-lead">投资者并不指望 AI 稳赚不赔。真正卡住散户的是：拥有自己的投资 Agent 已经很容易，但在掏真钱之前，根本没有地方让它跑出真实结果。</p>
+
+        <div class="tq-reveal">
+          <div class="tq-reveal-k">OUR ANSWER · OPENOUTCRY</div>
+          <div class="tq-reveal-v">面向所有散户的 AI 训练场</div>
+          <p class="tq-reveal-d">接入你自己的投资 Agent，先在我们的模拟盘里看真实结果，再决定要不要信它。</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="ev-foot">→ 先在模拟盘里看真实结果，再把真金白银交出去。</div>
+  </div>
+</section>
+
+<!-- ============ 05 · 答辩结构 ============ -->
+<section data-act="1" class="slide light" data-slide-id="presentation-roadmap" data-layout="S11" data-animate="timeline-walk">
+  <div class="canvas-card" style="padding-bottom:8.6vh">
+    <div class="chrome-min">
+      <div class="l">ACT 01 · 答辩结构</div>
+      <div class="r">05 / 23 · 引入收束</div>
+    </div>
+
+    <div data-anim="line" style="display:grid;grid-template-columns:minmax(0,1fr) auto;gap:3vw;align-items:end">
+      <div style="display:flex;flex-direction:column;gap:1.4vh;min-width:0">
+        <div class="t-meta">答辩结构 · 五个部分</div>
+        <h2 class="zh-title zh-title--52">五个部分，一条主线。</h2>
+      </div>
+    </div>
+    <div class="lead" style="margin-top:2vh;max-width:44em;color:var(--text-secondary);font-size:max(24px,1.5vw);line-height:1.5">围绕一条主线：为有自己投资 Agent 的散户，打造先看真实结果的 AI 训练场。</div>
+
+    <div class="timeline-h" data-anim="up" style="margin-top:1.4vh">
+      <div class="tl-row">
+        <div class="th-node up accent" data-anim="node">
+          <span class="dot"></span>
+          <span class="label">
+            <span class="yr">01 · 现在</span>
+            <span class="name">引入：背景与动机</span>
+            <span class="desc">为何不敢盲投 AI</span>
+          </span>
+        </div>
+        <div class="th-node down" data-anim="node">
+          <span class="dot"></span>
+          <span class="label">
+            <span class="yr">02</span>
+            <span class="name">用户痛点与核心需求</span>
+            <span class="desc">为何不敢交钱给 AI</span>
+          </span>
+        </div>
+        <div class="th-node up" data-anim="node">
+          <span class="dot"></span>
+          <span class="label">
+            <span class="yr">03</span>
+            <span class="name">方案与系统设计</span>
+            <span class="desc">训练场如何设计</span>
+          </span>
+        </div>
+        <div class="th-node down" data-anim="node">
+          <span class="dot"></span>
+          <span class="label">
+            <span class="yr">04</span>
+            <span class="name">实现、演示与验证</span>
+            <span class="desc">目前跑到了哪一步</span>
+          </span>
+        </div>
+        <div class="th-node up" data-anim="node">
+          <span class="dot"></span>
+          <span class="label">
+            <span class="yr">05</span>
+            <span class="name">结论与后续工作</span>
+            <span class="desc">下一步如何完善</span>
+          </span>
+        </div>
+      </div>
+    </div>
+
+    <div class="t-meta" style="margin-top:1.4vh;padding-top:1.6vh;border-top:1px solid var(--line);color:var(--text-secondary)">→ 下一部分 · 02 用户痛点与核心需求：为什么用户不敢把钱交给 AI？</div>
+  </div>
+</section>
+
+<!-- ============================================================
+     PART 2 · 用户痛点与核心需求 · 7 页（中文主稿）
+     01 SWISS-COVER-ASCII 封面 · 02 S03 分屏陈述(+概念对照图)
+     03 S08 双轨对照(dark) · 04 S16 多卡对照(+21:9 断层图)
+     05 S19 四列卡(+几何图标与验收流) · 06 S12 宣言+通栏(+16:10 对照图)
+     07 S10 收束(42/58 分屏)
+     叙事：一个人的困惑 → 两类人的难题 → 工具之间的断层 → 四项需求 → 交给第三部分
+     ============================================================ -->
+
+<!-- ============ 01 · 第二幕章隔页（极简暗底 · S09） ============ -->
+<section data-act="2" class="slide dark" data-layout="S09" data-slide-id="act02-cover" data-animate="statement">
+  <div class="canvas-card a2-canvas">
+    <span class="dot-mat a2-dots" aria-hidden="true"></span>
+
+    <div class="chrome-min a2-chrome">
+      <div class="l">ACT 02 · 用户痛点与核心需求</div>
+      <div class="r">06 / 23</div>
+    </div>
+
+    <div class="a2-body">
+      <div class="a2-idx-row" data-anim="line">
+        <span class="a2-num">02</span>
+        <span class="a2-rule" aria-hidden="true"></span>
+        <span class="t-meta a2-kicker">USER PROBLEMS &amp; REQUIREMENTS</span>
+      </div>
+
+      <h1 class="a2-title" data-anim="up">为什么用户<br>不敢把钱交给 AI？</h1>
+    </div>
+
+    <div class="a2-foot" data-anim="up">拆解背后的核心痛点，提炼 AI 训练场的四项核心需求。</div>
+  </div>
+</section>
+
+<!-- ============ 02 · 一次对，不等于可信 ============ -->
+<section data-act="2" class="slide split" data-layout="S03" data-slide-id="one-good-call" data-animate="statement">
+  <div class="canvas-card">
+    <div class="split-half is-p2-split">
+      <div class="half p2-split-left">
+        <div class="chrome-min" style="margin-bottom:0">
+          <div class="l">ACT 02 · 一个场景</div>
+          <div class="r">07 / 23</div>
+        </div>
+        <div class="p2-split-head">
+          <div class="t-meta">A SCENARIO · 一位投资者</div>
+          <h2 class="zh-h1" style="font-size:min(5.8vw,10.2vh);line-height:1.08">一次对，<br>不等于可信。</h2>
+          <span class="p2-rule-short"></span>
+          <p class="body-zh" style="max-width:21em">Agent 推荐了一只股票，理由听起来很充分；第二天，它真的涨了。这当然令人兴奋——但一次正确的推荐，足以说明它值得信任吗？</p>
+        </div>
+        <div class="p2-split-foot">
+          <span class="p2-sq"></span>
+          <span>核心判断：一次性说服 ≠ 连续决策稳定性</span>
+        </div>
+      </div>
+
+      <div class="half b-grey r-border p2-split-right">
+        <div class="chrome-min" style="margin-bottom:0">
+          <div class="l">真正要回答的</div>
+          <div class="r">03 QUESTIONS</div>
+        </div>
+        <div class="frame-img r-16x10 p2-plate-3x2">
+          <img src="images/02-scenario-one-call.png" data-image-slot="s03-scenario-16x10" alt="单日推荐与多月连续试炼对比图" loading="eager">
+        </div>
+        <div class="q-list is-compact">
+          <div class="q-row"><span class="q-idx">01</span><p class="q-txt">放回过去几个月，它究竟会怎么走？</p></div>
+          <div class="q-row"><span class="q-idx">02</span><p class="q-txt">面对下跌，它能控制多少风险？</p></div>
+          <div class="q-row"><span class="q-idx">03</span><p class="q-txt">改了提示词再测，表现真的变好了吗？</p></div>
+        </div>
+        <p class="q-close is-compact">一份看起来很专业的分析报告，并不能回答这三个问题。</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 03 · 两类人，两个卡点（深色） ============ -->
+<section data-act="2" class="slide dark" data-layout="S08" data-slide-id="two-kinds-of-users" data-animate="duo-mirror">
+  <div class="canvas-card" style="padding-bottom:7.8vh">
+    <div class="chrome-min">
+      <div class="l">ACT 02 · 两类用户</div>
+      <div class="r">08 / 23</div>
+    </div>
+
+    <div data-anim="line" style="display:flex;flex-direction:column;gap:1vh">
+      <div class="t-meta">不只是一个人的问题</div>
+      <h2 class="zh-h2" style="font-size:min(4.8vw,8.4vh);line-height:1.12">两类人，<br>两个卡点。</h2>
+    </div>
+
+    <div class="duo-compare is-p2-duo" style="margin-top:3.4vh;flex:1;min-height:0">
+      <div class="col">
+        <div class="col-rule"></div>
+        <div class="col-tag">01 · 想开始的人</div>
+        <div class="col-ttl">会用 AI，<br>搭不出考场。</div>
+        <ul class="col-list is-sq">
+          <li>没有条件搭一整套历史行情环境</li>
+          <li>跑出一串交易，却看不懂它意味着什么</li>
+          <li>只能凭感觉判断，不敢真正下场</li>
+        </ul>
+        <div class="need-row">
+          <span class="need-k">需要</span>
+          <span class="need-v">更低的验证门槛</span>
+        </div>
+      </div>
+
+      <span class="vrule"></span>
+
+      <div class="col accent">
+        <div class="col-rule"></div>
+        <div class="col-tag">02 · 自己造 Agent 的人</div>
+        <div class="col-ttl">能改配置，<br>比不出差异。</div>
+        <ul class="col-list is-sq">
+          <li>可以接新工具、换策略、调风控提示词</li>
+          <li>却缺一种可靠方法比较修改前后</li>
+          <li>说不清是策略变好了，还是运气变好了</li>
+        </ul>
+        <div class="need-row is-accent-box">
+          <span class="need-k">需要</span>
+          <span class="need-v is-accent">更高的验证可信度</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="ev-foot">一类人要降低验证门槛，另一类人要提高验证的可信度。</div>
+  </div>
+</section>
+
+<!-- ============ 04 · 工具不缺，过程是断的（S16） ============ -->
+<section data-act="2" class="slide light" data-layout="S16" data-slide-id="tools-but-no-chain" data-animate="field-notes">
+  <div class="canvas-card" style="padding-bottom:7.6vh">
+    <div class="chrome-min">
+      <div class="l">ACT 02 · 现有工具</div>
+      <div class="r">09 / 23</div>
+    </div>
+
+    <div data-anim="line" style="display:flex;flex-direction:column;gap:1.1vh">
+      <div class="t-meta">金融助手 · 量化框架 · 模拟交易 · 公开评测</div>
+      <h2 class="zh-h2">工具不缺，过程是断的。</h2>
+    </div>
+
+    <div class="s16-split">
+      <div class="s16-cards">
+        <article class="card-fill s16-card">
+          <div class="s16-head"><span class="s16-num">01</span><span class="s16-cat">AI ASSISTANT</span></div>
+          <h3 class="zh-h3">金融 AI 助手</h3>
+          <p class="s16-cap">强项：整理信息、生成分析观点。</p>
+          <p class="s16-gap">缺口：停在单轮建议，难接连续下单检验。</p>
+        </article>
+        <article class="card-fill s16-card">
+          <div class="s16-head"><span class="s16-num">02</span><span class="s16-cat">QUANT FRAMEWORK</span></div>
+          <h3 class="zh-h3">量化框架</h3>
+          <p class="s16-cap">强项：支持历史数据与策略回测。</p>
+          <p class="s16-gap">缺口：偏重代码规则，难直接容纳通用 Agent。</p>
+        </article>
+        <article class="card-fill s16-card">
+          <div class="s16-head"><span class="s16-num">03</span><span class="s16-cat">PAPER TRADING</span></div>
+          <h3 class="zh-h3">模拟交易</h3>
+          <p class="s16-cap">强项：贴近实盘节奏做纸面下单。</p>
+          <p class="s16-gap">缺口：等未来很慢，且难在同一段行情反复对照。</p>
+        </article>
+        <article class="card-fill s16-card">
+          <div class="s16-head"><span class="s16-num">04</span><span class="s16-cat">PUBLIC BENCHMARK</span></div>
+          <h3 class="zh-h3">公开评测</h3>
+          <p class="s16-cap">强项：统一题目跑出公开榜单结果。</p>
+          <p class="s16-gap">缺口：反映他人榜单，难直接验证你自己的 Agent。</p>
+        </article>
+      </div>
+
+      <div class="s16-visual">
+        <div class="frame-img r-21x9 s16-img-wrap">
+          <img src="images/04-tool-gap-21x9.png" data-image-slot="s16-brief-21x9" alt="四类现有工具与你的 Agent 验证链断裂示意图" loading="eager">
+        </div>
+        <div class="card-accent s16-focus">
+          <div class="s16-focus-tag">05 · THE MISSING CHAIN / 缺失的闭环</div>
+          <h3 class="s16-focus-ttl">面向“你手里的 Agent”的连续验证链</h3>
+          <p class="s16-focus-desc">把零散工具各自成立的能力，重新接成同一条可回溯、可对照的测试链条：接入 → 历史试炼 → 理解依据 → 同条件复测。</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="ev-foot-l">→ 我们关注的不是“现有工具都做不到”，而是完整验证过程仍不够顺畅。</div>
+  </div>
+</section>
+
+<!-- ============ 05 · 四项目标 ============ -->
+<section data-act="2" class="slide light" data-layout="S19" data-slide-id="four-requirements" data-animate="four-cards">
+  <div class="canvas-card" style="padding-bottom:7.6vh">
+    <div class="chrome-min">
+      <div class="l">ACT 02 · 把困惑变成需求</div>
+      <div class="r">10 / 23</div>
+    </div>
+
+    <div data-anim="line" style="display:flex;flex-direction:column;gap:1.8vh">
+      <div style="width:88px;height:2px;background:var(--accent)"></div>
+      <div style="display:flex;flex-direction:column;gap:1.1vh">
+        <div class="t-meta">四项目标 · REQUIREMENTS</div>
+        <h2 class="zh-h2">把困惑，变成四项要求。</h2>
+      </div>
+    </div>
+
+    <div class="four-cards is-p2-cards" data-anim="up">
+      <div class="fc-col is-card">
+        <div class="fc-top">
+          <div class="fc-meta-row">
+            <span class="fc-idx">01 / ACCESS</span>
+            <svg class="fc-ico" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="3" width="8" height="8"/><rect x="13" y="13" width="8" height="8"/><path d="M11 7h6v6"/></svg>
+          </div>
+          <h3 class="zh-h3">容易接入</h3>
+          <p class="fc-body">无论普通用户还是已有 Agent 的开发者，都能以可接受的成本开始测试。</p>
+        </div>
+        <div class="fc-criterion"><span>验收</span><strong>低成本起步</strong></div>
+      </div>
+      <div class="fc-col is-card">
+        <div class="fc-top">
+          <div class="fc-meta-row">
+            <span class="fc-idx">02 / TRIAL</span>
+            <svg class="fc-ico" viewBox="0 0 24 24" aria-hidden="true"><polyline points="3 17 8 11 13 14 21 6"/><polyline points="16 6 21 6 21 11"/></svg>
+          </div>
+          <h3 class="zh-h3">真实试炼</h3>
+          <p class="fc-body">在考虑 A 股规则的历史模拟里，观察连续决策与风险，而不是评价一次回答。</p>
+        </div>
+        <div class="fc-criterion"><span>验收</span><strong>连续行情检验</strong></div>
+      </div>
+      <div class="fc-col is-card">
+        <div class="fc-top">
+          <div class="fc-meta-row">
+            <span class="fc-idx">03 / INSIGHT</span>
+            <svg class="fc-ico" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="3" width="18" height="18"/><line x1="7" y1="9" x2="17" y2="9"/><line x1="7" y1="14" x2="13" y2="14"/></svg>
+          </div>
+          <h3 class="zh-h3">能够理解</h3>
+          <p class="fc-body">不只看到收益结果，还要能回顾关键交易与决策依据，知道问题出在哪。</p>
+        </div>
+        <div class="fc-criterion"><span>验收</span><strong>关键交易归因</strong></div>
+      </div>
+      <div class="fc-col is-card">
+        <div class="fc-top">
+          <div class="fc-meta-row">
+            <span class="fc-idx">04 / REPEAT</span>
+            <svg class="fc-ico" viewBox="0 0 24 24" aria-hidden="true"><polyline points="17 2 21 6 17 10"/><path d="M3 11V9a4 4 0 0 1 4-4h14"/><polyline points="7 22 3 18 7 14"/><path d="M21 13v2a4 4 0 0 1-4 4H3"/></svg>
+          </div>
+          <h3 class="zh-h3">可重复比较</h3>
+          <p class="fc-body">改配置后尽量保持测试条件一致，不把市场波动误当成改进。</p>
+        </div>
+        <div class="fc-criterion"><span>验收</span><strong>同条件可对比</strong></div>
+      </div>
+    </div>
+
+    <div class="fc-chain">
+      <span class="fc-chain-lbl">CLOSED-LOOP ACCEPTANCE</span>
+      <span class="fc-chain-steps">01 接入 → 02 试炼 → 03 理解 → 04 比较</span>
+    </div>
+
+    <div class="ev-foot-l" style="margin-top:0">→ 这四项，同时也是第三部分系统设计的四条验收标准。</div>
+  </div>
+</section>
+
+<!-- ============ 06 · 不是再造一个荐股的 AI ============ -->
+<section data-act="2" class="slide light" data-layout="S12" data-slide-id="not-another-stock-picker" data-animate="manifesto">
+  <div class="canvas-card" style="padding-bottom:6.6vh">
+    <div class="chrome-min">
+      <div class="l">ACT 02 · 结论</div>
+      <div class="r">11 / 23</div>
+    </div>
+
+    <div class="mani-top">
+      <div data-anim="line" class="mani-left">
+        <div class="t-cat">所以，真正要解决的是</div>
+        <div><h2 class="zh-h1" style="font-size:min(5.6vw,9.8vh);line-height:1.1">不是再造一个<br>荐股的 AI。</h2></div>
+        <span class="p2-rule-short"></span>
+        <p class="body-zh" style="max-width:21em">用户真正缺的不是又一个“买什么”的答案，而是一种持续判断与迭代的能力。</p>
+      </div>
+      <div class="mani-right">
+        <div class="frame-img r-16x10">
+          <img src="images/06-eval-vs-picker.png" data-image-slot="s12-contrast-16x10" alt="再造荐股AI与持续评估能力对比图" loading="eager">
+        </div>
+      </div>
+    </div>
+
+    <div class="ink-banner" data-anim="up">
+      <div class="ink-label">让用户有能力判断</div>
+      <div class="ink-items">
+        <div class="ink-item"><span class="k">01 / PERFORMANCE</span><span class="v">表现如何</span></div>
+        <div class="ink-item"><span class="k">02 / REASON</span><span class="v">为什么这样</span></div>
+        <div class="ink-item"><span class="k">03 / NEXT</span><span class="v">怎么改进</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 07 · 交给系统设计 ============ -->
+<section data-act="2" class="slide split" data-layout="S10" data-slide-id="handoff-to-part-3" data-animate="split-statement">
+  <div class="canvas-card">
+    <div class="split-half is-closing">
+      <div class="half b-accent" style="padding:5.4vh 3.6vw 7.6vh;justify-content:space-between;position:relative;overflow:hidden">
+        <canvas class="ascii-bg" aria-hidden="true"></canvas>
+        <div class="chrome-min" style="margin-bottom:0">
+          <div class="l">12 / 23</div>
+          <div class="r">→ ACT 03</div>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:2.4vh;min-width:0">
+          <div class="t-meta" style="color:rgba(var(--accent-on-rgb),.76)">接下来</div>
+          <h2 style="font-family:var(--sans);font-weight:200;font-size:min(6.2vw,10.8vh);line-height:1.06;letter-spacing:-.01em;color:var(--accent-on)">交给<br>系统设计。</h2>
+        </div>
+        <p style="font-family:var(--sans);font-weight:400;font-size:max(21px,1.31vw);line-height:1.6;letter-spacing:0;color:rgba(var(--accent-on-rgb),.9);max-width:20em">第三部分回答一个问题：这四项目标，如何变成一套能跑起来的系统。</p>
+      </div>
+
+      <div class="half" style="padding:5.4vh 3.8vw 7.6vh;justify-content:flex-start;gap:3.2vh">
+        <div class="chrome-min" style="margin-bottom:0">
+          <div class="l">第二部分 · 小结</div>
+          <div class="r">03 NOTES</div>
+        </div>
+        <ul class="takeaway-list">
+          <li>
+            <span class="num">01</span>
+            <div>
+              <h4>需求即约束</h4>
+              <p>四项要求不是功能清单，而是系统的设计约束。</p>
+            </div>
+          </li>
+          <li>
+            <span class="num">02</span>
+            <div>
+              <h4>边界先说清</h4>
+              <p>技术路径、实际完成度与测试证据，留给第三、四部分。</p>
+            </div>
+          </li>
+          <li class="is-accent">
+            <span class="num">03</span>
+            <div>
+              <h4>下一幕</h4>
+              <p>openOutcry 如何围绕这四项目标，设计整套系统。</p>
+            </div>
+          </li>
+        </ul>
+        <div class="t-meta" style="color:var(--text-helper);margin-top:auto">→ 完 · 第二部分</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 11 · 一条闭环（S14 loop） ============ -->
+<section class="slide light" data-layout="S14" data-animate="loop-form" data-slide-id="one-loop-onboarding-to-retest">
+  <div class="canvas-card">
+    <div class="chrome-min">
+      <div class="l">ACT 03 · 核心使用闭环</div>
+      <div class="r">13 / 23</div>
+    </div>
+
+    <div class="fs-head" data-anim="line" style="gap:1.5vh">
+      <div class="fs-rule"></div>
+      <div class="fs-kicker">ONE PATH · 从接入到复测</div>
+      <h2 class="fs-h2">从接入到复测，只走一条路。</h2>
+    </div>
+
+    <div class="fs-loop">
+      <div class="fs-loop-steps" data-anim="up">
+        <div class="fs-step"><div class="no">01</div><div><div class="h">接入 Agent</div><div class="d">选模板，或接自己的 Agent。</div></div></div>
+        <div class="fs-step"><div class="no">02</div><div><div class="h">配置一项实验</div><div class="d">角色、工具、模型、风险偏好，形成配置版本。</div></div></div>
+        <div class="fs-step"><div class="no">03</div><div><div class="h">在历史里试炼</div><div class="d">按模拟时钟与 A 股规则连续推进。</div></div></div>
+        <div class="fs-step"><div class="no">04</div><div><div class="h">检查与复盘</div><div class="d">看决策、订单、账户变化与组合结果。</div></div></div>
+        <div class="fs-step"><div class="no">05</div><div><div class="h">改配置，再跑一次</div><div class="d">条件尽量一致，差异才说得清。</div></div></div>
+      </div>
+
+      <div class="fs-loop-fig" data-anim="loop">
+        <svg viewBox="0 0 400 400" fill="none" aria-hidden="true">
+          <circle cx="200" cy="200" r="150" stroke="currentColor" stroke-opacity=".28" stroke-width="1"/>
+          <circle cx="200" cy="200" r="98" stroke="currentColor" stroke-opacity=".16" stroke-width="1"/>
+          <path d="M200 34 A166 166 0 0 1 320 104" stroke="currentColor" stroke-opacity=".55" stroke-width="1" stroke-dasharray="3 5"/>
+          <rect x="195" y="45" width="10" height="10" fill="currentColor"/>
+          <rect x="325" y="120" width="10" height="10" fill="currentColor"/>
+          <rect x="325" y="270" width="10" height="10" fill="currentColor"/>
+          <rect x="195" y="345" width="10" height="10" fill="currentColor"/>
+          <rect x="65" y="270" width="10" height="10" fill="currentColor"/>
+          <rect x="65" y="120" width="10" height="10" fill="currentColor"/>
+          <rect x="196" y="196" width="8" height="8" fill="currentColor" fill-opacity=".45"/>
+        </svg>
+        <div class="centre">闭环<br><span style="font-family:var(--font-mono);font-size:max(14px,.8vw);letter-spacing:.1em;font-weight:600;color:var(--accent-ink)">CONFIG → OBSERVE → REVIEW</span></div>
+      </div>
+    </div>
+
+    <div class="fs-foot" data-anim="up"><span class="fs-tri">→</span> 这不是三个互不相关的看板，而是一条反馈闭环。</div>
+  </div>
+</section>
+
+<!-- ============ 12 · 三个工作区（S15 图片矩阵 · 真实界面） ============ -->
+<section class="slide dark" data-layout="S15" data-animate="matrix-fill" data-slide-id="three-workspaces">
+  <div class="canvas-card">
+    <div class="chrome-min">
+      <div class="l">ACT 03 · 三个工作区</div>
+      <div class="r">14 / 23</div>
+    </div>
+
+    <div class="fs-head" data-anim="line" style="gap:1.4vh">
+      <div class="fs-rule"></div>
+      <div class="fs-kicker">STUDIO · ARENA · REVIEW</div>
+      <h2 class="fs-h2">三个工作区，围绕同一项任务。</h2>
+    </div>
+
+    <div class="fs-mtx" data-anim="up">
+      <div class="cell">
+        <div class="frame-img r-16x10">
+          <img src="images/12-studio-16x10.jpg" data-image-slot="s15-grid-16x10"
+               alt="openOutcry 委托台界面：训练委托单的时间、标的池、团队与规则配置" loading="eager">
+        </div>
+        <div class="cap"><span class="no">01</span><span class="n">工作室</span><span class="d">选 Agent、配置一项实验</span></div>
+      </div>
+      <div class="cell">
+        <div class="frame-img r-16x10">
+          <img src="images/12-arena-16x10.jpg" data-image-slot="s15-grid-16x10"
+               alt="openOutcry 训练场界面：决策事件流、待确认订单提案与账户持仓" loading="eager">
+        </div>
+        <div class="cap"><span class="no">02</span><span class="n">训练场</span><span class="d">决策事件流与账户同屏</span></div>
+      </div>
+      <div class="cell">
+        <div class="frame-img r-16x10">
+          <img src="images/12-review-16x10.jpg" data-image-slot="s15-grid-16x10"
+               alt="openOutcry 复盘界面：净值与基准对比、回撤曲线与调用分布" loading="eager">
+        </div>
+        <div class="cap"><span class="no">03</span><span class="n">复盘</span><span class="d">结果、过程与运行间差异</span></div>
+      </div>
+    </div>
+
+    <div class="fs-foot" data-anim="up"><span class="fs-tri">→</span> 真实原型界面 · 示例数据；收益数字仅用于演示流程，不是回测结果。</div>
+  </div>
+</section>
+
+<!-- ============ 13 · 系统架构（S17） ============ -->
+<section class="slide light" data-layout="S17" data-animate="system-diagram" data-slide-id="agent-decides-platform-owns-facts">
+  <div class="canvas-card">
+    <div class="chrome-min">
+      <div class="l">ACT 03 · 目标架构</div>
+      <div class="r">15 / 23</div>
+    </div>
+
+    <div class="fs-head" data-anim="line" style="gap:1.3vh">
+      <div class="fs-rule"></div>
+      <div class="fs-kicker">GOAL ARCHITECTURE · 不是已部署完成</div>
+      <h2 class="fs-h2">Agent 做决策，平台管事实。</h2>
+    </div>
+
+    <div class="fs-sys" data-anim="up">
+      <div class="fs-sys-row">
+        <div class="fs-node">
+          <div class="k">Agent 适配层</div>
+          <div class="h">你的 Agent</div>
+          <div class="d">提示词、模型、工具由你决定；平台只负责调用与记录。</div>
+        </div>
+        <div class="fs-arrow"><span class="lbl">ACP</span></div>
+        <div class="fs-node">
+          <div class="k">控制面</div>
+          <div class="h">任务与运行</div>
+          <div class="d">配置版本、运行状态、人工介入，都在控制面上留痕。</div>
+        </div>
+        <div class="fs-arrow"><span class="lbl">MCP</span></div>
+        <div class="fs-node">
+          <div class="k">工具层</div>
+          <div class="h">观察 · 证据 · 下单</div>
+          <div class="d">市场观察、历史证据与交易动作，都以结构化调用给出。</div>
+        </div>
+      </div>
+
+      <div class="fs-node is-ink" style="border-top:3px solid var(--accent)">
+        <div class="k" style="color:var(--accent-ink-inverse)">最终权威 · NOT THE MODEL</div>
+        <div class="h">A 股模拟器内核 · 模拟时钟 / 规则校验 / 撮合 / 账户账本</div>
+        <div class="d">Agent 说「我买了 100 股」，不等于一笔合法订单已经在模拟环境里成交。</div>
+      </div>
+
+      <div class="fs-sys-track">
+        <div class="lbl">事件轨迹</div>
+        <div class="v">看到什么 · 引用了哪条证据 · 提出什么动作 · 谁介入过 · 订单通过还是拒绝 · 账户怎么变</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 14 · 三道边界（S02 纵向时间轴 + 规则行） ============ -->
+<section class="slide dark" data-layout="S02" data-animate="progression" data-slide-id="three-boundaries-of-trust">
+  <div class="canvas-card">
+    <div class="chrome-min">
+      <div class="l">ACT 03 · 三项关键设计取舍</div>
+      <div class="r">16 / 23</div>
+    </div>
+
+    <div class="fs-head" data-anim="line" style="gap:1.3vh">
+      <div class="fs-rule"></div>
+      <div class="fs-kicker">POINT-IN-TIME · A-SHARE RULES · HUMAN-IN-THE-LOOP</div>
+      <h2 class="fs-h2">评估可信，取决于三道边界。</h2>
+    </div>
+
+    <div class="fs-vtl" data-anim="up">
+      <div class="fs-vrow">
+        <span class="dot"></span>
+        <div class="h">时点信息约束</div>
+        <div class="d">历史实验里，Agent 只能看到模拟日期<b>当时已经可用</b>的信息。否则后发的公告会泄漏到过去，让结论失真。</div>
+      </div>
+      <div class="fs-vrow">
+        <span class="dot"></span>
+        <div class="h">A 股交易规则</div>
+        <div class="d">T+1 卖出限制、停牌、涨跌停、交易手数、可用资金与费用，必须由引擎判断——<b>提出交易和真正成交是两种事件</b>。</div>
+      </div>
+      <div class="fs-vrow">
+        <span class="dot"></span>
+        <div class="h">人工介入与复现</div>
+        <div class="d">改过单就标注有人为介入；重跑时区间、初始资金保持一致；<b>回放轨迹与重新推理必须分开</b>。</div>
+      </div>
+    </div>
+
+    <div class="fs-kpi4" data-anim="up">
+      <div class="c"><div class="n">T+1</div><div class="l">当日买入不可卖</div></div>
+      <div class="c"><div class="n">±10%</div><div class="l">主板涨跌停幅度</div></div>
+      <div class="c"><div class="n">停牌</div><div class="l">无行情即不可成交</div></div>
+      <div class="c"><div class="n">100 股</div><div class="l">一手 · 费用与滑点</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 15 · 第一学期交付了什么（S22 主视觉 · 真实界面） ============ -->
+<section class="slide light" data-layout="S22" data-animate="image-hero" data-slide-id="term1-what-shipped">
+  <div class="canvas-card fs-ih">
+    <div class="fs-ih-media">
+      <img src="images/15-workbench-21x9.jpg" data-image-slot="s22-hero-21x9"
+           alt="openOutcry 训练场运行工作台：决策事件流、待确认订单提案、账户与持仓"
+           style="object-position:center 8%">
+    </div>
+
+    <div class="fs-ih-body" style="grid-template-columns:minmax(0,.98fr) minmax(0,1.32fr);grid-template-rows:auto 1fr;padding-top:2.6vh">
+      <div class="chrome-min" style="margin-bottom:0;grid-column:1 / -1">
+        <div class="l">ACT 04 · 第一学期实现范围</div>
+        <div class="r">17 / 23 · 训练场运行工作台 · 示例数据</div>
+      </div>
+      <div data-anim="line">
+        <div class="fs-kicker" style="margin-bottom:1.6vh">TERM 1 · DELIVERED</div>
+        <h2 class="fs-h1" style="font-size:min(3.5vw,6.2vh)">交付了一个<br>可交互原型。</h2>
+        <p class="fs-lead" style="margin-top:4.2vh;max-width:22em">不是几张静态效果图：所有页面共用同一份运行状态，操作会一致地改变事件、持仓与账户。</p>
+      </div>
+      <div class="fs-ih-stats" data-anim="kpi">
+        <div class="fs-ih-stat">
+          <div class="k">01 · 前端</div>
+          <div class="v">React + TS</div>
+          <div class="d">Vite 构建、路由级代码分割的 Web 原型。</div>
+        </div>
+        <div class="fs-ih-stat">
+          <div class="k">02 · 状态</div>
+          <div class="v">单一 reducer</div>
+          <div class="d">批准、改单、拒绝、成交都由状态机推进。</div>
+        </div>
+        <div class="fs-ih-stat">
+          <div class="k">03 · 留痕</div>
+          <div class="v">事件流</div>
+          <div class="d">决策、介入与账户变化写在同一条轨迹上。</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 16 · 一笔订单是四个事件（S11 dark） ============ -->
+<section class="slide dark" data-layout="S11" data-animate="timeline-walk" data-slide-id="one-order-four-events">
+  <div class="canvas-card">
+    <div class="chrome-min">
+      <div class="l">ACT 04 · 领域模型</div>
+      <div class="r">18 / 23</div>
+    </div>
+
+    <div class="fs-head" data-anim="line" style="gap:1.3vh">
+      <div class="fs-rule"></div>
+      <div class="fs-kicker">PROPOSED → APPROVED → SUBMITTED → FILLED</div>
+      <h2 class="fs-h2">一笔订单，是四个不同事件。</h2>
+      <p class="fs-lead" style="margin-top:2.8vh;max-width:32em">四个事件各有语义与副作用：改一个状态，不该让别的状态跟着乱变。</p>
+    </div>
+
+    <div class="timeline-h" data-anim="up">
+      <div class="tl-row is-4">
+        <div class="th-node up accent" data-anim="node">
+          <span class="dot"></span>
+          <span class="label"><span class="yr">order.proposed</span><span class="name">提案</span><span class="desc">只是意图，账户不变</span></span>
+        </div>
+        <div class="th-node down" data-anim="node">
+          <span class="dot"></span>
+          <span class="label"><span class="yr">order.approved</span><span class="name">批准</span><span class="desc">记下谁批准、是否改量</span></span>
+        </div>
+        <div class="th-node up" data-anim="node">
+          <span class="dot"></span>
+          <span class="label"><span class="yr">order.submitted</span><span class="name">提交</span><span class="desc">进入待撮合，仍未成交</span></span>
+        </div>
+        <div class="th-node down accent" data-anim="node">
+          <span class="dot"></span>
+          <span class="label"><span class="yr">order.filled</span><span class="name">演示撮合</span><span class="desc">现金与持仓此刻才变化</span></span>
+        </div>
+      </div>
+    </div>
+
+    <div data-anim="up" style="flex:0 0 auto;margin-top:3vh;display:grid;grid-template-columns:auto minmax(0,1fr);gap:0 1.6vw;align-items:baseline;border-top:1px solid var(--line);padding-top:1.8vh">
+      <div style="font-family:var(--font-mono);font-size:max(14px,.86vw);font-weight:600;letter-spacing:.06em;color:var(--accent-ink-inverse)">order.rejected</div>
+      <div class="fs-body" style="color:rgba(var(--paper-rgb),.82)">另一条出口：提案被拒绝，账户与持仓完全不变——这条分支在 reducer 里是独立状态。</div>
+    </div>
+
+    <div class="fs-foot" data-anim="up"><span class="fs-tri">→</span> 提交 ≠ 成交：批准只是记录，撮合才改账。</div>
+  </div>
+</section>
+
+<!-- ============ 17 · 现场演示路线（S20 accent 账单） ============ -->
+<section class="slide accent" data-layout="S20" data-animate="stacked-ledger" data-slide-id="demo-walkthrough">
+  <div class="canvas-card">
+    <div class="chrome-min">
+      <div class="l">ACT 04 · 现场演示 · 约 3 分钟</div>
+      <div class="r">19 / 23</div>
+    </div>
+
+    <div class="fs-head" data-anim="line" style="gap:1.3vh">
+      <div class="fs-rule"></div>
+      <div class="fs-kicker" style="color:rgba(var(--accent-on-rgb),.8)">LIVE WALKTHROUGH · 交互原型，示例数据</div>
+      <h2 class="fs-h2" style="color:var(--accent-on)">看着一个决策，变成一条轨迹。</h2>
+    </div>
+
+    <div class="fs-ledger" data-anim="up">
+      <div class="fs-lrow">
+        <div class="t">0:00</div>
+        <div class="h">Agent 卡</div>
+        <div class="d">它是什么角色、配了哪些工具与风控。</div>
+        <div class="tag">STUDIO</div>
+      </div>
+      <div class="fs-lrow">
+        <div class="t">0:35</div>
+        <div class="h">训练任务</div>
+        <div class="d">区间、标的池、模拟时钟停在 09:15。</div>
+        <div class="tag">ARENA</div>
+      </div>
+      <div class="fs-lrow">
+        <div class="t">1:05</div>
+        <div class="h">事件流</div>
+        <div class="d">观察 → 检索证据 → 形成订单提案。</div>
+        <div class="tag">TRACE</div>
+      </div>
+      <div class="fs-lrow">
+        <div class="t">1:50</div>
+        <div class="h">批准或改单</div>
+        <div class="d">人工介入被记录，此刻账户不动。</div>
+        <div class="tag">APPROVAL</div>
+      </div>
+      <div class="fs-lrow">
+        <div class="t">2:35</div>
+        <div class="h">演示撮合</div>
+        <div class="d">现金、持仓与已实现盈亏同时更新。</div>
+        <div class="tag">FILL</div>
+      </div>
+      <div class="fs-lrow" style="border-bottom:0">
+        <div class="t">3:00</div>
+        <div class="h">账户与复盘</div>
+        <div class="d">结果和过程放在一起看，才知道为什么。</div>
+        <div class="tag">REVIEW</div>
+      </div>
+    </div>
+
+    <div style="flex:0 0 auto;margin-top:1.6vh;padding-top:1.6vh;border-top:1px solid rgba(var(--accent-on-rgb),.34);font-family:var(--font-sans);font-size:max(17px,1.04vw);line-height:1.5;color:rgba(var(--accent-on-rgb),.9)">
+      演示验证的是界面工作流程，不是策略盈利能力。
+    </div>
+  </div>
+</section>
+
+<!-- ============ 18 · 已验证 / 未验证（S08 light） ============ -->
+<section class="slide light" data-layout="S08" data-animate="duo-mirror" data-slide-id="verified-vs-unverified">
+  <div class="canvas-card">
+    <div class="chrome-min">
+      <div class="l">ACT 04 · 证据边界</div>
+      <div class="r">20 / 23</div>
+    </div>
+
+    <div class="fs-head" data-anim="line" style="gap:1.3vh">
+      <div class="fs-rule"></div>
+      <div class="fs-kicker">WHAT IS DONE · WHAT IS NOT</div>
+      <h2 class="fs-h2">已验交互，未验收益。</h2>
+    </div>
+
+    <div class="duo-compare fs-duo" data-anim="up">
+      <div class="col">
+        <div class="col-tag">已经做到</div>
+        <div class="col-ttl">流程与状态<br>可以跑通。</div>
+        <ul class="col-list">
+          <li>界面流程：接入 → 配置 → 试炼 → 复盘。</li>
+          <li>状态联动：事件、持仓、账户来自同一份状态。</li>
+          <li>拒绝分支不改变账户，提交与成交分开。</li>
+        </ul>
+        <div class="col-note">可以在现场完整走一遍。</div>
+      </div>
+
+      <span class="vrule"></span>
+
+      <div class="col accent">
+        <div class="col-tag">尚未做到</div>
+        <div class="col-ttl">收益与规则<br>还没有验证。</div>
+        <ul class="col-list">
+          <li>历史 A 股数据后端与撮合引擎。</li>
+          <li>时点证据过滤是否真的生效。</li>
+          <li>完整规则校验与受控对照实验。</li>
+        </ul>
+        <div class="col-note">这些是工程目标，不是已完成项。</div>
+      </div>
+    </div>
+
+    <div class="fs-foot" data-anim="up"><span class="fs-tri">→</span> 界面上出现的收益数字，仅用于演示交互，不是实测表现。</div>
+  </div>
+</section>
+
+<!-- ============ 19 · 下一步怎么验证（S19 four cards） ============ -->
+<section class="slide light" data-layout="S19" data-animate="four-cards" data-slide-id="how-to-prove-it-next">
+  <div class="canvas-card">
+    <div class="chrome-min">
+      <div class="l">ACT 04 · 验证计划</div>
+      <div class="r">21 / 23</div>
+    </div>
+
+    <div class="fs-head" data-anim="line" style="gap:1.5vh">
+      <div class="fs-rule"></div>
+      <div class="fs-kicker">TEST PLAN · 计划，不是已跑出的结果</div>
+      <h2 class="fs-h2">下一步，怎么证明它可信？</h2>
+    </div>
+
+    <div class="fs-four" data-anim="up">
+      <div class="fc">
+        <div class="no">L1 / STATE</div>
+        <div class="h">状态转换</div>
+        <div class="d">批准、改单、拒绝、撮合、暂停、中止，逐条断言。</div>
+        <div class="criterion"><span>通过标准</span><strong>拒绝不改账</strong></div>
+      </div>
+      <div class="fc">
+        <div class="no">L2 / RULES</div>
+        <div class="h">市场规则</div>
+        <div class="d">用固定历史数据集核对 T+1、停牌、涨跌停、费用与组合计算。</div>
+        <div class="criterion"><span>通过标准</span><strong>对齐已知结果</strong></div>
+      </div>
+      <div class="fc">
+        <div class="no">L3 / POINT-IN-TIME</div>
+        <div class="h">时点完整性</div>
+        <div class="d">塞入一条晚于模拟日期的公告，检查它是否真的检索不到。</div>
+        <div class="criterion"><span>通过标准</span><strong>越界证据不可见</strong></div>
+      </div>
+      <div class="fc">
+        <div class="no">L4 / CONTROL</div>
+        <div class="h">受控对照</div>
+        <div class="d">同数据同规则多次运行，记录配置版本与人工介入差异。</div>
+        <div class="criterion"><span>通过标准</span><strong>差异可归因</strong></div>
+      </div>
+    </div>
+
+    <div class="fs-foot" data-anim="up"><span class="fs-tri">→</span> 四层都跑通之后，收益与回撤的对比才有实验意义。</div>
+  </div>
+</section>
+
+<!-- ============ 20 · 结论（S10 split closing） ============ -->
+<section class="slide split" data-layout="S10" data-animate="split-statement" data-slide-id="testable-before-trustworthy">
+  <div class="canvas-card">
+    <div class="split-half">
+      <div class="half b-ink" style="padding:5.2vh 3.4vw 7vh;justify-content:space-between;position:relative;overflow:hidden">
+        <div class="chrome-min" style="margin-bottom:0">
+          <div class="l">结论 · CONCLUSION</div>
+          <div class="r">22 / 23</div>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:3.8vh;min-width:0">
+          <div class="fs-kicker" style="color:var(--accent-ink-inverse)">THE QUESTION CHANGED</div>
+          <h2 style="font-family:var(--font-sans);font-weight:200;font-size:min(5.2vw,9.4vh);line-height:1.1;letter-spacing:-.02em;color:var(--paper);margin:0">让 Agent<br>先可测试，<br>再谈可信。</h2>
+          <p class="fs-body" style="color:rgba(var(--paper-rgb),.78);max-width:22em">问题不再只是「它推得准不准」，而是「我能不能评估它、理解它、在可比条件下改进它」。</p>
+        </div>
+        <div class="fs-meta" style="color:rgba(var(--paper-rgb),.55)">openOutcry · QXU2602</div>
+      </div>
+
+      <div class="half" style="padding:5.2vh 3.4vw 7vh;justify-content:flex-start;gap:3vh">
+        <div class="chrome-min" style="margin-bottom:0">
+          <div class="l">这一学期 · 下一学期</div>
+          <div class="r">3 NOTES</div>
+        </div>
+        <ul class="fs-take">
+          <li>
+            <span class="n">01</span>
+            <div>
+              <div class="h">本期交付</div>
+              <div class="p">需求、架构、目标协议，以及一个可交互、可演示的前端原型。</div>
+            </div>
+          </li>
+          <li>
+            <span class="n">02</span>
+            <div>
+              <div class="h">下期重点</div>
+              <div class="p">接入真实 Agent、历史行情与模拟后端、时点控制、事件持久化。</div>
+            </div>
+          </li>
+          <li class="is-accent">
+            <span class="n">03</span>
+            <div>
+              <div class="h">验收判据</div>
+              <div class="p">能展示一次完整、可核验的运行，和一次解释得清差异的受控重跑。</div>
+            </div>
+          </li>
+        </ul>
+        <div class="fs-meta" style="margin-top:auto;color:var(--text-helper)">→ 完 · 第 22 / 23 页</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 21 · 致谢（SWISS-CLOSING-ASCII） ============ -->
+<section class="slide accent" data-layout="SWISS-CLOSING-ASCII" data-animate="hero" data-slide-id="closing-thank-you">
+  <div class="canvas-card" style="padding-bottom:8vh">
+    <canvas class="ascii-bg" aria-hidden="true"></canvas>
+    <div class="chrome-min">
+      <div class="l">OPENOUTCRY · QXU2602</div>
+      <div class="r">23 / 23 · 致谢</div>
+    </div>
+
+    <div style="flex:1;min-height:0;display:grid;grid-template-rows:1fr auto;gap:2.4vh">
+      <div style="display:flex;flex-direction:column;justify-content:center;gap:3.4vh;min-width:0">
+        <div class="fs-kicker" style="color:rgba(var(--accent-on-rgb),.8);letter-spacing:.16em">FYP FINAL DEFENSE · 2026.12.07</div>
+        <h1 class="fs-close-mark">Thank you.</h1>
+        <div style="font-family:var(--font-sans);font-weight:300;font-size:min(3.2vw,5.6vh);line-height:1.15;color:rgba(var(--accent-on-rgb),.9)">Questions?</div>
+      </div>
+
+      <div style="border-top:1px solid rgba(var(--accent-on-rgb),.26);padding-top:2.2vh;display:flex;justify-content:space-between;align-items:flex-end;gap:2vw">
+        <div class="fs-meta" style="color:rgba(var(--accent-on-rgb),.7)">openOutcry · 面向中国 A 股的 Agent 评测与迭代环境</div>
+        <div class="fs-meta" style="color:rgba(var(--accent-on-rgb),.7)">焦浩楠 · 1155211226 · SHB 1037</div>
+      </div>
+    </div>
+  </div>
+</section>
