@@ -89,7 +89,7 @@ function TaskListGroup({ title, tasks, activeTaskId, onRoute, onOpenTask }: Task
  */
 function RailBody({ onNavigate }: { onNavigate?: () => void }) {
   const { tasks, current, selectTask, liveTasks, liveCurrent, selectLiveTask } = useTraining()
-  const { lang, isEn, theme, toggleLang, toggleTheme, bi } = useLocale()
+  const { lang, isEn, theme, marketColors, toggleLang, toggleTheme, toggleMarketColors, bi } = useLocale()
   const { pathname } = useLocation()
   const navigate = useNavigate()
   const onTraining = pathname === '/training'
@@ -184,9 +184,19 @@ function RailBody({ onNavigate }: { onNavigate?: () => void }) {
         </button>
       </div>
 
-      <div className="rail-foot">
-        <span className="rail-foot-dot" aria-hidden />
-        <span>{bi('交互原型 · 虚构演示数据', 'Interactive Prototype · Mock Data')}</span>
+      <div className="rail-foot justify-between">
+        <span className="inline-flex items-center gap-2">
+          <span className="rail-foot-dot" aria-hidden />
+          <span>{bi('交互原型 · 虚构数据', 'Prototype · Mock')}</span>
+        </span>
+        <button
+          type="button"
+          onClick={toggleMarketColors}
+          className="font-mono text-micro text-[var(--fg-1)] underline decoration-dotted underline-offset-2 hover:text-[var(--fg-0)]"
+          title={bi('切换涨跌配色习惯（红涨绿跌 / 绿涨红跌）', 'Toggle PnL color convention')}
+        >
+          {marketColors === 'cn' ? bi('红涨绿跌', 'Red ↑') : bi('绿涨红跌', 'Green ↑')}
+        </button>
       </div>
     </>
   )

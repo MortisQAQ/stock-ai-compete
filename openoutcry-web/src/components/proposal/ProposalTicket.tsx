@@ -21,7 +21,7 @@ export function ProposalTicket() {
   const kind = useWorkspaceKind()
   const { state, actions } = useRun()
   const { open } = useDialog()
-  const { bi } = useLocale()
+  const { lang, bi } = useLocale()
   const navigate = useNavigate()
   const { proposal } = state
   const decidable = canDecide(state)
@@ -63,7 +63,7 @@ export function ProposalTicket() {
                 : 'ver'
           }
         >
-          {proposalStampOf(state)}
+          {proposalStampOf(state, lang)}
         </Stamp>
       </CardHeader>
 
@@ -92,7 +92,7 @@ export function ProposalTicket() {
           </div>
           <div>
             <dt>{bi('状态', 'Status')}</dt>
-            <dd className="font-mono text-note tracking-normal">{proposalTextOf(state)}</dd>
+            <dd className="font-mono text-note tracking-normal">{proposalTextOf(state, lang)}</dd>
           </div>
         </dl>
 
@@ -191,7 +191,7 @@ export function ProposalTicket() {
           </Button>
         </div>
 
-        <p className="proposal-note">{approvalNote(state)}</p>
+        <p className="proposal-note">{approvalNote(state, lang)}</p>
       </CardContent>
     </Card>
   )

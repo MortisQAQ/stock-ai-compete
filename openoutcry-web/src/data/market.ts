@@ -19,3 +19,11 @@ export const TOOL_USAGE: Array<{ label: string; count: number }> = [
   { label: '计划与自检', count: 6 },
   { label: '风控拒单', count: 3 },
 ]
+
+export const TOOL_USAGE_EN: Array<{ label: string; count: number }> = [
+  { label: 'Quote Snapshot', count: 22 },
+  { label: 'PIT Search', count: 14 },
+  { label: 'Filings & Cashflow', count: 9 },
+  { label: 'Plan & Self-Check', count: 6 },
+  { label: 'Risk Rejections', count: 3 },
+]

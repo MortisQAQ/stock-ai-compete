@@ -10,7 +10,7 @@ import { Button } from '../components/ui/Button'
 import { Card } from '../components/ui/Card'
 import { Stamp } from '../components/ui/Stamp'
 import { agentOf } from '../data/agents'
-import { BENCH_SERIES, NAV_SERIES, TOOL_USAGE } from '../data/market'
+import { BENCH_SERIES, NAV_SERIES, TOOL_USAGE, TOOL_USAGE_EN } from '../data/market'
 import { money, signed, signedPct, tone } from '../lib/format'
 import { useDialog } from '../store/DialogProvider'
 import { useLocale } from '../store/LocaleProvider'
@@ -23,10 +23,10 @@ export function ReviewPage() {
   const { state, totals, actions } = useRun('training')
   const { compareRuns } = useTraining()
   const { open } = useDialog()
-  const { isEn, bi } = useLocale()
+  const { lang, isEn, bi } = useLocale()
   const navigate = useNavigate()
   const agent = agentOf(state.agent)
-  const band = accountBandItems(state, totals)
+  const band = accountBandItems(state, totals, lang)
 
   const facts: Array<[string, string]> = [
     [bi('委托编号与口径', 'Mandate & Universe'), `${state.mandateNo ?? '№ 0042'} · ${state.universeLabel ?? '沪深 300 成分池'}`],
@@ -206,7 +206,7 @@ export function ReviewPage() {
             <span>{bi('受控工具调用分布', 'Sandboxed Tool Calls')}</span>
           </div>
           <div className="chart-bd">
-            <ToolUsageChart data={TOOL_USAGE} />
+            <ToolUsageChart data={isEn ? TOOL_USAGE_EN : TOOL_USAGE} />
           </div>
         </div>
 

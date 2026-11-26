@@ -25,74 +25,97 @@ export const TRAINING_STATUS_TEXT_EN = {
 
 /* ---------------- 账户表头 ---------------- */
 
-export function accountBandItems(state: RunState, totals: Totals): BandItem[] {
+export function accountBandItems(state: RunState, totals: Totals, lang: 'zh' | 'en' = 'zh'): BandItem[] {
   const cashPct = totals.equity ? ((state.cash / totals.equity) * 100).toFixed(1) : '0.0'
   const netPct = state.initial ? ((totals.net / state.initial) * 100).toFixed(2) : '0.00'
+  const en = lang === 'en'
 
   if (state.kind === 'live') {
     return [
-      { label: '总资产（估算）', value: money(totals.equity), note: state.syncLabel ?? '手动维护' },
       {
-        label: '累计净收益',
+        label: en ? 'Mirror Equity (Est.)' : '总资产（估算）',
+        value: money(totals.equity),
+        note: en ? 'Manual mirror' : (state.syncLabel ?? '手动维护'),
+      },
+      {
+        label: en ? 'Net PnL' : '累计净收益',
         value: signed(totals.net),
-        note: netPct + '% · 已扣费用',
+        note: netPct + (en ? '% · net of fees' : '% · 已扣费用'),
         tone: totals.net >= 0 ? 'up' : 'dn',
       },
       {
-        label: '可用现金',
+        label: en ? 'Available Cash' : '可用现金',
         value: money(state.cash),
-        note: '占总资产 ' + cashPct + '%',
+        note: (en ? 'Share ' : '占总资产 ') + cashPct + '%',
       },
       {
-        label: '持仓市值',
+        label: en ? 'Market Value' : '持仓市值',
         value: money(totals.market),
-        note: state.holdings.length + ' 个标的 · 实时参考',
+        note: state.holdings.length + (en ? ' positions · live ref' : ' 个标的 · 实时参考'),
       },
     ]
   }
 
   return [
-    { label: '账户净值', value: money(totals.equity), note: '初始资金 ' + money(state.initial) },
     {
-      label: '累计净收益',
+      label: en ? 'Account Equity' : '账户净值',
+      value: money(totals.equity),
+      note: (en ? 'Initial ' : '初始资金 ') + money(state.initial),
+    },
+    {
+      label: en ? 'Net PnL' : '累计净收益',
       value: signed(totals.net),
-      note: netPct + '% · 已扣费用',
+      note: netPct + (en ? '% · net of fees' : '% · 已扣费用'),
       tone: totals.net >= 0 ? 'up' : 'dn',
     },
     {
-      label: '可用现金',
+      label: en ? 'Available Cash' : '可用现金',
       value: money(state.cash),
-      note: '占总资产 ' + cashPct + '%',
+      note: (en ? 'Share ' : '占总资产 ') + cashPct + '%',
     },
-    { label: '持仓市值', value: money(totals.market), note: state.holdings.length + ' 个标的 · 当前估值' },
+    {
+      label: en ? 'Market Value' : '持仓市值',
+      value: money(totals.market),
+      note: state.holdings.length + (en ? ' positions · mark-to-market' : ' 个标的 · 当前估值'),
+    },
   ]
 }
 
 /** 已结束任务用冻结档案，不读实时账户 */
-export function archiveBandItems(task: TrainingTask): BandItem[] {
+export function archiveBandItems(task: TrainingTask, lang: 'zh' | 'en' = 'zh'): BandItem[] {
   const archive = task.archive
   if (!archive) return []
   const liveArchive = task.kind === 'live'
+  const en = lang === 'en'
   return [
-    { label: liveArchive ? '总资产快照' : '账户净值', value: money(archive.equity), note: liveArchive ? '归档时镜像' : '任务结束时冻结' },
     {
-      label: '累计净收益',
+      label: liveArchive ? (en ? 'Snapshot Equity' : '总资产快照') : (en ? 'Final Equity' : '账户净值'),
+      value: money(archive.equity),
+      note: liveArchive ? (en ? 'Mirror archive' : '归档时镜像') : (en ? 'Frozen at close' : '任务结束时冻结'),
+    },
+    {
+      label: en ? 'Net PnL' : '累计净收益',
       value: signed(archive.net),
-      note: liveArchive ? '已扣费用 · 实盘记录' : '已扣费用 · 含全部平仓',
+      note: liveArchive ? (en ? 'Net of fees · live' : '已扣费用 · 实盘记录') : (en ? 'Net of fees' : '已扣费用 · 含全部平仓'),
       tone: archive.net >= 0 ? 'up' : 'dn',
     },
-    { label: '可用现金', value: money(archive.cash), note: '结束时快照' },
+    { label: en ? 'Cash' : '可用现金', value: money(archive.cash), note: en ? 'End snapshot' : '结束时快照' },
     {
-      label: '持仓市值',
+      label: en ? 'Market Value' : '持仓市值',
       value: money(archive.market),
-      note: archive.market === 0 ? '已全部平仓' : '结束时快照',
+      note: archive.market === 0 ? (en ? 'Fully closed' : '已全部平仓') : (en ? 'End snapshot' : '结束时快照'),
     },
   ]
 }
 
 /** 当前任务取实时快照，非当前任务取冻结档案 */
-export function bandItemsFor(task: TrainingTask, state: RunState, totals: Totals): BandItem[] {
-  return task.live ? accountBandItems(state, totals) : archiveBandItems(task)
+export function bandItemsFor(
+  task: TrainingTask,
+  state: RunState,
+  totals: Totals,
+  lang: 'zh' | 'en' = 'zh',
+): BandItem[] {
+  return task.live ? accountBandItems(state, totals, lang) : archiveBandItems(task, lang)
 }
 
 /* ---------------- 持仓行 ---------------- */

@@ -153,9 +153,9 @@ export function WorkbenchBody({ task }: { task: TrainingTask }) {
  */
 export function WorkbenchPane({ task, className }: { task: TrainingTask; className?: string }) {
   const { state, totals } = useRun()
-  const { isEn, bi } = useLocale()
+  const { lang, isEn, bi } = useLocale()
   const navigate = useNavigate()
-  const band = bandItemsFor(task, state, totals)
+  const band = bandItemsFor(task, state, totals, lang)
   const isLive = state.kind === 'live'
   const statusMap = isEn ? TRAINING_STATUS_TEXT_EN : TRAINING_STATUS_TEXT
   const phase: TrainingPhase = state.phase ?? 'pre_market'
