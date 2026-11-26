@@ -15,7 +15,7 @@
    3. 涨跌用 --up 红 / --down 翠绿，且只出现在数字上。
       中性文字一律 --fg-*，一屏里信号色不超过三种。
    4. 字色对比度 ≥ 4.5:1（WCAG AA），控件轮廓 ≥ 3:1（1.4.11）。
-      字号只准用 --fs-* 令牌，下限 13px 不可跌破。
+      字号只准用 --fs-* 令牌，下限 14px 不可跌破（完整规范见 docs/design-typography.md）。
    ============================================================ */
 
 /* ---------- 字体 ----------
@@ -44,18 +44,15 @@
   --bg-3: #16241c;
   --well: #040705;
 
-  /* ---------- 文字：偏绿的白 ----------
-     纯白在绿底上会发青，主文用 #f0f2ed（暖白偏绿）才压得住。 */
+  /* ---------- 文字：偏绿的白（微提次级对比度，保障教室投影可读） ---------- */
   --fg-0: #f0f2ed;
-  --fg-1: #97a393;
-  --fg-2: #7c8a79;
+  --fg-1: #a5b2a1;
+  --fg-2: #8a9987;
 
-  /* ---------- 线 ----------
-     --line 是中性的，--line-lime 才是「有身份的那根」。
-     页面里绝大多数线应该用中性线，酸橙线只出现在分节与选中态。 */
-  --line: rgba(240, 242, 237, 0.1);
-  --line-soft: rgba(240, 242, 237, 0.055);
-  --line-strong: rgba(240, 242, 237, 0.24);
+  /* ---------- 线 ---------- */
+  --line: rgba(240, 242, 237, 0.13);
+  --line-soft: rgba(240, 242, 237, 0.085);
+  --line-strong: rgba(240, 242, 237, 0.28);
   --line-lime: rgba(180, 238, 131, 0.28);
   --line-lime-soft: rgba(180, 238, 131, 0.13);
   /* 0.34 在 --well(#040705) 上只有 2.79:1，够不到 1.4.11 的 3:1；
@@ -154,7 +151,7 @@
   /* ---------- 版式尺度 ----------
      布局参考 DSH：左侧一条常驻栏（页面索引 + 训练任务树），
      正文拿到剩余整宽。两条顶部横栏已整体删除。 */
-  --rail: 268px;
+  --rail: 280px;
   /* 顶栏已移除，--mast 归零，留名兼容旧引用 */
   --mast: 0px;
 
@@ -169,31 +166,98 @@
   --sp-8: 80px;
 
   /* 控件高度 */
-  --control-h-xs: 24px;
-  --control-h-sm: 30px;
-  --control-h-md: 36px;
-  --control-h-lg: 44px;
+  --control-h-xs: 28px;
+  --control-h-sm: 34px;
+  --control-h-md: 40px;
+  --control-h-lg: 46px;
 
   --ease-out-quart: cubic-bezier(0.25, 1, 0.5, 1);
 
-  /* ---------- 字号 ----------
-     基准对齐 DSH：正文 14px、说明 13px、标题 17–28px。
-     「密」不靠缩字号解决 —— 缩字只会更难读；密度交给留白（--sp-*）
-     与灰阶层级（--fg-0 / --fg-1 / --fg-2）。
-     硬下限仍是 13px，见 scripts/check-type-floor.mjs。 */
-  --fs-min: 13px;
-  --fs-display: clamp(30px, 1.5vw + 23px, 44px);
-  --fs-h1: clamp(21px, 0.55vw + 18.6px, 28px);
-  --fs-h2: clamp(16px, 0.2vw + 15.2px, 18px);
-  --fs-kpi: clamp(18px, 0.5vw + 15.6px, 24px);
-  --fs-row: clamp(15px, 0.15vw + 14.4px, 16px);
-  --fs-body: clamp(14px, 0.1vw + 13.6px, 15px);
-  --fs-sm: clamp(13px, 0.08vw + 12.8px, 13.5px);
-  --fs-data: clamp(13px, 0.1vw + 12.8px, 14px);
-  --fs-micro: 13px;
+  /* ---------- 字号（v3 · Signal Grid 高可读标尺） ----------
+     基准：1440 桌面正文 18px、说明 16.2px、数据 17px、微标签 14.6px。
+     硬下限 14px 不可跌破（完整规范见 docs/design-typography.md，校验见 scripts/check-type-floor.mjs）。
+     「密」不靠缩字号解决 —— 密度交给留白（--sp-*）与灰阶层级（--fg-0 / --fg-1 / --fg-2）。 */
+  --fs-min: 14px;
+  --fs-display: clamp(36px, 1.3vw + 29.3px, 52px);
+  --fs-h1: clamp(28px, 0.7vw + 23.9px, 36px);
+  --fs-h2: clamp(20px, 0.32vw + 18.4px, 24px);
+  --fs-kpi: clamp(22px, 0.55vw + 18.5px, 29px);
+  --fs-row: clamp(18px, 0.22vw + 16.8px, 21px);
+  --fs-body: clamp(16.5px, 0.16vw + 15.7px, 18.5px);
+  --fs-data: clamp(16px, 0.14vw + 15px, 17.5px);
+  --fs-sm: clamp(15px, 0.14vw + 14.2px, 16.5px);
+  --fs-micro: clamp(14px, 0.08vw + 13.4px, 15px);
 
-  --lh-body: 1.62;
-  --lh-sm: 1.5;
+  --lh-body: 1.65;
+  --lh-sm: 1.55;
   --lh-micro: 1.35;
   --lh-data: 1.25;
+}
+
+/* ============================================================
+   国际涨跌习惯（英文模式默认：绿涨红跌）
+   ============================================================ */
+:root[data-market-colors='intl'] {
+  --up: #2ed47f;
+  --up-soft: rgba(46, 212, 127, 0.14);
+  --down: #ff5c52;
+  --down-soft: rgba(255, 92, 82, 0.14);
+}
+
+/* ============================================================
+   高对比度亮色投影主题（SHB 1037 教室演示推荐：?theme=light）
+   ============================================================ */
+:root[data-theme='light'] {
+  color-scheme: light;
+
+  --bg-0: #f3f5f1;
+  --bg-1: #ffffff;
+  --bg-2: #e9eee6;
+  --bg-3: #dce5d8;
+  --well: #e3eae0;
+
+  --fg-0: #132119;
+  --fg-1: #35493d;
+  --fg-2: #54695c;
+
+  --line: rgba(19, 33, 25, 0.15);
+  --line-soft: rgba(19, 33, 25, 0.09);
+  --line-strong: rgba(19, 33, 25, 0.3);
+  --line-lime: rgba(28, 107, 64, 0.38);
+  --line-lime-soft: rgba(28, 107, 64, 0.18);
+  --control-line: rgba(19, 33, 25, 0.38);
+
+  --lime: #1c6b40;
+  --lime-dim: #2b7a4e;
+  --lime-soft: rgba(28, 107, 64, 0.11);
+  --lime-glow: rgba(28, 107, 64, 0.2);
+
+  --accent: #0b6ea4;
+  --accent-hover: #085985;
+  --accent-soft: rgba(11, 110, 164, 0.12);
+
+  --up: #c0392b;
+  --up-soft: rgba(192, 57, 43, 0.11);
+  --down: #15803d;
+  --down-soft: rgba(21, 128, 61, 0.11);
+  --warn: #b45309;
+  --warn-soft: rgba(180, 83, 9, 0.12);
+
+  --chart-agent: #1c6b40;
+  --chart-bench: #64746b;
+  --chart-drawdown: #b45309;
+  --chart-grid: rgba(19, 33, 25, 0.08);
+  --chart-zero: rgba(19, 33, 25, 0.28);
+  --chart-label: #4a5e52;
+  --chart-value: #132119;
+  --chart-tool: #35493d;
+
+  --shadow-pop: 0 20px 50px rgba(19, 33, 25, 0.18);
+}
+
+:root[data-theme='light'][data-market-colors='intl'] {
+  --up: #15803d;
+  --up-soft: rgba(21, 128, 61, 0.11);
+  --down: #c0392b;
+  --down-soft: rgba(192, 57, 43, 0.11);
 }
