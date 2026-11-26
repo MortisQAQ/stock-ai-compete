@@ -4,20 +4,20 @@ import { Outlet, useLocation, useNavigation } from 'react-router-dom'
 import { Sidebar } from './Sidebar'
 import { Toasts } from '../ui/Toasts'
 import { Dialogs } from '../dialogs/Dialogs'
-import { TrainingProvider } from '../../store/TrainingProvider'
+import { WorkbenchScopeProvider } from '../../store/RunProvider'
 import { cn } from '../../lib/utils'
 
 /**
- * 应用外框 = 左栏（页面索引 + 训练任务树）+ 内容区。
+ * 应用外框 = 左栏（页面索引 + 实战/训练任务树）+ 内容区。
  *
  * 布局参考 DSH：导航竖排进左栏，正文独占剩余宽度。
- * 原来的两条顶部横栏（品牌行 / 站点索引行）已整体删除 ——
- * 它们常驻吃掉 113px 视口高度，却只放六个两字入口。
+ * 历史训练场与实战工作台通过 WorkbenchScopeProvider 共享同一套工作台组件。
  */
 export function AppShell() {
   const { pathname } = useLocation()
   const navigation = useNavigation()
-  const bench = pathname === '/training'
+  const isLive = pathname === '/live'
+  const bench = pathname === '/training' || isLive
   const busy = navigation.state !== 'idle'
 
   useEffect(() => {
@@ -25,7 +25,7 @@ export function AppShell() {
   }, [pathname])
 
   return (
-    <TrainingProvider>
+    <WorkbenchScopeProvider kind={isLive ? 'live' : 'training'}>
       {/* 路由级懒加载：切页时等 chunk 才有内容，给一条细进度条，避免"点了没反应" */}
       {busy ? (
         <div
@@ -51,6 +51,6 @@ export function AppShell() {
 
       <Toasts />
       <Dialogs />
-    </TrainingProvider>
+    </WorkbenchScopeProvider>
   )
 }

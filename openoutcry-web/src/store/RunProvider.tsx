@@ -1,5 +1,6 @@
-import { createContext, useContext, useMemo, useReducer } from 'react'
+import { createContext, useContext, useMemo } from 'react'
 import type { ReactNode } from 'react'
+import { create } from 'zustand'
 
 import type {
   AgentId,
@@ -16,7 +17,7 @@ import { createInitialLiveRun } from '../data/live'
 import { agentOf } from '../data/agents'
 import { totalsOf, runStatusLabel } from './derive'
 import { round } from '../lib/format'
-import { useToast, type ToastOptions } from './ToastProvider'
+import { useToastStore } from './ToastProvider'
 
 type Action =
   | { type: 'switchAgent'; agent: AgentId }
@@ -508,12 +509,37 @@ export interface RunContextValue {
   actions: RunActions
 }
 
-interface DualRunStore {
-  training: RunContextValue
-  live: RunContextValue
+export interface RunStoreState {
+  training: RunState
+  live: RunState
+  switchAgent: (id: AgentId, scope?: WorkspaceKind) => void
+  applyMandate: (mandate: MandatePayload, scope?: WorkspaceKind) => void
+  deployAgentToLive: (id: AgentId) => void
+  approve: (
+    quantity: number,
+    actor?: '人工确认' | '人工修改后批准' | 'Agent 自主提交',
+    scope?: WorkspaceKind,
+  ) => void
+  undoApprove: (scope?: WorkspaceKind) => void
+  reject: (scope?: WorkspaceKind) => void
+  match: (scope?: WorkspaceKind) => void
+  advanceClose: (scope?: WorkspaceKind) => void
+  completeGoalRun: (scope?: WorkspaceKind) => void
+  recordLiveFill: (
+    quantity: number,
+    price: number,
+    actor?: '按建议执行' | '按实际修改记录',
+    scope?: WorkspaceKind,
+  ) => void
+  upsertHolding: (holding: Omit<Holding, 'entryFee'>, scope?: WorkspaceKind) => void
+  removeHolding: (name: string, scope?: WorkspaceKind) => void
+  setCash: (cash: number, scope?: WorkspaceKind) => void
+  togglePause: (scope?: WorkspaceKind) => void
+  abort: (scope?: WorkspaceKind) => void
+  sendGuidance: (text: string, scope?: WorkspaceKind) => void
+  enterGoalMode: (scope?: WorkspaceKind) => void
 }
 
-const DualRunContext = createContext<DualRunStore | null>(null)
 const WorkbenchScopeContext = createContext<WorkspaceKind>('training')
 
 /** 标识当前子树属于历史训练场还是实战工作台；默认 training */
@@ -535,134 +561,152 @@ export function useWorkspaceKind(): WorkspaceKind {
 const INITIAL_RUN = createInitialRun('native')
 const INITIAL_LIVE_RUN = createInitialLiveRun('native')
 
-function makeActions(
-  dispatch: React.Dispatch<Action>,
-  dispatchLive: React.Dispatch<Action>,
-  kind: WorkspaceKind,
-  notify: (text: string, tone?: 'info' | 'success' | 'warn', options?: ToastOptions) => void,
-): RunActions {
-  const isLive = kind === 'live'
+export const useRunStore = create<RunStoreState>((set) => {
+  const dispatchScope = (scope: WorkspaceKind, action: Action) => {
+    set((store) => {
+      const prev = store[scope]
+      const next = reducer(prev, action)
+      return next === prev ? store : { [scope]: next }
+    })
+  }
+
   return {
-    switchAgent: (id) => dispatch({ type: 'switchAgent', agent: id }),
-    applyMandate: (mandate) => {
-      dispatch({ type: 'applyMandate', mandate })
-      notify(`已开具委托单 ${mandate.no} 并同步团队与口径`, 'success')
+    training: INITIAL_RUN,
+    live: INITIAL_LIVE_RUN,
+
+    switchAgent: (id, scope = 'training') => {
+      dispatchScope(scope, { type: 'switchAgent', agent: id })
     },
+
+    applyMandate: (mandate, scope = 'training') => {
+      dispatchScope(scope, { type: 'applyMandate', mandate })
+      useToastStore.getState().notify(`已开具委托单 ${mandate.no} 并同步团队与口径`, 'success')
+    },
+
     deployAgentToLive: (id) => {
-      dispatchLive({ type: 'bindAgent', agent: id })
-      notify('已将该 Agent 应用到实战工作台', 'success')
+      dispatchScope('live', { type: 'bindAgent', agent: id })
+      useToastStore.getState().notify('已将该 Agent 应用到实战工作台', 'success')
     },
-    approve: (quantity, actor = '人工确认') => {
-      dispatch({ type: 'approve', quantity, actor })
-      notify('已提交待开盘撮合（账户尚未变化）', 'info', {
+
+    approve: (quantity, actor = '人工确认', scope = 'training') => {
+      dispatchScope(scope, { type: 'approve', quantity, actor })
+      useToastStore.getState().notify('已提交待开盘撮合（账户尚未变化）', 'info', {
         actionLabel: '撤销',
         onAction: () => {
-          dispatch({ type: 'undoApprove' })
-          notify('已撤销提交，提案回到待确认态', 'warn')
+          dispatchScope(scope, { type: 'undoApprove' })
+          useToastStore.getState().notify('已撤销提交，提案回到待确认态', 'warn')
         },
         durationMs: 3600,
       })
     },
-    undoApprove: () => {
-      dispatch({ type: 'undoApprove' })
-      notify('已撤销提交，提案回到待确认态', 'warn')
+
+    undoApprove: (scope = 'training') => {
+      dispatchScope(scope, { type: 'undoApprove' })
+      useToastStore.getState().notify('已撤销提交，提案回到待确认态', 'warn')
     },
-    reject: () => {
-      dispatch({ type: 'reject' })
-      notify(isLive ? '已标记为暂不采纳' : '已拒绝该提案', 'warn')
+
+    reject: (scope = 'training') => {
+      dispatchScope(scope, { type: 'reject' })
+      useToastStore.getState().notify(scope === 'live' ? '已标记为暂不采纳' : '已拒绝该提案', 'warn')
     },
-    match: () => {
-      dispatch({ type: 'fill' })
-      notify('09:30 开盘撮合完成，账本已刷新', 'success')
+
+    match: (scope = 'training') => {
+      dispatchScope(scope, { type: 'fill' })
+      useToastStore.getState().notify('09:30 开盘撮合完成，账本已刷新', 'success')
     },
-    advanceClose: () => {
-      dispatch({ type: 'advanceClose' })
-      notify('已推进至 15:00 尾盘结算', 'success')
+
+    advanceClose: (scope = 'training') => {
+      dispatchScope(scope, { type: 'advanceClose' })
+      useToastStore.getState().notify('已推进至 15:00 尾盘结算', 'success')
     },
-    completeGoalRun: () => {
-      dispatch({ type: 'completeGoalRun' })
-      notify('已按 /goal 模式完成剩余交易日', 'success')
+
+    completeGoalRun: (scope = 'training') => {
+      dispatchScope(scope, { type: 'completeGoalRun' })
+      useToastStore.getState().notify('已按 /goal 模式完成剩余交易日', 'success')
     },
-    recordLiveFill: (quantity, price, actor = '按建议执行') => {
-      dispatch({ type: 'recordLiveFill', quantity, price, actor })
-      notify('已记录实盘成交并更新镜像账本', 'success')
+
+    recordLiveFill: (quantity, price, actor = '按建议执行', scope = 'live') => {
+      dispatchScope(scope, { type: 'recordLiveFill', quantity, price, actor })
+      useToastStore.getState().notify('已记录实盘成交并更新镜像账本', 'success')
     },
-    upsertHolding: (holding) => {
-      dispatch({ type: 'upsertHolding', holding })
-      notify('镜像持仓已更新', 'success')
+
+    upsertHolding: (holding, scope = 'live') => {
+      dispatchScope(scope, { type: 'upsertHolding', holding })
+      useToastStore.getState().notify('镜像持仓已更新', 'success')
     },
-    removeHolding: (name) => {
-      dispatch({ type: 'removeHolding', name })
-      notify('已移除持仓 ' + name, 'warn')
+
+    removeHolding: (name, scope = 'live') => {
+      dispatchScope(scope, { type: 'removeHolding', name })
+      useToastStore.getState().notify('已移除持仓 ' + name, 'warn')
     },
-    setCash: (cash) => {
-      dispatch({ type: 'setCash', cash })
-      notify('可用现金已更新', 'success')
+
+    setCash: (cash, scope = 'live') => {
+      dispatchScope(scope, { type: 'setCash', cash })
+      useToastStore.getState().notify('可用现金已更新', 'success')
     },
-    togglePause: () => dispatch({ type: 'togglePause' }),
-    abort: () => {
-      dispatch({ type: 'abort' })
-      notify('运行已中止', 'warn')
+
+    togglePause: (scope = 'training') => {
+      dispatchScope(scope, { type: 'togglePause' })
     },
-    sendGuidance: (text: string) => {
-      dispatch({ type: 'guidance', text })
-      notify(isLive ? '已发送追问' : '指导已追加', 'success')
+
+    abort: (scope = 'training') => {
+      dispatchScope(scope, { type: 'abort' })
+      useToastStore.getState().notify('运行已中止', 'warn')
     },
-    enterGoalMode: () => {
-      if (isLive) {
-        notify('实战工作台禁用自动下单推进', 'warn')
+
+    sendGuidance: (text, scope = 'training') => {
+      dispatchScope(scope, { type: 'guidance', text })
+      useToastStore.getState().notify(scope === 'live' ? '已发送追问' : '指导已追加', 'success')
+    },
+
+    enterGoalMode: (scope = 'training') => {
+      if (scope === 'live') {
+        useToastStore.getState().notify('实战工作台禁用自动下单推进', 'warn')
         return
       }
-      dispatch({ type: 'goalMode' })
-      notify('已进入自主推进', 'success')
+      dispatchScope(scope, { type: 'goalMode' })
+      useToastStore.getState().notify('已进入自主推进', 'success')
     },
+  }
+})
+
+function bindScopeActions(scope: WorkspaceKind): RunActions {
+  return {
+    switchAgent: (id) => useRunStore.getState().switchAgent(id, scope),
+    applyMandate: (mandate) => useRunStore.getState().applyMandate(mandate, scope),
+    deployAgentToLive: (id) => useRunStore.getState().deployAgentToLive(id),
+    approve: (quantity, actor) => useRunStore.getState().approve(quantity, actor, scope),
+    undoApprove: () => useRunStore.getState().undoApprove(scope),
+    reject: () => useRunStore.getState().reject(scope),
+    match: () => useRunStore.getState().match(scope),
+    advanceClose: () => useRunStore.getState().advanceClose(scope),
+    completeGoalRun: () => useRunStore.getState().completeGoalRun(scope),
+    recordLiveFill: (quantity, price, actor) => useRunStore.getState().recordLiveFill(quantity, price, actor, scope),
+    upsertHolding: (holding) => useRunStore.getState().upsertHolding(holding, scope),
+    removeHolding: (name) => useRunStore.getState().removeHolding(name, scope),
+    setCash: (cash) => useRunStore.getState().setCash(cash, scope),
+    togglePause: () => useRunStore.getState().togglePause(scope),
+    abort: () => useRunStore.getState().abort(scope),
+    sendGuidance: (text) => useRunStore.getState().sendGuidance(text, scope),
+    enterGoalMode: () => useRunStore.getState().enterGoalMode(scope),
   }
 }
 
-export function RunProvider({ children }: { children: ReactNode }) {
-  const [trainingState, dispatchTraining] = useReducer(reducer, INITIAL_RUN)
-  const [liveState, dispatchLive] = useReducer(reducer, INITIAL_LIVE_RUN)
-  const { notify } = useToast()
-
-  const trainingActions = useMemo(
-    () => makeActions(dispatchTraining, dispatchLive, 'training', notify),
-    [notify],
-  )
-  const liveActions = useMemo(
-    () => makeActions(dispatchLive, dispatchLive, 'live', notify),
-    [notify],
-  )
-
-  const trainingTotals = useMemo(() => totalsOf(trainingState), [trainingState])
-  const trainingStatus = useMemo(() => runStatusLabel(trainingState), [trainingState])
-
-  const liveTotals = useMemo(() => totalsOf(liveState), [liveState])
-  const liveStatus = useMemo(() => runStatusLabel(liveState), [liveState])
-
-  const store = useMemo<DualRunStore>(
-    () => ({
-      training: {
-        state: trainingState,
-        totals: trainingTotals,
-        status: trainingStatus,
-        actions: trainingActions,
-      },
-      live: {
-        state: liveState,
-        totals: liveTotals,
-        status: liveStatus,
-        actions: liveActions,
-      },
-    }),
-    [trainingState, trainingTotals, trainingStatus, trainingActions, liveState, liveTotals, liveStatus, liveActions],
-  )
-
-  return <DualRunContext.Provider value={store}>{children}</DualRunContext.Provider>
+const SCOPED_ACTIONS: Record<WorkspaceKind, RunActions> = {
+  training: bindScopeActions('training'),
+  live: bindScopeActions('live'),
 }
 
 export function useRun(explicitScope?: WorkspaceKind): RunContextValue {
-  const store = useContext(DualRunContext)
-  if (!store) throw new Error('useRun 必须在 RunProvider 内部使用')
   const ambientScope = useContext(WorkbenchScopeContext)
-  return store[explicitScope ?? ambientScope]
+  const scope = explicitScope ?? ambientScope
+  const state = useRunStore((s) => s[scope])
+  const totals = useMemo(() => totalsOf(state), [state])
+  const status = useMemo(() => runStatusLabel(state), [state])
+  const actions = SCOPED_ACTIONS[scope]
+
+  return useMemo<RunContextValue>(
+    () => ({ state, totals, status, actions }),
+    [state, totals, status, actions],
+  )
 }

@@ -1,10 +1,11 @@
-import { createContext, useCallback, useContext, useEffect, useMemo, useState, type ReactNode } from 'react'
+import { useCallback, useMemo } from 'react'
+import { create } from 'zustand'
 
 export type Lang = 'zh' | 'en'
 export type ThemeMode = 'dark' | 'light'
 export type MarketColors = 'cn' | 'intl'
 
-interface LocaleContextValue {
+export interface LocaleContextValue {
   lang: Lang
   isEn: boolean
   theme: ThemeMode
@@ -19,7 +20,17 @@ interface LocaleContextValue {
   bi: (zh: string, en: string) => string
 }
 
-const LocaleCtx = createContext<LocaleContextValue | null>(null)
+interface LocaleStoreState {
+  lang: Lang
+  theme: ThemeMode
+  marketColors: MarketColors
+  setLang: (next: Lang) => void
+  toggleLang: () => void
+  setTheme: (next: ThemeMode) => void
+  toggleTheme: () => void
+  setMarketColors: (next: MarketColors) => void
+  toggleMarketColors: () => void
+}
 
 function readQueryParam(key: string): string | null {
   if (typeof window === 'undefined') return null
@@ -53,89 +64,79 @@ function initialTheme(): ThemeMode {
   return 'dark'
 }
 
-export function LocaleProvider({ children }: { children: ReactNode }) {
-  const [lang, setLangState] = useState<Lang>(initialLang)
-  const [theme, setThemeState] = useState<ThemeMode>(initialTheme)
-  const [marketColors, setMarketColorsState] = useState<MarketColors>(() =>
-    initialLang() === 'en' ? 'intl' : 'cn',
-  )
+const bootLang = initialLang()
 
-  const setLang = useCallback((next: Lang) => {
-    setLangState(next)
-    setMarketColorsState(next === 'en' ? 'intl' : 'cn')
+export const useLocaleStore = create<LocaleStoreState>((set, get) => ({
+  lang: bootLang,
+  theme: initialTheme(),
+  marketColors: bootLang === 'en' ? 'intl' : 'cn',
+
+  setLang: (next: Lang) => {
+    set({
+      lang: next,
+      marketColors: next === 'en' ? 'intl' : 'cn',
+    })
     if (typeof window !== 'undefined') {
       window.localStorage.setItem('openoutcry.lang', next)
     }
-  }, [])
+  },
 
-  const toggleLang = useCallback(() => {
-    setLang(lang === 'zh' ? 'en' : 'zh')
-  }, [lang, setLang])
+  toggleLang: () => {
+    get().setLang(get().lang === 'zh' ? 'en' : 'zh')
+  },
 
-  const setTheme = useCallback((next: ThemeMode) => {
-    setThemeState(next)
+  setTheme: (next: ThemeMode) => {
+    set({ theme: next })
     if (typeof window !== 'undefined') {
       window.localStorage.setItem('openoutcry.theme', next)
     }
-  }, [])
+  },
 
-  const toggleTheme = useCallback(() => {
-    setTheme(theme === 'dark' ? 'light' : 'dark')
-  }, [theme, setTheme])
+  toggleTheme: () => {
+    get().setTheme(get().theme === 'dark' ? 'light' : 'dark')
+  },
 
-  const setMarketColors = useCallback((next: MarketColors) => {
-    setMarketColorsState(next)
-  }, [])
+  setMarketColors: (next: MarketColors) => {
+    set({ marketColors: next })
+  },
 
-  const toggleMarketColors = useCallback(() => {
-    setMarketColorsState((prev) => (prev === 'cn' ? 'intl' : 'cn'))
-  }, [])
+  toggleMarketColors: () => {
+    set((state) => ({ marketColors: state.marketColors === 'cn' ? 'intl' : 'cn' }))
+  },
+}))
 
-  const bi = useCallback((zh: string, en: string) => (lang === 'en' ? en : zh), [lang])
-
-  useEffect(() => {
-    if (typeof document === 'undefined') return
-    document.documentElement.lang = lang === 'en' ? 'en' : 'zh-CN'
-    document.documentElement.dataset.theme = theme
-    document.documentElement.dataset.marketColors = marketColors
-  }, [lang, theme, marketColors])
-
-  const value = useMemo<LocaleContextValue>(
-    () => ({
-      lang,
-      isEn: lang === 'en',
-      theme,
-      marketColors,
-      setLang,
-      toggleLang,
-      setTheme,
-      toggleTheme,
-      setMarketColors,
-      toggleMarketColors,
-      bi,
-    }),
-    [lang, theme, marketColors, setLang, toggleLang, setTheme, toggleTheme, setMarketColors, toggleMarketColors, bi],
-  )
-
-  return <LocaleCtx.Provider value={value}>{children}</LocaleCtx.Provider>
+export function syncLocaleDom(): void {
+  if (typeof document === 'undefined') return
+  const { lang, theme, marketColors } = useLocaleStore.getState()
+  document.documentElement.lang = lang === 'en' ? 'en' : 'zh-CN'
+  document.documentElement.dataset.theme = theme
+  document.documentElement.dataset.marketColors = marketColors
 }
 
+useLocaleStore.subscribe(() => {
+  syncLocaleDom()
+})
+
+syncLocaleDom()
+
 export function useLocale(): LocaleContextValue {
-  const ctx = useContext(LocaleCtx)
-  if (!ctx) {
-    return {
-      lang: 'zh',
-      isEn: false,
-      theme: 'dark',
-      marketColors: 'cn',
-      setLang: () => {},
-      toggleLang: () => {},
-      setTheme: () => {},
-      toggleTheme: () => {},
-      setMarketColors: () => {},
-      toggleMarketColors: () => {},
-      bi: (zh) => zh,
-    }
-  }
-  return ctx
+  const store = useLocaleStore()
+  const bi = useCallback((zh: string, en: string) => (store.lang === 'en' ? en : zh), [store.lang])
+
+  return useMemo<LocaleContextValue>(
+    () => ({
+      lang: store.lang,
+      isEn: store.lang === 'en',
+      theme: store.theme,
+      marketColors: store.marketColors,
+      setLang: store.setLang,
+      toggleLang: store.toggleLang,
+      setTheme: store.setTheme,
+      toggleTheme: store.toggleTheme,
+      setMarketColors: store.setMarketColors,
+      toggleMarketColors: store.toggleMarketColors,
+      bi,
+    }),
+    [store, bi],
+  )
 }

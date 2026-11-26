@@ -1,5 +1,4 @@
-import { createContext, useCallback, useContext, useMemo, useRef, useState } from 'react'
-import type { ReactNode } from 'react'
+import { create } from 'zustand'
 
 import type { AgentId, WorkspaceKind } from '../types'
 
@@ -16,13 +15,13 @@ export type DialogState =
   | { kind: 'switchAgent'; agentId: AgentId; scope?: WorkspaceKind }
   | { kind: 'onboard'; scope?: WorkspaceKind }
 
-interface DialogContextValue {
+export interface DialogContextValue {
   dialog: DialogState
   open: (d: DialogState) => void
   close: () => void
 }
 
-const DialogContext = createContext<DialogContextValue | null>(null)
+let restoreTarget: HTMLElement | null = null
 
 /**
  * 全站弹窗路由 + 焦点归还。
@@ -32,30 +31,29 @@ const DialogContext = createContext<DialogContextValue | null>(null)
  * 在 open() 这个**事件回调**里记录触发元素（不在 render 期读 DOM），
  * close() 后等 Radix 卸载完再 focus 回去。
  */
-export function DialogProvider({ children }: { children: ReactNode }) {
-  const [dialog, setDialog] = useState<DialogState>({ kind: 'none' })
-  const restoreRef = useRef<HTMLElement | null>(null)
+export const useDialogStore = create<DialogContextValue>((set) => ({
+  dialog: { kind: 'none' },
 
-  const open = useCallback((next: DialogState) => {
+  open: (next: DialogState) => {
     const active = typeof document === 'undefined' ? null : document.activeElement
-    restoreRef.current = active instanceof HTMLElement ? active : null
-    setDialog(next)
-  }, [])
+    restoreTarget =
+      typeof HTMLElement !== 'undefined' && active instanceof HTMLElement ? active : null
+    set({ dialog: next })
+  },
 
-  const close = useCallback(() => {
-    setDialog({ kind: 'none' })
-    const target = restoreRef.current
-    restoreRef.current = null
+  close: () => {
+    set({ dialog: { kind: 'none' } })
+    const target = restoreTarget
+    restoreTarget = null
     if (!target || !target.isConnected) return
-    requestAnimationFrame(() => target.focus())
-  }, [])
-
-  const value = useMemo(() => ({ dialog, open, close }), [dialog, open, close])
-  return <DialogContext.Provider value={value}>{children}</DialogContext.Provider>
-}
+    if (typeof requestAnimationFrame === 'function') {
+      requestAnimationFrame(() => target.focus())
+    } else {
+      target.focus()
+    }
+  },
+}))
 
 export function useDialog(): DialogContextValue {
-  const ctx = useContext(DialogContext)
-  if (!ctx) throw new Error('useDialog 必须在 DialogProvider 内部使用')
-  return ctx
+  return useDialogStore()
 }
