@@ -147,8 +147,8 @@ export function ConversationPane({ className, hideHeader = false }: Props) {
       )}
 
       {/* 精简筛选栏 + 跟随滚动开关 */}
-      <div className="flex flex-wrap items-center justify-between gap-2 border-b border-[var(--line-soft)] px-4 py-2.5">
-        <div className="flex flex-wrap items-center gap-1" role="group" aria-label={t('training.conv.filterAria')}>
+      <div className="flex flex-nowrap items-center justify-between gap-1 border-b border-[var(--line-soft)] px-3 py-2">
+        <div className="flex min-w-0 flex-nowrap items-center gap-0.5 overflow-x-auto" role="group" aria-label={t('training.conv.filterAria')}>
           {FILTERS.map((f) => (
             <button
               key={f.id}
@@ -156,7 +156,7 @@ export function ConversationPane({ className, hideHeader = false }: Props) {
               onClick={() => setFilter(f.id)}
               aria-pressed={filter === f.id}
               className={cn(
-                'rounded-md px-2.5 py-1 text-micro transition-colors',
+                'min-h-8 whitespace-nowrap rounded-md px-1.5 py-1 text-micro transition-colors',
                 filter === f.id
                   ? 'bg-[var(--lime-soft)] font-medium text-[var(--lime)]'
                   : 'text-[var(--fg-2)] hover:text-[var(--fg-0)]',
@@ -171,7 +171,7 @@ export function ConversationPane({ className, hideHeader = false }: Props) {
           onClick={() => setPauseScroll((v) => !v)}
           aria-pressed={pauseScroll}
           className={cn(
-            'inline-flex items-center gap-1 rounded-md px-2.5 py-1 text-micro transition-colors',
+            'inline-flex min-h-8 shrink-0 items-center gap-1 whitespace-nowrap rounded-md px-2 py-1 text-micro transition-colors',
             pauseScroll ? 'bg-[var(--warn-soft)] text-[var(--warn)]' : 'text-[var(--fg-2)] hover:text-[var(--fg-0)]',
           )}
         >

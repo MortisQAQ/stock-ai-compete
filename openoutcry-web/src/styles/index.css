@@ -44,7 +44,7 @@
   --popover-foreground: var(--fg-0);
 
   --primary: var(--accent);
-  --primary-foreground: #04070d;
+  --primary-foreground: var(--on-accent);
 
   --secondary: var(--bg-2);
   --secondary-foreground: var(--fg-1);
@@ -56,7 +56,7 @@
   --accent-foreground: var(--fg-0);
 
   --destructive: var(--up);
-  --destructive-foreground: #04070d;
+  --destructive-foreground: var(--on-accent);
 
   --border: var(--line);
   --border-strong: var(--line-strong);

@@ -64,12 +64,13 @@ function TaskListGroup({ title, tasks, activeTaskId, onRoute, onOpenTask }: Task
               <button
                 type="button"
                 className="rail-task-main"
+                title={view.name}
                 aria-current={active ? 'page' : undefined}
                 onClick={() => onOpenTask(task.id)}
               >
-                <span className="flex items-center gap-2.5">
+                <span className="flex w-full min-w-0 items-center gap-2.5">
                   <i className={cn('rail-dot shrink-0', task.status)} aria-hidden />
-                  <span className="rail-task-name">{view.name}</span>
+                  <span className="rail-task-name min-w-0 flex-1">{view.name}</span>
                 </span>
               </button>
             </li>

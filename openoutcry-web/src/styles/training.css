@@ -813,7 +813,7 @@
 
 .conv-send {
   background: var(--accent);
-  color: #04070d;
+  color: var(--on-accent);
 }
 
 .conv-send:hover:not(:disabled) {

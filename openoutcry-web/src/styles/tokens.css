@@ -54,11 +54,13 @@
   --lime-dim: #7fa85c;
   --lime-soft: rgba(180, 238, 131, 0.12);
   --lime-glow: rgba(180, 238, 131, 0.35);
+  --on-lime: #08110a;
 
   /* ---------- 交互色：电光青 ---------- */
   --accent: #18d1ff;
   --accent-hover: #5ce0ff;
   --accent-soft: rgba(24, 209, 255, 0.14);
+  --on-accent: #04070d;
 
   /* ---------- 信号色：只给有方向的数字 ---------- */
   --up: #ff5c52;
@@ -202,34 +204,36 @@
 
   --fg-0: #132119;
   --fg-1: #35493d;
-  --fg-2: #54695c;
+  --fg-2: #4a5f53;
 
   --line: rgba(19, 33, 25, 0.15);
   --line-soft: rgba(19, 33, 25, 0.09);
   --line-strong: rgba(19, 33, 25, 0.3);
   --line-lime: rgba(28, 107, 64, 0.38);
   --line-lime-soft: rgba(28, 107, 64, 0.18);
-  --control-line: rgba(19, 33, 25, 0.38);
+  --control-line: rgba(19, 33, 25, 0.56);
 
   --lime: #1c6b40;
   --lime-dim: #2b7a4e;
   --lime-soft: rgba(28, 107, 64, 0.11);
   --lime-glow: rgba(28, 107, 64, 0.2);
+  --on-lime: #ffffff;
 
-  --accent: #0b6ea4;
-  --accent-hover: #085985;
+  --accent: #096191;
+  --accent-hover: #074e75;
   --accent-soft: rgba(11, 110, 164, 0.12);
+  --on-accent: #ffffff;
 
-  --up: #c0392b;
-  --up-soft: rgba(192, 57, 43, 0.11);
-  --down: #15803d;
-  --down-soft: rgba(21, 128, 61, 0.11);
-  --warn: #b45309;
-  --warn-soft: rgba(180, 83, 9, 0.12);
+  --up: #a6231a;
+  --up-soft: rgba(166, 35, 26, 0.11);
+  --down: #126330;
+  --down-soft: rgba(18, 99, 48, 0.11);
+  --warn: #92400e;
+  --warn-soft: rgba(146, 64, 14, 0.12);
 
   --chart-agent: #1c6b40;
   --chart-bench: #64746b;
-  --chart-drawdown: #b45309;
+  --chart-drawdown: #92400e;
   --chart-grid: rgba(19, 33, 25, 0.08);
   --chart-zero: rgba(19, 33, 25, 0.28);
   --chart-label: #4a5e52;
@@ -240,8 +244,8 @@
 }
 
 :root[data-theme='light'][data-market-colors='intl'] {
-  --up: #15803d;
-  --up-soft: rgba(21, 128, 61, 0.11);
-  --down: #c0392b;
-  --down-soft: rgba(192, 57, 43, 0.11);
+  --up: #126330;
+  --up-soft: rgba(18, 99, 48, 0.11);
+  --down: #a6231a;
+  --down-soft: rgba(166, 35, 26, 0.11);
 }

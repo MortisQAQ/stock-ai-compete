@@ -113,7 +113,7 @@ pre {
 
 ::selection {
   background: var(--lime);
-  color: #08110a;
+  color: var(--on-lime);
 }
 
 :focus-visible {
@@ -174,7 +174,7 @@ pre {
   z-index: 9500;
   padding: 10px 16px;
   background: var(--lime);
-  color: #08110a;
+  color: var(--on-lime);
   font: 600 var(--fs-micro) / 1 var(--sans);
   letter-spacing: 0.02em;
   border-radius: var(--radius-sm);

@@ -160,6 +160,8 @@ export function WorkbenchPane({ task, className }: { task: TrainingTask; classNa
   const phase: TrainingPhase = state.phase ?? 'pre_market'
   const phaseIdx = PHASE_STEPS.findIndex((p) => p.id === phase)
   const team = state.team ?? [state.agent]
+  const fullPitCutoff = state.pitCutoff ?? '2024-04-22 23:59'
+  const shortPitCutoff = fullPitCutoff.replace(/^\d{4}-/, '')
 
   return (
     <section
@@ -179,7 +181,7 @@ export function WorkbenchPane({ task, className }: { task: TrainingTask; classNa
       {/* 单行状态带：训练场收束为时钟 + 三阶段 + PIT 锁 + 可展开合规/团队；实战场保持清晰绿色安全边界 */}
       {task.live ? (
         isLive ? (
-          <div className="flex flex-wrap items-center justify-between gap-3 border-b border-[var(--line-lime-soft)] bg-[var(--lime-soft)] px-8 py-3">
+          <div className="flex flex-wrap items-center justify-between gap-3 border-b border-[var(--line-lime-soft)] bg-[var(--lime-soft)] px-6 py-2.5">
             <div className="flex flex-wrap items-center gap-2.5 text-micro text-[var(--fg-0)]">
               <ShieldCheck size={15} aria-hidden className="text-[var(--lime)]" />
               <span className="font-semibold text-[var(--lime)]">{t('training.liveSafetyTitle')}</span>
@@ -194,9 +196,9 @@ export function WorkbenchPane({ task, className }: { task: TrainingTask; classNa
             </Button>
           </div>
         ) : (
-          <div className="border-b border-[var(--line-soft)] bg-[var(--bg-1)] px-8 py-3">
-            <div className="flex flex-wrap items-center justify-between gap-3">
-              <div className="flex flex-wrap items-center gap-2 text-micro">
+          <div className="border-b border-[var(--line-soft)] bg-[var(--bg-1)] px-6 py-2.5">
+            <div className="flex flex-wrap items-center justify-between gap-2.5">
+              <div className="flex flex-wrap items-center gap-1.5 text-micro">
                 <span className="inline-flex items-center gap-1.5 rounded-md bg-[var(--bg-2)] px-2.5 py-1 font-mono font-medium tabular-nums text-[var(--fg-0)]">
                   <Clock size={14} aria-hidden className="text-[var(--lime)]" />
                   {formatStateClock(state, t)}
@@ -204,11 +206,13 @@ export function WorkbenchPane({ task, className }: { task: TrainingTask; classNa
                 {PHASE_STEPS.map((st, idx) => {
                   const active = idx === phaseIdx
                   const passed = idx < phaseIdx
+                  const label = t(st.labelKey)
                   return (
                     <span
                       key={st.id}
+                      title={`${st.time} · ${label}`}
                       className={cn(
-                        'inline-flex items-center gap-1.5 rounded-md px-2.5 py-1 transition-colors',
+                        'inline-flex items-center gap-1.5 rounded-md px-2 py-1 transition-colors',
                         active
                           ? 'bg-[var(--lime-soft)] font-medium text-[var(--lime)]'
                           : passed
@@ -217,18 +221,20 @@ export function WorkbenchPane({ task, className }: { task: TrainingTask; classNa
                       )}
                     >
                       <span aria-hidden>{passed ? '✓' : active ? '●' : '○'}</span>
-                      <span className="font-mono tabular-nums">{st.time}</span>
-                      <span>{t(st.labelKey)}</span>
+                      <span>{label}</span>
                     </span>
                   )
                 })}
               </div>
 
               <div className="flex flex-wrap items-center gap-2 text-micro">
-                <span className="inline-flex items-center gap-1.5 rounded-md bg-[var(--warn-soft)] px-2.5 py-1 font-medium text-[var(--warn)]">
+                <span
+                  title={t('training.pitCutoff', { cutoff: fullPitCutoff })}
+                  className="inline-flex items-center gap-1.5 rounded-md bg-[var(--warn-soft)] px-2.5 py-1 font-medium text-[var(--warn)]"
+                >
                   <Lock size={13} aria-hidden />
                   <span className="font-mono tabular-nums">
-                    {t('training.pitCutoff', { cutoff: state.pitCutoff ?? '04-22 23:59' })}
+                    {t('training.pitCutoff', { cutoff: shortPitCutoff })}
                   </span>
                 </span>
 

@@ -29,7 +29,7 @@ const buttonVariants = cva(
           'border-[var(--control-line)] bg-transparent text-foreground hover:border-ink/45 hover:bg-[var(--bg-2)] active:translate-y-px',
         // 主操作：全站唯一的实底 accent
         solid:
-          'border-[var(--accent)] bg-[var(--accent)] text-[#04070d] hover:border-[var(--accent-hover)] hover:bg-[var(--accent-hover)] active:translate-y-px',
+          'border-[var(--accent)] bg-[var(--accent)] text-[var(--on-accent)] hover:border-[var(--accent-hover)] hover:bg-[var(--accent-hover)] active:translate-y-px',
         // 主动作的次级形态：accent 描边，不填实底
         ver: 'border-[var(--accent)] bg-transparent text-[var(--accent)] hover:bg-[var(--accent-soft)] active:translate-y-px',
         // 危险 = 红描边 + 红字，不填实底（填实底会和涨跌色抢注意力）
