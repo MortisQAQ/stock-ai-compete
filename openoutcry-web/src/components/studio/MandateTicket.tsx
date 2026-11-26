@@ -1,18 +1,18 @@
 import { useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useNavigate } from 'react-router-dom'
-import { ArrowRight, Lock, Settings2, Shield } from 'lucide-react'
+import { ArrowRight, ChevronDown, Lock, Settings2, Shield } from 'lucide-react'
 
 import { AGENT_ORDER } from '../../data/agents'
 import { SESSION_PRESETS, UNIVERSE_PRESETS } from '../../data/trainings'
 import { formatAgent } from '../../i18n/helpers'
+import { cn } from '../../lib/utils'
 import { useDialog } from '../../store/DialogProvider'
 import { useTraining } from '../../store/TrainingProvider'
 import type { AgentId, Mode, TranslationKey } from '../../types'
 import { Button } from '../ui/Button'
 import { Input } from '../ui/Input'
 import { Stamp } from '../ui/Stamp'
-import { cn } from '../../lib/utils'
 
 const CAPITALS = [
   { label: '¥100,000', value: 100000 },
@@ -68,8 +68,6 @@ export function MandateTicket() {
     return Math.max(1, Math.round(((b - a) / 86400000 / 7) * 5))
   }, [from, to])
 
-  const budget = Math.max(1, team.length) * 400
-
   const handleIssue = () => {
     if (team.length === 0 || days === 0) return
     const created = issueMandate({
@@ -90,11 +88,11 @@ export function MandateTicket() {
   }
 
   return (
-    <section aria-labelledby="mandate-h" className="mt-5">
-      <div className="section-hd">
+    <section aria-labelledby="mandate-h">
+      <div className="section-hd mt-0">
         <h2 id="mandate-h">{t('mandate.title')}</h2>
         <div className="section-hd-side">
-          <span className="count">{issuedNo ?? nextMandateNo}</span>
+          <span className="count font-mono tabular-nums">{issuedNo ?? nextMandateNo}</span>
           <Stamp tone={issuedNo ? 'lime' : 'slate'}>
             {issuedNo ? t('mandate.issuedLocked') : t('mandate.draft')}
           </Stamp>
@@ -102,28 +100,14 @@ export function MandateTicket() {
       </div>
 
       <div className="plate">
-        <div className="flex flex-wrap items-center justify-between gap-x-4 gap-y-2 border-b border-[var(--line-soft)] px-[var(--sp-5)] py-3">
-          <span className="label">{t('mandate.contractLabel')}</span>
-          <div className="flex flex-wrap items-center gap-2 font-mono text-micro text-[var(--fg-2)]">
-            <span>
-              {from} → {to} · {days} {t('mandate.daysUnit')}
-            </span>
-            {days < 60 ? (
-              <span className="rounded bg-[var(--warn-soft)] px-2 py-0.5 text-[var(--warn)]">
-                {t('mandate.unrankedBadge')}
-              </span>
-            ) : null}
-          </div>
-        </div>
-
-        <div className="grid grid-cols-1 gap-x-[var(--sp-6)] gap-y-0 p-[var(--sp-5)] md:grid-cols-2">
+        <div className="grid grid-cols-1 gap-x-[var(--sp-6)] gap-y-2 p-[var(--sp-5)] md:grid-cols-2">
           {/* 01 时段与抗污染 */}
           <fieldset className="min-w-0 pb-[var(--sp-5)]">
             <legend className="sr-only">{t('mandate.field01Legend')}</legend>
             <FieldHead
               no="01"
               title={t('mandate.field01Title')}
-              note={t('mandate.field01Note')}
+              note={`${t('mandate.daysShort', { days })}${days < 60 ? t('mandate.unrankedShort') : ''}`}
             />
             <div className="flex flex-wrap items-center gap-2">
               <Input
@@ -149,7 +133,7 @@ export function MandateTicket() {
               />
             </div>
 
-            <div className="mt-3 flex flex-col gap-2">
+            <div className="mt-3.5 flex flex-col gap-2">
               {SESSION_PRESETS.map((s) => (
                 <Choice
                   key={s.id}
@@ -165,8 +149,8 @@ export function MandateTicket() {
               ))}
             </div>
 
-            <div className="mt-3 flex flex-wrap items-center gap-2">
-              <span className="inline-flex items-center gap-1.5 rounded-md bg-[var(--lime-soft)] px-2.5 py-1 font-mono text-micro text-[var(--lime)]">
+            <div className="mt-3.5 flex flex-wrap items-center gap-2">
+              <span className="inline-flex items-center gap-1.5 rounded-md bg-[var(--lime-soft)] px-2.5 py-1 text-micro font-medium text-[var(--lime)]">
                 <Lock size={13} aria-hidden />
                 {t('mandate.pitEnforced')}
               </span>
@@ -177,7 +161,7 @@ export function MandateTicket() {
                   setIssuedNo(null)
                 }}
                 className={cn(
-                  'inline-flex items-center gap-1.5 rounded-md px-2.5 py-1 font-mono text-micro transition-colors',
+                  'inline-flex items-center gap-1.5 rounded-md px-2.5 py-1 text-micro font-medium transition-colors',
                   blindMask
                     ? 'bg-[var(--lime-soft)] text-[var(--lime)]'
                     : 'bg-[var(--bg-2)] text-[var(--fg-2)]',
@@ -208,18 +192,17 @@ export function MandateTicket() {
                 />
               ))}
             </div>
-            <p className="mt-2.5 text-note text-[var(--fg-2)]">{t('mandate.funnelNote')}</p>
           </fieldset>
 
           {/* 03 单执行者团队 */}
-          <fieldset className="min-w-0 pb-[var(--sp-4)] md:border-t md:border-[var(--line-soft)] md:pt-[var(--sp-4)]">
+          <fieldset className="min-w-0 pb-[var(--sp-4)] md:border-t md:border-[var(--line-soft)] md:pt-[var(--sp-5)]">
             <legend className="sr-only">{t('mandate.field03Legend')}</legend>
             <FieldHead
               no="03"
               title={t('mandate.field03Title')}
               note={t('mandate.selectedCount', { count: team.length })}
             />
-            <div className="flex flex-col gap-1.5">
+            <div className="flex flex-col gap-2">
               {AGENT_ORDER.map((id) => {
                 const agent = formatAgent(id, t)
                 const idx = team.indexOf(id)
@@ -229,7 +212,7 @@ export function MandateTicket() {
                   <label
                     key={id}
                     className={cn(
-                      'relative flex min-h-10 cursor-pointer items-center gap-3 rounded-lg px-3 py-2 transition-colors',
+                      'relative flex min-h-11 cursor-pointer items-center gap-3 rounded-lg px-3.5 py-2.5 transition-colors',
                       on ? 'bg-[var(--lime-soft)]' : 'bg-[var(--bg-2)] hover:bg-[var(--bg-3)]',
                     )}
                   >
@@ -252,7 +235,7 @@ export function MandateTicket() {
                     </span>
                     <span
                       className={cn(
-                        'cond shrink-0 text-micro',
+                        'shrink-0 text-micro font-medium',
                         on ? 'text-[var(--lime)]' : 'text-[var(--fg-2)]',
                       )}
                     >
@@ -263,13 +246,13 @@ export function MandateTicket() {
               })}
             </div>
             {team.length === 0 ? (
-              <p className="mt-2 text-note text-[var(--up)]">{t('mandate.selectAtLeastOne')}</p>
+              <p className="mt-2.5 text-note text-[var(--up)]">{t('mandate.selectAtLeastOne')}</p>
             ) : (
               <Button
                 type="button"
                 variant="ghost"
                 size="sm"
-                className="mt-2 h-9 w-full justify-start px-2 text-micro font-normal"
+                className="mt-2.5 h-9 w-full justify-start px-2 text-micro font-normal"
                 onClick={() => open({ kind: 'agent', agentId: team[0] })}
               >
                 <Settings2 aria-hidden className="size-3.5" />
@@ -279,14 +262,14 @@ export function MandateTicket() {
           </fieldset>
 
           {/* 04 资金与规则 */}
-          <fieldset className="min-w-0 pb-[var(--sp-4)] md:border-t md:border-[var(--line-soft)] md:pt-[var(--sp-4)]">
+          <fieldset className="min-w-0 pb-[var(--sp-4)] md:border-t md:border-[var(--line-soft)] md:pt-[var(--sp-5)]">
             <legend className="sr-only">{t('mandate.field04Legend')}</legend>
             <FieldHead
               no="04"
               title={t('mandate.field04Title')}
               note={`¥${capital.toLocaleString('en-US')}`}
             />
-            <div className="grid grid-cols-2 gap-2">
+            <div className="grid grid-cols-2 gap-2.5">
               {CAPITALS.map((c) => (
                 <Chip
                   key={c.label}
@@ -299,7 +282,7 @@ export function MandateTicket() {
                 />
               ))}
             </div>
-            <div className="mt-2 grid grid-cols-2 gap-2">
+            <div className="mt-2.5 grid grid-cols-2 gap-2.5">
               {MODES.map((m) => (
                 <Chip
                   key={m.id}
@@ -312,33 +295,36 @@ export function MandateTicket() {
                 />
               ))}
             </div>
-            <dl className="mt-3.5 border-t border-[var(--line-soft)] pt-2 text-note">
-              <Row k={t('mandate.aShareRulesKey')} v={t('mandate.aShareRulesVal')} />
-              <Row k={t('mandate.feeSlippageKey')} v={t('mandate.feeSlippageVal')} />
-              <Row k={t('mandate.pricingBasisKey')} v={t('mandate.pricingBasisVal')} />
-            </dl>
+
+            <details className="mt-4 rounded-lg border border-[var(--line-soft)] bg-[var(--bg-2)] px-3.5 py-2.5">
+              <summary className="flex list-none items-center justify-between gap-2 text-micro font-medium text-[var(--fg-1)] [&::-webkit-details-marker]:hidden">
+                <span>{t('mandate.rulesDrawerSummary')}</span>
+                <ChevronDown size={14} aria-hidden className="text-[var(--fg-2)]" />
+              </summary>
+              <dl className="mt-2.5 border-t border-[var(--line-soft)] pt-2 text-note">
+                <Row k={t('mandate.aShareRulesKey')} v={t('mandate.aShareRulesVal')} />
+                <Row k={t('mandate.feeSlippageKey')} v={t('mandate.feeSlippageVal')} />
+                <Row k={t('mandate.pricingBasisKey')} v={t('mandate.pricingBasisVal')} />
+              </dl>
+            </details>
           </fieldset>
         </div>
 
         {/* 摘要 + 开具 + 直达训练场 */}
         <div className="flex flex-wrap items-center justify-between gap-4 border-t border-[var(--line-soft)] px-[var(--sp-5)] py-4">
-          <div className="min-w-0">
-            <p className="font-sans text-body font-semibold leading-snug text-[var(--fg-0)]">
-              {t('mandate.summaryLine', {
-                days,
-                universe: t(chosenUniverse.nameKey),
-                count: team.length,
-                mode: mode === 'approval' ? t('mandate.modeHitl') : '/goal',
-              })}
-            </p>
-            <p className="cond mt-1 text-micro text-[var(--fg-2)]">
-              {t('mandate.summaryFoot', { budget })}
-            </p>
-          </div>
+          <p className="min-w-0 font-sans text-body font-medium leading-snug text-[var(--fg-1)]">
+            {t('mandate.summaryLine', {
+              days,
+              universe: t(chosenUniverse.nameKey),
+              count: team.length,
+              mode: mode === 'approval' ? t('mandate.modeHitl') : '/goal',
+            })}
+          </p>
           <div className="flex flex-wrap items-center gap-2">
             {issuedNo ? (
               <Button variant="solid" size="sm" onClick={() => navigate('/training')}>
                 {t('mandate.btnEnterArena', { no: issuedNo })}
+                <ArrowRight size={15} aria-hidden />
               </Button>
             ) : (
               <Button
@@ -368,12 +354,12 @@ function Row({ k, v }: { k: string; v: string }) {
 
 function FieldHead({ no, title, note }: { no: string; title: string; note: string }) {
   return (
-    <div className="mb-3 flex items-baseline justify-between gap-2">
+    <div className="mb-3.5 flex items-baseline justify-between gap-2">
       <div className="flex items-baseline gap-2.5">
-        <span className="font-mono text-micro font-semibold text-[var(--lime)]">{no}</span>
+        <span className="font-mono text-micro font-medium tabular-nums text-[var(--lime)]">{no}</span>
         <span className="font-sans text-body font-semibold text-[var(--fg-0)]">{title}</span>
       </div>
-      <span className="cond truncate text-micro text-[var(--fg-2)]">{note}</span>
+      <span className="truncate text-micro text-[var(--fg-2)]">{note}</span>
     </div>
   )
 }
@@ -423,7 +409,7 @@ function Chip({ checked, onSelect, label }: { checked: boolean; onSelect: () => 
       aria-pressed={checked}
       onClick={onSelect}
       className={cn(
-        'h-10 rounded-lg border px-3 font-mono text-note font-medium transition-colors',
+        'h-10 rounded-lg border px-3 font-sans text-note font-medium transition-colors',
         checked
           ? 'border-[var(--line-lime)] bg-[var(--lime-soft)] text-[var(--fg-0)]'
           : 'border-[var(--line-soft)] bg-[var(--bg-2)] text-[var(--fg-1)] hover:bg-[var(--bg-3)]',

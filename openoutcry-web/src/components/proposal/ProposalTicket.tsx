@@ -1,19 +1,24 @@
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useNavigate } from 'react-router-dom'
-import { ArrowRight, CheckCircle2, FastForward } from 'lucide-react'
+import { ArrowRight, CheckCircle2, ChevronDown, FastForward } from 'lucide-react'
 
 import { formatProposal } from '../../i18n/helpers'
 import { money, round, signed } from '../../lib/format'
 import { useDialog } from '../../store/DialogProvider'
 import { useLocale } from '../../store/LocaleProvider'
 import { useRun, useWorkspaceKind } from '../../store/RunProvider'
-import { approvalNote, canDecide, proposalStampOf, proposalTextOf } from '../../store/derive'
+import { approvalNote, canDecide, proposalStampOf } from '../../store/derive'
 import { PitPriceStrip } from '../charts/PitPriceStrip'
 import { Button } from '../ui/Button'
 import { Card, CardContent, CardHeader } from '../ui/Card'
 import { Stamp } from '../ui/Stamp'
 
+/**
+ * 决策主卡：
+ * - 历史训练场：Order Proposal + PIT 截断走势条 + 折叠式 A 股规则预检 + 审批/撮合/结算流程；
+ * - 实战工作台：Advisory Proposal（仅提供按建议记账 / 按实际录入 / 暂不采纳）。
+ */
 export function ProposalTicket() {
   const kind = useWorkspaceKind()
   const { state, actions } = useRun()
@@ -36,6 +41,7 @@ export function ProposalTicket() {
       : Math.max(1000, proposal.original * 3)
 
   const phase = state.phase ?? 'pre_market'
+  const estAmount = round(proposal.quantity * proposal.price)
 
   const finishAndReview = () => {
     actions.completeGoalRun()
@@ -44,12 +50,9 @@ export function ProposalTicket() {
 
   return (
     <Card>
-      <CardHeader className="items-start">
+      <CardHeader className="items-center">
         <div className="min-w-0">
-          <div className="label">
-            {isLive ? t('proposal.liveKicker') : t('proposal.simKicker')}
-          </div>
-          <h3 className="mt-1.5 font-sans text-row font-semibold leading-snug tracking-[-0.02em] text-ink">
+          <h3 className="font-sans text-row font-semibold leading-snug text-ink">
             {view.side} {view.asset} · {proposal.quantity} {t('proposal.sharesUnit')}
           </h3>
         </div>
@@ -66,7 +69,7 @@ export function ProposalTicket() {
         </Stamp>
       </CardHeader>
 
-      <CardContent className="py-3">
+      <CardContent className="py-5">
         {!isLive ? (
           <PitPriceStrip
             asset={rawAsset}
@@ -77,52 +80,65 @@ export function ProposalTicket() {
           />
         ) : null}
 
+        {/* 核心三数：价格、数量、预估金额 */}
         <dl className="proposal-facts">
           <div>
             <dt>{isLive ? t('proposal.refBand') : t('proposal.limitPrice')}</dt>
             <dd>{isLive ? (proposal.priceBand ?? money(proposal.price)) : money(proposal.price)}</dd>
           </div>
           <div>
-            <dt>{isLive ? t('proposal.aiSuggested') : t('proposal.proposed')}</dt>
+            <dt>{t('proposal.quantity')}</dt>
             <dd>
-              {proposal.original} {t('proposal.sharesUnit')}
+              {proposal.quantity} {t('proposal.sharesUnit')}
             </dd>
           </div>
           <div>
-            <dt>{t('proposal.status')}</dt>
-            <dd className="font-mono text-note tracking-normal">{proposalTextOf(state, lang)}</dd>
+            <dt>{t('proposal.estAmount')}</dt>
+            <dd>{money(estAmount)}</dd>
           </div>
         </dl>
 
+        {/* 渐进披露：一行通过指示器 + 折叠的 A 股规则预检与详细说明 */}
         {!isLive ? (
-          <div className="mb-3 flex flex-wrap items-center gap-1.5 rounded-lg border border-[var(--line-soft)] bg-[var(--bg-2)] px-3 py-2 font-mono text-micro text-[var(--lime)]">
-            <span className="inline-flex items-center gap-1">
-              <CheckCircle2 size={13} aria-hidden />
-              {t('proposal.precheckLot')}
-            </span>
-            <span className="text-[var(--fg-2)]">·</span>
-            <span>{t('proposal.precheckSellable', { count: sellableShares })}</span>
-            <span className="text-[var(--fg-2)]">·</span>
-            <span>{t('proposal.precheckLimit')}</span>
-            <span className="text-[var(--fg-2)]">·</span>
-            <span className="text-[var(--fg-1)]">{t('proposal.precheckFee')}</span>
-          </div>
-        ) : null}
-
-        <p className="proposal-note">
-          {isLive ? (
-            <>
-              {view.reason ?? t('proposal.liveDefaultReason')}
-              {view.invalidation ? ' ' + t('proposal.invalidationPrefix', { text: view.invalidation }) : ''}
-            </>
-          ) : (
-            t('proposal.simSummary', {
-              qty: proposal.quantity,
-              price: money(proposal.price),
-              pnl: signed(round(proposal.quantity * (proposal.price - costBasis))),
-            })
-          )}
-        </p>
+          <details className="mt-4 rounded-lg border border-[var(--line-soft)] bg-[var(--bg-1)] px-3.5 py-2.5">
+            <summary className="flex list-none items-center justify-between gap-2 text-micro font-medium text-[var(--lime)] [&::-webkit-details-marker]:hidden">
+              <span className="inline-flex items-center gap-1.5">
+                <CheckCircle2 size={14} aria-hidden />
+                {t('proposal.precheckSummary')}
+              </span>
+              <ChevronDown size={14} aria-hidden className="shrink-0 text-[var(--fg-2)]" />
+            </summary>
+            <div className="mt-3 space-y-2 border-t border-[var(--line-soft)] pt-3 text-micro text-[var(--fg-1)]">
+              <div className="flex flex-wrap gap-x-4 gap-y-1.5 font-mono tabular-nums text-[var(--lime)]">
+                <span>✓ {t('proposal.precheckLot')}</span>
+                <span>✓ {t('proposal.precheckSellable', { count: sellableShares })}</span>
+                <span>✓ {t('proposal.precheckLimit')}</span>
+                <span className="text-[var(--fg-1)]">{t('proposal.precheckFee')}</span>
+              </div>
+              <p className="leading-relaxed text-[var(--fg-2)]">
+                {t('proposal.precheckDetail', {
+                  cost: money(costBasis),
+                  pnl: signed(round(proposal.quantity * (proposal.price - costBasis))),
+                })}{' '}
+                {approvalNote(state, lang)}
+              </p>
+            </div>
+          </details>
+        ) : (
+          <details className="mt-4 rounded-lg border border-[var(--line-soft)] bg-[var(--bg-1)] px-3.5 py-2.5">
+            <summary className="flex list-none items-center justify-between gap-2 text-micro font-medium text-[var(--fg-1)] [&::-webkit-details-marker]:hidden">
+              <span className="truncate">
+                {view.invalidation
+                  ? t('proposal.invalidationSummary', { text: view.invalidation })
+                  : t('proposal.advisoryDetailsSummary')}
+              </span>
+              <ChevronDown size={14} aria-hidden className="shrink-0 text-[var(--fg-2)]" />
+            </summary>
+            <p className="mt-2.5 border-t border-[var(--line-soft)] pt-2.5 text-note leading-relaxed text-[var(--fg-2)]">
+              {view.reason ?? t('proposal.liveDefaultReason')} {approvalNote(state, lang)}
+            </p>
+          </details>
+        )}
 
         <div className="proposal-actions">
           {decidable ? (
@@ -179,6 +195,7 @@ export function ProposalTicket() {
           {!isLive && proposal.status === 'filled' && phase === 'close_settle' ? (
             <Button variant="solid" size="sm" onClick={() => navigate('/review')}>
               {t('proposal.btnGoReview')}
+              <ArrowRight size={14} aria-hidden />
             </Button>
           ) : null}
 
@@ -186,8 +203,6 @@ export function ProposalTicket() {
             {t('proposal.btnTrace')}
           </Button>
         </div>
-
-        <p className="proposal-note">{approvalNote(state, lang)}</p>
       </CardContent>
     </Card>
   )

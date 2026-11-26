@@ -52,18 +52,14 @@ function Card({ className, variant, interactive, asChild = false, ...props }: Ca
   )
 }
 
-/** 卡头：等宽大写微标签条，与卡身用 1px 发丝线隔开 */
+/** 卡头：柔和常规无衬线标签条，与卡身用 1px 细线隔开 */
 function CardHeader({ className, ...props }: React.ComponentProps<'div'>) {
   return (
     <div
       data-slot="card-header"
       className={cn(
-        /* 卡头留白统一到 --sp-* 令牌：横向 22、纵向 16。
-           写死 px-4 / py-2.5（16/10）是上一版「密」的一半来源。 */
         'flex items-center justify-between gap-3 border-b border-[var(--line-soft)] px-[var(--sp-5)] py-[var(--sp-4)]',
-        /* 英文铭牌走 Oswald 窄体：同字号下宽度约为常规无衬线一半，
-           正好装下金融界面里那些长英文标签。 */
-        'cond text-micro font-semibold leading-none text-muted-foreground',
+        'font-sans text-note font-medium leading-snug text-muted-foreground',
         'group-data-[variant=instrument]/card:border-instrument-border group-data-[variant=instrument]/card:text-instrument-muted',
         className,
       )}

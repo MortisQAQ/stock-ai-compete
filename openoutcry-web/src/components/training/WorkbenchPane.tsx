@@ -1,6 +1,6 @@
 import { useTranslation } from 'react-i18next'
 import { useNavigate } from 'react-router-dom'
-import { Clock, Lock, RotateCcw, Shield, ShieldCheck, Users } from 'lucide-react'
+import { ChevronDown, Clock, Lock, RotateCcw, Shield, ShieldCheck, Users } from 'lucide-react'
 
 import {
   formatAgent,
@@ -9,13 +9,13 @@ import {
   formatSyncLabel,
   formatTask,
 } from '../../i18n/helpers'
+import { cn } from '../../lib/utils'
 import { useDialog } from '../../store/DialogProvider'
 import { useLocale } from '../../store/LocaleProvider'
 import { useRun, useWorkspaceKind } from '../../store/RunProvider'
-import { bandItemsFor, trainingStatusText } from '../../store/selectors'
+import { bandItemsFor } from '../../store/selectors'
 import { useToast } from '../../store/ToastProvider'
 import type { TrainingPhase, TrainingTask, TranslationKey } from '../../types'
-import { cn } from '../../lib/utils'
 import { ProposalTicket } from '../proposal/ProposalTicket'
 import { RunDrawer } from '../run/RunDrawer'
 import { StatBand } from '../run/StatBand'
@@ -136,22 +136,19 @@ function ArchiveBody({ task }: { task: TrainingTask }) {
 }
 
 export function WorkbenchBody({ task }: { task: TrainingTask }) {
-  const { state } = useRun()
-  const { t } = useTranslation()
   if (!task.live) return <ArchiveBody task={task} />
-  const isLive = state.kind === 'live'
 
   return (
     <div className="flex flex-col gap-[var(--sp-5)]">
       <ProposalTicket />
       <WorkbenchTabs />
-      <p className="font-mono text-micro leading-relaxed tracking-[0.04em] text-[var(--ink-3)]">
-        {isLive ? t('training.liveFooterNote') : t('training.simFooterNote')}
-      </p>
     </div>
   )
 }
 
+/**
+ * 工作台 = 精简头部 + 单行状态带（时间机器 / 实盘安全边界）+ 四格资产带 + 可滚动正文。
+ */
 export function WorkbenchPane({ task, className }: { task: TrainingTask; className?: string }) {
   const { state, totals } = useRun()
   const { lang } = useLocale()
@@ -170,24 +167,20 @@ export function WorkbenchPane({ task, className }: { task: TrainingTask; classNa
       className={cn('bench-work', className)}
     >
       <header className="bench-hd">
-        <div className="bench-hd-main">
-          <div className="flex flex-wrap items-center gap-2">
-            <h2 className="min-w-0">{view.name}</h2>
-            <Stamp size="sm" tone={isLive ? 'lime' : 'slate'}>
-              {isLive ? t('training.liveStamp') : t('training.simStamp')}
-            </Stamp>
-          </div>
-          <p className="bench-hd-meta">
-            {view.windowLabel} · {trainingStatusText(task.status, lang)}
-          </p>
+        <div className="bench-hd-main flex flex-wrap items-center gap-2.5">
+          <h2 className="min-w-0">{view.name}</h2>
+          <Stamp size="sm" tone={isLive ? 'lime' : 'slate'}>
+            {isLive ? t('training.liveStamp') : t('training.simStamp')}
+          </Stamp>
         </div>
         <RunDrawer />
       </header>
 
+      {/* 单行状态带：训练场收束为时钟 + 三阶段 + PIT 锁 + 可展开合规/团队；实战场保持清晰绿色安全边界 */}
       {task.live ? (
         isLive ? (
-          <div className="flex flex-wrap items-center justify-between gap-2 border-b border-[var(--line-lime)] bg-[var(--lime-soft)] px-4 py-2.5">
-            <div className="flex flex-wrap items-center gap-2 font-mono text-micro text-[var(--fg-0)]">
+          <div className="flex flex-wrap items-center justify-between gap-3 border-b border-[var(--line-lime-soft)] bg-[var(--lime-soft)] px-8 py-3">
+            <div className="flex flex-wrap items-center gap-2.5 text-micro text-[var(--fg-0)]">
               <ShieldCheck size={15} aria-hidden className="text-[var(--lime)]" />
               <span className="font-semibold text-[var(--lime)]">{t('training.liveSafetyTitle')}</span>
               <span className="text-[var(--fg-1)]">
@@ -201,10 +194,10 @@ export function WorkbenchPane({ task, className }: { task: TrainingTask; classNa
             </Button>
           </div>
         ) : (
-          <div className="flex flex-col gap-2 border-b border-[var(--line)] bg-[var(--bg-2)] px-4 py-2.5">
-            <div className="flex flex-wrap items-center justify-between gap-2">
-              <div className="flex flex-wrap items-center gap-1.5 font-mono text-micro">
-                <span className="inline-flex items-center gap-1.5 rounded bg-[var(--bg-1)] px-2 py-1 font-semibold text-[var(--fg-0)]">
+          <div className="border-b border-[var(--line-soft)] bg-[var(--bg-1)] px-8 py-3">
+            <div className="flex flex-wrap items-center justify-between gap-3">
+              <div className="flex flex-wrap items-center gap-2 text-micro">
+                <span className="inline-flex items-center gap-1.5 rounded-md bg-[var(--bg-2)] px-2.5 py-1 font-mono font-medium tabular-nums text-[var(--fg-0)]">
                   <Clock size={14} aria-hidden className="text-[var(--lime)]" />
                   {formatStateClock(state, t)}
                 </span>
@@ -215,53 +208,77 @@ export function WorkbenchPane({ task, className }: { task: TrainingTask; classNa
                     <span
                       key={st.id}
                       className={cn(
-                        'inline-flex items-center gap-1 rounded px-2 py-1 transition-colors',
+                        'inline-flex items-center gap-1.5 rounded-md px-2.5 py-1 transition-colors',
                         active
-                          ? 'bg-[var(--lime-soft)] font-semibold text-[var(--lime)]'
+                          ? 'bg-[var(--lime-soft)] font-medium text-[var(--lime)]'
                           : passed
-                            ? 'bg-[var(--bg-1)] text-[var(--fg-1)]'
+                            ? 'text-[var(--fg-1)]'
                             : 'text-[var(--fg-2)]',
                       )}
                     >
-                      <span>{passed ? '✓' : active ? '●' : '○'}</span>
-                      <span>
-                        {st.time} {t(st.labelKey)}
-                      </span>
+                      <span aria-hidden>{passed ? '✓' : active ? '●' : '○'}</span>
+                      <span className="font-mono tabular-nums">{st.time}</span>
+                      <span>{t(st.labelKey)}</span>
                     </span>
                   )
                 })}
               </div>
 
-              <div className="flex flex-wrap items-center gap-1.5 font-mono text-micro">
-                <span className="inline-flex items-center gap-1 rounded bg-[var(--warn-soft)] px-2 py-1 text-[var(--warn)]">
+              <div className="flex flex-wrap items-center gap-2 text-micro">
+                <span className="inline-flex items-center gap-1.5 rounded-md bg-[var(--warn-soft)] px-2.5 py-1 font-medium text-[var(--warn)]">
                   <Lock size={13} aria-hidden />
-                  {t('training.pitCutoff', { cutoff: state.pitCutoff ?? '04-22 23:59' })}
+                  <span className="font-mono tabular-nums">
+                    {t('training.pitCutoff', { cutoff: state.pitCutoff ?? '04-22 23:59' })}
+                  </span>
                 </span>
-                <span className="inline-flex items-center gap-1 rounded bg-[var(--bg-1)] px-2 py-1 text-[var(--fg-1)]">
-                  <Shield size={13} aria-hidden className="text-[var(--lime)]" />
-                  {state.blindMask !== false
-                    ? t('training.blindMaskTag', { asset: formatAsset(state.proposal.asset ?? '公司-017', t) })
-                    : t('training.unmaskedTag')}
-                </span>
+
+                <details className="relative">
+                  <summary className="inline-flex list-none items-center gap-1 rounded-md bg-[var(--bg-2)] px-2.5 py-1 font-medium text-[var(--fg-1)] transition-colors hover:bg-[var(--bg-3)] hover:text-[var(--fg-0)] [&::-webkit-details-marker]:hidden">
+                    <Shield size={13} aria-hidden className="text-[var(--lime)]" />
+                    <span>
+                      {team.length > 1
+                        ? t('training.guardrailsTeamSummary', { count: team.length })
+                        : t('training.guardrailsSummary')}
+                    </span>
+                    <ChevronDown size={13} aria-hidden />
+                  </summary>
+                  <div className="absolute right-0 top-[calc(100%+8px)] z-30 w-[300px] space-y-2.5 rounded-lg border border-[var(--line)] bg-[var(--bg-2)] p-4 shadow-[var(--shadow-pop)]">
+                    <div className="flex items-center gap-2 text-micro text-[var(--fg-0)]">
+                      <Shield size={14} aria-hidden className="shrink-0 text-[var(--lime)]" />
+                      <span>
+                        {state.blindMask !== false
+                          ? t('training.blindMaskDetailOn', {
+                              asset: formatAsset(state.proposal.asset ?? '公司-017', t),
+                            })
+                          : t('training.blindMaskDetailOff')}
+                      </span>
+                    </div>
+                    <div className="border-t border-[var(--line-soft)] pt-2.5">
+                      <div className="mb-1.5 flex items-center gap-1.5 text-micro text-[var(--fg-2)]">
+                        <Users size={13} aria-hidden className="text-[var(--lime)]" />
+                        <span>{t('training.teamDivisionTitle')}</span>
+                      </div>
+                      <div className="flex flex-col gap-1.5">
+                        {team.map((id, idx) => (
+                          <div key={id} className="flex items-center justify-between text-micro">
+                            <span className="text-[var(--fg-1)]">
+                              {idx === 0
+                                ? t('training.teamLead')
+                                : idx === 1
+                                  ? t('training.teamResearch')
+                                  : t('training.teamRisk')}
+                            </span>
+                            <span className="font-medium text-[var(--fg-0)]">
+                              {formatAgent(id, t).shortName}
+                            </span>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                </details>
               </div>
             </div>
-
-            {team.length > 1 ? (
-              <div className="flex flex-wrap items-center gap-2 border-t border-[var(--line-soft)] pt-1.5 font-mono text-micro text-[var(--fg-1)]">
-                <Users size={13} aria-hidden className="text-[var(--lime)]" />
-                <span>{t('training.teamPrefix')}</span>
-                {team.map((id, idx) => (
-                  <span key={id} className="rounded bg-[var(--bg-1)] px-2 py-0.5 text-[var(--fg-0)]">
-                    {idx === 0
-                      ? t('training.teamLead')
-                      : idx === 1
-                        ? t('training.teamResearch')
-                        : t('training.teamRisk')}{' '}
-                    · {formatAgent(id, t).shortName}
-                  </span>
-                ))}
-              </div>
-            ) : null}
           </div>
         )
       ) : null}

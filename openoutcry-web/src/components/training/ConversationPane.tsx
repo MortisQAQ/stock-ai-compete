@@ -132,23 +132,22 @@ export function ConversationPane({ className, hideHeader = false }: Props) {
             <h2 className="conv-title">{convView.name}</h2>
             <p className="conv-sub">
               <i aria-hidden className="conv-dot" data-on={connected ? 'y' : 'n'} />
-              {isLive ? (
-                <>
-                  {agent.name} · {t('training.conv.liveSub')}
-                </>
-              ) : (
-                <>
-                  {agent.name} · {connected ? t('training.conv.online') : t('training.conv.offline')} ·{' '}
-                  {state.mode === 'goal' ? t('training.conv.goalMode') : t('training.conv.hitlMode')}
-                </>
-              )}
+              <span>{agent.name}</span>
+              <span>·</span>
+              <span>
+                {isLive
+                  ? t('training.conv.liveSubShort')
+                  : state.mode === 'goal'
+                    ? t('training.conv.goalMode')
+                    : t('training.conv.hitlMode')}
+              </span>
             </p>
           </div>
         </header>
       )}
 
-      {/* 轻量事件筛选 + 暂停滚动开关 */}
-      <div className="flex flex-wrap items-center justify-between gap-2 border-b border-[var(--line-soft)] px-4 py-2">
+      {/* 精简筛选栏 + 跟随滚动开关 */}
+      <div className="flex flex-wrap items-center justify-between gap-2 border-b border-[var(--line-soft)] px-4 py-2.5">
         <div className="flex flex-wrap items-center gap-1" role="group" aria-label={t('training.conv.filterAria')}>
           {FILTERS.map((f) => (
             <button
@@ -157,9 +156,9 @@ export function ConversationPane({ className, hideHeader = false }: Props) {
               onClick={() => setFilter(f.id)}
               aria-pressed={filter === f.id}
               className={cn(
-                'rounded px-2 py-0.5 font-mono text-micro transition-colors',
+                'rounded-md px-2.5 py-1 text-micro transition-colors',
                 filter === f.id
-                  ? 'bg-[var(--lime-soft)] font-semibold text-[var(--lime)]'
+                  ? 'bg-[var(--lime-soft)] font-medium text-[var(--lime)]'
                   : 'text-[var(--fg-2)] hover:text-[var(--fg-0)]',
               )}
             >
@@ -172,7 +171,7 @@ export function ConversationPane({ className, hideHeader = false }: Props) {
           onClick={() => setPauseScroll((v) => !v)}
           aria-pressed={pauseScroll}
           className={cn(
-            'inline-flex items-center gap-1 rounded px-2 py-0.5 font-mono text-micro transition-colors',
+            'inline-flex items-center gap-1 rounded-md px-2.5 py-1 text-micro transition-colors',
             pauseScroll ? 'bg-[var(--warn-soft)] text-[var(--warn)]' : 'text-[var(--fg-2)] hover:text-[var(--fg-0)]',
           )}
         >
@@ -210,45 +209,45 @@ export function ConversationPane({ className, hideHeader = false }: Props) {
           return (
             <div key={e.id} className="space-y-3">
               {view.divider ? (
-                <div className="flex items-center gap-2 py-1">
-                  <span className="h-px flex-1 bg-[var(--line)]" aria-hidden />
-                  <span className="rounded bg-[var(--bg-2)] px-2.5 py-0.5 font-mono text-micro text-[var(--fg-1)]">
+                <div className="flex items-center gap-2.5 py-1">
+                  <span className="h-px flex-1 bg-[var(--line-soft)]" aria-hidden />
+                  <span className="rounded-md bg-[var(--bg-2)] px-2.5 py-0.5 text-micro text-[var(--fg-2)]">
                     {view.divider}
                   </span>
-                  <span className="h-px flex-1 bg-[var(--line)]" aria-hidden />
+                  <span className="h-px flex-1 bg-[var(--line-soft)]" aria-hidden />
                 </div>
               ) : null}
 
               {isSystem ? (
-                <div className="rounded-lg border border-[var(--line)] bg-[var(--bg-2)] px-3.5 py-2.5">
-                  <div className="flex items-center justify-between gap-2 font-mono text-micro text-[var(--lime)]">
+                <div className="rounded-xl border border-[var(--line-soft)] bg-[var(--bg-2)] px-4 py-3">
+                  <div className="flex items-center justify-between gap-2 text-micro font-medium text-[var(--lime)]">
                     <span>{view.title}</span>
-                    <span className="text-[var(--fg-2)]">{view.at}</span>
+                    <span className="font-mono tabular-nums text-[var(--fg-2)]">{view.at}</span>
                   </div>
-                  {view.body ? <p className="mt-1 text-note leading-relaxed text-[var(--fg-1)]">{view.body}</p> : null}
+                  {view.body ? <p className="mt-1.5 text-note leading-relaxed text-[var(--fg-1)]">{view.body}</p> : null}
                 </div>
               ) : isMine ? (
                 <div className="flex flex-col items-end gap-1">
-                  <div className="max-w-[88%] rounded-[16px] rounded-br-[6px] bg-[var(--bg-3)] px-3.5 py-2.5 text-body leading-[1.6] text-[var(--ink)]">
+                  <div className="max-w-[88%] rounded-[16px] rounded-br-[6px] bg-[var(--bg-3)] px-4 py-2.5 text-body leading-[1.6] text-[var(--ink)]">
                     {view.body || view.title}
                   </div>
                   <span className="pr-1 font-mono text-micro tabular-nums text-[var(--ink-2)]">{view.at}</span>
                 </div>
               ) : isTool || isOrder ? (
-                <div className="space-y-1.5">
+                <div className="space-y-2">
                   <button
                     type="button"
                     onClick={() => setExpanded((prev) => ({ ...prev, [e.id]: !openBody }))}
                     aria-expanded={openBody}
                     className={cn(
-                      'group flex w-full items-center gap-2 rounded-[10px] px-2.5 py-2 text-left transition-colors',
+                      'group flex w-full items-center gap-2.5 rounded-xl px-3 py-2.5 text-left transition-colors',
                       isOrder ? 'bg-[var(--up-soft)] hover:bg-[var(--bg-3)]' : 'bg-[var(--bg-2)] hover:bg-[var(--bg-3)]',
                     )}
                   >
                     <span
                       aria-hidden
                       className={cn(
-                        'grid size-6 shrink-0 place-items-center rounded-full font-mono text-micro font-bold',
+                        'grid size-6 shrink-0 place-items-center rounded-full text-micro font-semibold',
                         isOrder ? 'bg-[var(--ver)] text-[var(--bg-1)]' : 'bg-[var(--brass-hi)] text-[var(--bg-0)]',
                       )}
                     >
@@ -259,33 +258,31 @@ export function ConversationPane({ className, hideHeader = false }: Props) {
                         : t('training.conv.glyphTool')}
                     </span>
                     <span className="min-w-0 flex-1 truncate text-note font-medium text-[var(--ink)]">{view.title}</span>
-                    <span className="shrink-0 font-mono text-micro tracking-[0.04em] text-[var(--ink-2)]">
+                    <span className="shrink-0 font-mono text-micro tabular-nums text-[var(--ink-2)]">
                       {isOrder && isLive ? t('training.conv.advisoryShort') : t(KIND_KEY[e.kind])} · {view.at}
                     </span>
                   </button>
 
                   {openBody ? (
-                    <div className="space-y-2 rounded-[10px] border border-[var(--line)] bg-[var(--bg-1)] p-3">
-                      {view.body ? <p className="whitespace-pre-wrap text-note leading-relaxed text-[var(--ink-2)]">{view.body}</p> : null}
-
+                    <div className="space-y-2.5 rounded-xl border border-[var(--line-soft)] bg-[var(--bg-1)] p-3.5">
                       {e.evidenceItems && e.evidenceItems.length > 0 ? (
-                        <div className="space-y-2 pt-1">
+                        <div className="space-y-2">
                           {e.evidenceItems.map((ev) => {
                             const evView = formatEvidence(ev, t)
                             return (
                               <div
                                 key={ev.id}
-                                className="rounded-md border border-[var(--line-soft)] bg-[var(--bg-2)] px-3 py-2"
+                                className="rounded-lg border border-[var(--line-soft)] bg-[var(--bg-2)] px-3.5 py-2.5"
                               >
-                                <div className="flex flex-wrap items-center justify-between gap-2 font-mono text-micro">
-                                  <span className="font-semibold text-[var(--fg-0)]">
-                                    {ev.id} · {evView.title}
+                                <div className="flex flex-wrap items-center justify-between gap-2 text-micro">
+                                  <span className="font-medium text-[var(--fg-0)]">
+                                    <span className="font-mono text-[var(--fg-2)]">{ev.id}</span> · {evView.title}
                                   </span>
-                                  <span className="text-[var(--lime)]">
+                                  <span className="font-mono tabular-nums text-[var(--lime)]">
                                     {ev.publishedAt} · {ev.pitPass ? t('training.conv.pitPass') : t('training.conv.pitBlocked')}
                                   </span>
                                 </div>
-                                <p className="mt-1 text-note leading-relaxed text-[var(--fg-1)]">{evView.summary}</p>
+                                <p className="mt-1.5 text-note leading-relaxed text-[var(--fg-1)]">{evView.summary}</p>
                               </div>
                             )
                           })}
@@ -293,26 +290,41 @@ export function ConversationPane({ className, hideHeader = false }: Props) {
                       ) : null}
 
                       {view.interceptedNote ? (
-                        <div className="flex items-start gap-2 rounded-md bg-[var(--warn-soft)] px-3 py-2 font-mono text-micro text-[var(--warn)]">
+                        <div className="flex items-start gap-2 rounded-lg bg-[var(--warn-soft)] px-3.5 py-2.5 text-micro font-medium text-[var(--warn)]">
                           <ShieldAlert size={15} aria-hidden className="mt-0.5 shrink-0" />
                           <span>{view.interceptedNote}</span>
                         </div>
+                      ) : null}
+
+                      {view.body ? (
+                        e.evidenceItems && e.evidenceItems.length > 0 ? (
+                          <details className="pt-1">
+                            <summary className="text-micro text-[var(--fg-2)] hover:text-[var(--fg-0)]">
+                              {t('training.conv.showRawPayload')}
+                            </summary>
+                            <p className="mt-2 whitespace-pre-wrap rounded-md bg-[var(--well)] p-2.5 font-mono text-micro leading-relaxed text-[var(--fg-2)]">
+                              {view.body}
+                            </p>
+                          </details>
+                        ) : (
+                          <p className="whitespace-pre-wrap text-note leading-relaxed text-[var(--ink-2)]">{view.body}</p>
+                        )
                       ) : null}
                     </div>
                   ) : null}
                 </div>
               ) : (
-                <div className="group space-y-1">
-                  <div className="flex flex-wrap items-center gap-1.5">
+                <div className="group space-y-1.5">
+                  <div className="flex flex-wrap items-center gap-2">
                     <span
                       aria-hidden
-                      className="block size-[5px] rounded-full"
+                      className="block size-[6px] rounded-full"
                       style={{ background: e.kind === 'error' ? 'var(--ver)' : 'var(--lime)' }}
                     />
-                    <span className="font-mono text-micro font-semibold tracking-[0.04em] text-[var(--ink-2)]">
+                    <span className="text-micro font-medium text-[var(--ink-2)]">
                       {view.speakerRole ?? agent.shortName}
                     </span>
-                    <span className="font-mono text-micro tabular-nums tracking-[0.04em] text-[var(--ink-2)]">
+                    <span className="font-mono text-micro tabular-nums text-[var(--ink-2)]">
                       {view.at}
                     </span>
                     <button
@@ -340,13 +352,8 @@ export function ConversationPane({ className, hideHeader = false }: Props) {
         })}
 
         {waitingHuman ? (
-          <div className="rounded-[12px] bg-[var(--warn-soft)] px-3.5 py-3">
-            <span className="font-mono text-micro font-semibold uppercase tracking-[0.14em] text-[var(--warn)]">
-              {isLive ? t('training.conv.waitingLiveTitle') : t('training.conv.waitingSimTitle')}
-            </span>
-            <p className="mt-1.5 text-note leading-relaxed text-[var(--fg-0)]">
-              {isLive ? t('training.conv.waitingLiveBody') : t('training.conv.waitingSimBody')}
-            </p>
+          <div className="rounded-xl bg-[var(--warn-soft)] px-4 py-3 text-micro font-medium text-[var(--warn)]">
+            {isLive ? t('training.conv.waitingLiveBody') : t('training.conv.waitingSimBody')}
           </div>
         ) : null}
 
@@ -355,7 +362,7 @@ export function ConversationPane({ className, hideHeader = false }: Props) {
             <button
               type="button"
               onClick={() => scrollToBottom()}
-              className="flex items-center gap-1 rounded-full border border-[var(--line)] bg-[var(--bg-1)] px-2.5 py-1 font-mono text-micro uppercase tracking-[0.1em] text-[var(--ink-2)]"
+              className="flex items-center gap-1 rounded-full border border-[var(--line)] bg-[var(--bg-1)] px-3 py-1 text-micro font-medium text-[var(--ink-2)]"
             >
               <ArrowDown size={13} />
               {t('training.conv.latest')}

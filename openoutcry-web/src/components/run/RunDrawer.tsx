@@ -5,14 +5,15 @@ import { Dialog as DialogPrimitive } from 'radix-ui'
 
 import {
   formatAgent,
+  formatAsset,
   formatMarketSession,
   formatStateClock,
   formatSyncLabel,
 } from '../../i18n/helpers'
-import { useRun, useWorkspaceKind } from '../../store/RunProvider'
-import { useDialog } from '../../store/DialogProvider'
-import { useToast } from '../../store/ToastProvider'
 import { exportRun } from '../../lib/exportRun'
+import { useDialog } from '../../store/DialogProvider'
+import { useRun, useWorkspaceKind } from '../../store/RunProvider'
+import { useToast } from '../../store/ToastProvider'
 
 export function RunDrawer() {
   const kind = useWorkspaceKind()
@@ -24,6 +25,7 @@ export function RunDrawer() {
   const agent = formatAgent(state.agent, t)
   const aborted = state.status === 'aborted'
   const isLive = state.kind === 'live'
+  const team = state.team ?? [state.agent]
 
   const act = (fn: () => void) => {
     setOpen(false)
@@ -98,17 +100,40 @@ export function RunDrawer() {
                     <div className="kv">
                       <span>{t('drawer.dataCutoff')}</span>
                       <span className="dots" />
-                      <b>2024-04-22 23:59:58</b>
+                      <b>{state.pitCutoff ?? '2024-04-22 23:59'}</b>
                     </div>
                     <div className="kv">
-                      <span>{t('drawer.researchAccess')}</span>
+                      <span>{t('drawer.blindMaskLabel')}</span>
+                      <span className="dots" />
+                      <b>
+                        {state.blindMask !== false
+                          ? t('drawer.blindMaskOn', {
+                              asset: formatAsset(state.proposal.asset ?? '公司-017', t),
+                            })
+                          : t('drawer.blindMaskOff')}
+                      </b>
+                    </div>
+                    <div className="kv">
+                      <span>{t('drawer.teamLabel')}</span>
+                      <span className="dots" />
+                      <b>
+                        {team
+                          .map((id, idx) => {
+                            const role =
+                              idx === 0
+                                ? t('training.teamLead')
+                                : idx === 1
+                                  ? t('training.teamResearch')
+                                  : t('training.teamRisk')
+                            return `${role} · ${formatAgent(id, t).shortName}`
+                          })
+                          .join(' / ')}
+                      </b>
+                    </div>
+                    <div className="kv">
+                      <span>{t('drawer.toolGatewayLabel')}</span>
                       <span className="dots" />
                       <b>{t('drawer.controlled')}</b>
-                    </div>
-                    <div className="kv">
-                      <span>{t('drawer.traceIntegrity')}</span>
-                      <span className="dots" />
-                      <b>100%</b>
                     </div>
                     <div className="kv">
                       <span>{t('drawer.qualification')}</span>

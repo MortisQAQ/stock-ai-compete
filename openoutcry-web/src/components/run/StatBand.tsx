@@ -1,8 +1,7 @@
-import type { ReactNode } from 'react'
-
 import type { BandItem } from '../../types'
 
-export function StatBand({ items, tags }: { items: BandItem[]; tags?: ReactNode }) {
+/** 四格 KPI 资产带：聚焦核心数字，去除底部重复标签条 */
+export function StatBand({ items }: { items: BandItem[] }) {
   return (
     <div className="band">
       <div className="band-in">
@@ -10,11 +9,9 @@ export function StatBand({ items, tags }: { items: BandItem[]; tags?: ReactNode 
           <div className="band-cell" key={item.label}>
             <span className="label">{item.label}</span>
             <b className={item.tone ?? undefined}>{item.value}</b>
-            <small>{item.note}</small>
           </div>
         ))}
       </div>
-      {tags ? <div className="band-tags">{tags}</div> : null}
     </div>
   )
 }

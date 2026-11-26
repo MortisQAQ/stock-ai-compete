@@ -17,13 +17,12 @@ import {
 } from 'lucide-react'
 import { Dialog as DialogPrimitive } from 'radix-ui'
 
-import { PRIMARY_NAV, REFERENCE_NAV, titleOf } from '../../nav'
 import { formatTask } from '../../i18n/helpers'
+import { cn } from '../../lib/utils'
+import { PRIMARY_NAV, REFERENCE_NAV, titleOf } from '../../nav'
 import { useLocale } from '../../store/LocaleProvider'
 import { useTraining } from '../../store/TrainingProvider'
-import { trainingStatusText } from '../../store/selectors'
 import type { TrainingTask } from '../../types'
-import { cn } from '../../lib/utils'
 
 type IconType = ComponentType<{ size?: number | string; 'aria-hidden'?: boolean; className?: string }>
 
@@ -46,9 +45,8 @@ interface TaskListGroupProps {
   onOpenTask: (id: string) => void
 }
 
-/** 单层任务列表（移除点击不换内容的假二级子会话，释放 900px 投影空间） */
+/** 单层精简任务列表：每行聚焦任务名 + 状态点 */
 function TaskListGroup({ title, tasks, activeTaskId, onRoute, onOpenTask }: TaskListGroupProps) {
-  const { lang } = useLocale()
   const { t } = useTranslation()
   return (
     <div className="rail-group">
@@ -69,10 +67,9 @@ function TaskListGroup({ title, tasks, activeTaskId, onRoute, onOpenTask }: Task
                 aria-current={active ? 'page' : undefined}
                 onClick={() => onOpenTask(task.id)}
               >
-                <span className="rail-task-name">{view.name}</span>
-                <span className="rail-task-meta">
-                  <i className={cn('rail-dot', task.status)} aria-hidden />
-                  {trainingStatusText(task.status, lang)}
+                <span className="flex items-center gap-2.5">
+                  <i className={cn('rail-dot shrink-0', task.status)} aria-hidden />
+                  <span className="rail-task-name">{view.name}</span>
                 </span>
               </button>
             </li>
@@ -83,6 +80,13 @@ function TaskListGroup({ title, tasks, activeTaskId, onRoute, onOpenTask }: Task
   )
 }
 
+/**
+ * 左侧栏内容（桌面常驻 + 移动端抽屉共用）：
+ *   上 = 品牌（直达 01 Agent 库）
+ *   中上 = 五步主流程（01 → 05 严格单向因果顺序）
+ *   中下 = 训练任务（在上）+ 实战账户（在下）
+ *   底 = 参考区（协议与 Skill / 产品说明）+ ZH/EN、主题与涨跌色紧凑一行开关
+ */
 function RailBody({ onNavigate }: { onNavigate?: () => void }) {
   const { tasks, current, selectTask, liveTasks, liveCurrent, selectLiveTask } = useTraining()
   const { theme, marketColors, toggleLang, toggleTheme, toggleMarketColors } = useLocale()
@@ -110,7 +114,6 @@ function RailBody({ onNavigate }: { onNavigate?: () => void }) {
           <b>openOutcry</b>
           <s aria-hidden />
         </Link>
-        <p className="rail-tagline">{t('sidebar.tagline')}</p>
       </div>
 
       <nav className="rail-nav" aria-label={t('sidebar.workflowAria')}>
@@ -165,7 +168,7 @@ function RailBody({ onNavigate }: { onNavigate?: () => void }) {
           onClick={toggleLang}
           aria-label={t('sidebar.switchLangAria')}
         >
-          <Globe size={15} aria-hidden />
+          <Globe size={14} aria-hidden />
           <span>{t('sidebar.switchLangLabel')}</span>
         </button>
         <button
@@ -174,23 +177,17 @@ function RailBody({ onNavigate }: { onNavigate?: () => void }) {
           onClick={toggleTheme}
           aria-label={t('sidebar.toggleThemeAria')}
         >
-          {theme === 'dark' ? <Sun size={15} aria-hidden /> : <Moon size={15} aria-hidden />}
-          <span>{theme === 'dark' ? t('sidebar.themeLight') : t('sidebar.themeDark')}</span>
+          {theme === 'dark' ? <Sun size={14} aria-hidden /> : <Moon size={14} aria-hidden />}
+          <span>{theme === 'dark' ? t('sidebar.themeLightShort') : t('sidebar.themeDarkShort')}</span>
         </button>
-      </div>
-
-      <div className="rail-foot justify-between">
-        <span className="inline-flex items-center gap-2">
-          <span className="rail-foot-dot" aria-hidden />
-          <span>{t('sidebar.prototypeMock')}</span>
-        </span>
         <button
           type="button"
+          className="rail-tool-btn"
           onClick={toggleMarketColors}
-          className="font-mono text-micro text-[var(--fg-1)] underline decoration-dotted underline-offset-2 hover:text-[var(--fg-0)]"
+          aria-label={t('sidebar.toggleMarketColorsTitle')}
           title={t('sidebar.toggleMarketColorsTitle')}
         >
-          {marketColors === 'cn' ? t('sidebar.colorsCn') : t('sidebar.colorsIntl')}
+          <span>{marketColors === 'cn' ? t('sidebar.colorsCnShort') : t('sidebar.colorsIntlShort')}</span>
         </button>
       </div>
     </>

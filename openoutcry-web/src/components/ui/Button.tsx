@@ -15,7 +15,7 @@ import { cn } from '@/lib/utils'
 const buttonVariants = cva(
   [
     'inline-flex shrink-0 select-none items-center justify-center gap-1.5 whitespace-nowrap',
-    'rounded-sm border font-mono text-note font-semibold uppercase leading-none tracking-[0.08em]',
+    'rounded-md border font-sans text-note font-medium leading-none tracking-[0.01em]',
     'transition-[background-color,border-color,color,transform] duration-150 ease-[var(--ease-out-quart)]',
     'disabled:pointer-events-none disabled:opacity-40',
     'aria-invalid:border-destructive',

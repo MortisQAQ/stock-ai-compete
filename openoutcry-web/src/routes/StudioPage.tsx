@@ -3,15 +3,16 @@ import { useNavigate } from 'react-router-dom'
 import { ArrowRight } from 'lucide-react'
 
 import { formatAgent } from '../i18n/helpers'
+import { money, signedPct } from '../lib/format'
 import { useRun } from '../store/RunProvider'
 import { useTraining } from '../store/TrainingProvider'
 import { Button } from '../components/ui/Button'
 import { MandateTicket } from '../components/studio/MandateTicket'
 import { TrainingLedger } from '../components/studio/TrainingLedger'
-import { money, signedPct } from '../lib/format'
 
 /**
- * Step 02 · 训练委托台（首屏压实布局）
+ * Step 02 · 训练委托台：
+ * 紧凑头部与当前在跑摘要 + 2×2 委托单 + 训练台账。
  */
 export function StudioPage() {
   const { state, totals } = useRun('training')
@@ -25,23 +26,19 @@ export function StudioPage() {
 
   return (
     <>
-      <div className="vlabel page-vlabel" aria-hidden="true">
-        OPENOUTCRY / 02 TRAINING DESK / 2026
-      </div>
-
       <div className="pagehead">
         <div>
-          <span className="label">{t('studio.kicker')}</span>
           <h1>{t('studio.title')}</h1>
           <p className="deck">{t('studio.deck')}</p>
         </div>
 
-        <div className="flex flex-wrap items-center gap-3 rounded-lg border border-[var(--line)] bg-[var(--bg-1)] px-4 py-2.5">
-          <div className="flex flex-col">
-            <span className="font-mono text-micro text-[var(--fg-2)]">
-              {t('studio.activeRun')} {state.mandateNo ?? current.no}
+        <div className="flex flex-wrap items-center gap-4 rounded-xl border border-[var(--line-soft)] bg-[var(--bg-1)] px-4 py-3">
+          <div className="flex flex-col gap-0.5">
+            <span className="text-micro text-[var(--fg-2)]">
+              {t('studio.activeRun')}{' '}
+              <span className="font-mono">{state.mandateNo ?? current.no}</span>
             </span>
-            <span className="font-mono text-note font-semibold text-[var(--fg-0)]">
+            <span className="font-mono text-note font-semibold tabular-nums text-[var(--fg-0)]">
               {teamNames} · {money(totals.equity)}{' '}
               <em className={totals.net >= 0 ? 'not-italic text-[var(--up)]' : 'not-italic text-[var(--down)]'}>
                 ({signedPct(netPct)})
@@ -55,14 +52,9 @@ export function StudioPage() {
         </div>
       </div>
 
-      <MandateTicket />
-      <TrainingLedger />
-
-      <div className="foot">
-        <span>
-          <b>openOutcry</b> — {t('studio.footerDesc')}
-        </span>
-        <span>v2.0 · 2026-11</span>
+      <div className="space-y-10">
+        <MandateTicket />
+        <TrainingLedger />
       </div>
     </>
   )

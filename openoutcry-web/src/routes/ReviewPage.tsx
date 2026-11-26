@@ -9,7 +9,6 @@ import { StatBand } from '../components/run/StatBand'
 import { Badge } from '../components/ui/Badge'
 import { Button } from '../components/ui/Button'
 import { Card } from '../components/ui/Card'
-import { Stamp } from '../components/ui/Stamp'
 import { BENCH_SERIES, NAV_SERIES, TOOL_USAGE_ITEMS } from '../data/market'
 import {
   formatAgent,
@@ -54,16 +53,8 @@ export function ReviewPage() {
 
   return (
     <>
-      <div className="vlabel page-vlabel" aria-hidden="true">
-        OPENOUTCRY / 04 REVIEW &amp; COMPARE / 2026
-      </div>
-
       <div className="pagehead">
         <div>
-          <div className="flex flex-wrap items-center gap-2.5">
-            <span className="label">{t('review.kicker')}</span>
-            <Stamp tone="slate">{t('review.stampUnranked')}</Stamp>
-          </div>
           <h1>{t('review.title')}</h1>
           <p className="deck">
             {t('review.deck', {
@@ -95,28 +86,10 @@ export function ReviewPage() {
         </div>
       </div>
 
-      <StatBand
-        items={band}
-        tags={
-          <>
-            <span>
-              {t('review.tagBenchmark')} <b>{t('review.tagBenchmarkVal')}</b>
-            </span>
-            <span>
-              {t('review.tagSample')} <b>{t('review.tagSampleVal')}</b>
-            </span>
-            <span>
-              {t('review.tagRankGate')} <b>{t('review.tagRankGateVal')}</b>
-            </span>
-            <span>
-              Deflated Sharpe <b>{t('review.tagDsrVal')}</b>
-            </span>
-          </>
-        }
-      />
+      <StatBand items={band} />
 
       {/* 同口径多版本对照表 */}
-      <div className="section-hd">
+      <div className="section-hd mt-10">
         <h2 className="flex items-center gap-2">
           <GitCompare size={18} aria-hidden className="text-[var(--lime)]" />
           {t('review.compareTitle')}
@@ -149,7 +122,7 @@ export function ReviewPage() {
               return (
                 <tr key={row.id} className={row.isCurrent ? 'is-current' : ''}>
                   <td>
-                    <div className="font-mono text-micro text-[var(--fg-2)]">{row.no}</div>
+                    <div className="font-mono text-micro tabular-nums text-[var(--fg-2)]">{row.no}</div>
                     <div className="font-semibold text-[var(--fg-0)]">{rowLabel}</div>
                   </td>
                   <td className="text-[var(--fg-1)]">{rowVar}</td>
@@ -177,8 +150,8 @@ export function ReviewPage() {
         </table>
       </div>
 
-      {/* 图表三件套 */}
-      <div className="charts frame mt-8">
+      {/* 图表三件套 + 运行事实 */}
+      <div className="charts frame mt-10">
         <div className="chart-card">
           <div className="chart-hd">
             <b>Equity vs Benchmark</b>
@@ -248,12 +221,12 @@ export function ReviewPage() {
         </div>
       </div>
 
-      <div className="section-hd">
+      <div className="section-hd mt-10">
         <h2>{t('review.tradesTitle')}</h2>
-        <span className="label">{t('review.tradesHint')}</span>
+        <span className="text-micro text-[var(--fg-2)]">{t('review.tradesHint')}</span>
       </div>
 
-      <Card className="px-4">
+      <Card className="px-5">
         {state.trades.map((tr) => {
           const tv = formatTrade(tr, t)
           return (
@@ -266,7 +239,7 @@ export function ReviewPage() {
                   {tv.time} · {money(tr.price)} · {t('review.feePrefix')} {money(tr.fee)} · {tr.evidence}
                 </small>
               </span>
-              <span className={'font-mono text-data ' + (tr.pnl === null ? 'dim' : tone(tr.pnl))}>
+              <span className={'font-mono text-data tabular-nums ' + (tr.pnl === null ? 'dim' : tone(tr.pnl))}>
                 {tr.pnl === null ? t('review.entryLabel') : signed(tr.pnl)}
               </span>
             </button>
@@ -274,13 +247,8 @@ export function ReviewPage() {
         })}
       </Card>
 
-      <div className="note mt-4 max-w-[78ch]">{t('review.formulaNote')}</div>
-
       <div className="foot">
-        <span>
-          <b>{t('review.footBasis')}</b> — {t('review.footBasisDesc')}
-        </span>
-        <span>{t('review.footDemo')}</span>
+        <span>{t('review.footSummary')}</span>
       </div>
     </>
   )

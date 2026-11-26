@@ -4,12 +4,12 @@ import { ArrowUpRight } from 'lucide-react'
 
 import type { TrainingRecord } from '../../data/trainings'
 import { formatAgent, formatTrainingRecord } from '../../i18n/helpers'
+import { cn } from '../../lib/utils'
 import { useLocale } from '../../store/LocaleProvider'
 import { useTraining } from '../../store/TrainingProvider'
 import { trainingStatusText } from '../../store/selectors'
 import { LIVE_TASK_ID } from '../../store/trainingTasks'
 import type { TrainingStatus } from '../../types'
-import { cn } from '../../lib/utils'
 
 const AGENT_CODE: Record<string, string> = { codex: 'CX', native: 'OC', kimi: 'KM', custom: '??' }
 
@@ -70,7 +70,7 @@ export function TrainingLedger() {
 }
 
 function Col({ children, className }: { children: React.ReactNode; className?: string }) {
-  return <span className={cn('cond text-micro font-semibold text-[var(--fg-2)]', className)}>{children}</span>
+  return <span className={cn('text-micro font-medium text-[var(--fg-2)]', className)}>{children}</span>
 }
 
 function TrainingRow({
@@ -92,18 +92,18 @@ function TrainingRow({
       <button
         type="button"
         onClick={onOpen}
-        className="group flex w-full items-center gap-4 px-[var(--sp-5)] py-3.5 text-left transition-colors hover:bg-[var(--bg-2)] focus-visible:bg-[var(--bg-2)]"
+        className="group flex w-full items-center gap-4 px-[var(--sp-5)] py-4 text-left transition-colors hover:bg-[var(--bg-2)] focus-visible:bg-[var(--bg-2)]"
       >
         <span className="min-w-0 flex-1">
           <span className="flex flex-wrap items-baseline gap-x-2">
-            <span className="shrink-0 font-mono text-micro tracking-[0.08em] text-[var(--ink-3)]">
+            <span className="shrink-0 font-mono text-micro tabular-nums text-[var(--ink-3)]">
               {training.no}
             </span>
-            <span className="line-clamp-2 min-w-0 font-sans text-row font-semibold leading-snug tracking-[-0.02em] text-ink md:truncate">
+            <span className="line-clamp-2 min-w-0 font-sans text-row font-semibold leading-snug text-ink md:truncate">
               {view.title}
             </span>
           </span>
-          <span className="mt-1 flex flex-wrap items-center gap-x-2 gap-y-0.5 text-note text-[var(--fg-2)]">
+          <span className="mt-1 flex flex-wrap items-center gap-x-2.5 gap-y-0.5 text-note text-[var(--fg-2)]">
             <span className="md:hidden">
               {training.from.slice(5)} → {training.to.slice(5)}
             </span>
@@ -111,7 +111,7 @@ function TrainingRow({
             {training.result ? (
               <span
                 className={cn(
-                  'font-mono text-note font-semibold',
+                  'font-mono text-note font-semibold tabular-nums',
                   training.result.startsWith('-') ? 'text-[var(--down)]' : 'text-[var(--up)]',
                 )}
               >
@@ -121,12 +121,12 @@ function TrainingRow({
           </span>
         </span>
 
-        <span className="hidden w-[148px] shrink-0 items-center gap-1 md:flex">
+        <span className="hidden w-[148px] shrink-0 items-center gap-1.5 md:flex">
           {training.team.map((id) => (
             <span
               key={id}
               title={formatAgent(id, t).name}
-              className="grid size-8 place-items-center border border-[var(--rule)] bg-[var(--bg-1)] font-mono text-micro font-semibold uppercase text-ink-2"
+              className="grid size-8 place-items-center rounded-md border border-[var(--line-soft)] bg-[var(--bg-2)] font-sans text-micro font-medium text-ink-2"
             >
               {AGENT_CODE[id] ?? id.slice(0, 2)}
             </span>
@@ -146,7 +146,7 @@ function TrainingRow({
           </span>
         </span>
 
-        <span className={cn('w-[88px] shrink-0 text-right font-mono text-micro font-semibold', TONE[training.status])}>
+        <span className={cn('w-[88px] shrink-0 text-right text-micro font-medium', TONE[training.status])}>
           {trainingStatusText(training.status, lang)}
         </span>
 

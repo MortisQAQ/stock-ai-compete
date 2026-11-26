@@ -13,6 +13,12 @@ interface PitPriceStripProps {
   filled: boolean
 }
 
+/**
+ * 标的 PIT 截断走势条（借鉴 TradingView Bar Replay）：
+ * - 盘前研究态：垂直虚线右侧覆半透明未来遮罩，标明「04-23 开盘尚未揭示」；
+ * - 推进至 09:30 开盘撮合后：遮罩解开，实时渲染 ¥20.36 开盘成交点与标记；
+ * - 推进至 15:00 尾盘结算后：同步显示收盘价 ¥20.18。
+ */
 export function PitPriceStrip({ asset, costBasis, limitPrice, phase, filled }: PitPriceStripProps) {
   const hatchId = 'pit-mask-hatch-' + useId().replace(/:/g, '')
   const { t } = useTranslation()
@@ -64,19 +70,19 @@ export function PitPriceStrip({ asset, costBasis, limitPrice, phase, filled }: P
     : ''
 
   return (
-    <div className="mb-3 rounded-lg border border-[var(--line)] bg-[var(--well)] p-3">
-      <div className="mb-2 flex flex-wrap items-center justify-between gap-2">
-        <span className="font-mono text-micro font-semibold text-[var(--fg-0)]">
+    <div className="mb-4 rounded-xl border border-[var(--line-soft)] bg-[var(--well)] p-3.5">
+      <div className="mb-2.5 flex flex-wrap items-center justify-between gap-2 text-micro">
+        <span className="font-medium text-[var(--fg-0)]">
           {assetLabel} · {t('pitChart.titleSuffix')}
         </span>
-        <span className="font-mono text-micro text-[var(--fg-2)]">
+        <span className={revealed ? 'font-mono tabular-nums text-[var(--lime)]' : 'font-mono tabular-nums text-[var(--warn)]'}>
           {revealed
             ? t('pitChart.revealedStatus', { open: PIT_REVEALED_OPEN.open.toFixed(2), closePart })
             : t('pitChart.maskedStatus')}
         </span>
       </div>
 
-      <div className="relative overflow-hidden rounded border border-[var(--line-soft)] bg-[var(--bg-1)]">
+      <div className="relative overflow-hidden rounded-lg border border-[var(--line-soft)] bg-[var(--bg-1)]">
         <svg
           viewBox={`0 0 ${W} ${H}`}
           className="block h-[96px] w-full"
@@ -151,20 +157,11 @@ export function PitPriceStrip({ asset, costBasis, limitPrice, phase, filled }: P
 
         {!revealed ? (
           <div className="pointer-events-none absolute inset-y-0 right-0 flex w-[26%] items-center justify-center px-1.5 text-center">
-            <span className="rounded bg-[var(--bg-0)]/85 px-1.5 py-0.5 font-mono text-micro font-semibold text-[var(--warn)]">
+            <span className="rounded-md bg-[var(--bg-0)]/85 px-2 py-0.5 text-micro font-medium text-[var(--warn)]">
               {t('pitChart.maskedBadge')}
             </span>
           </div>
         ) : null}
-      </div>
-
-      <div className="mt-2 flex flex-wrap items-center justify-between gap-2 font-mono text-micro text-[var(--fg-2)]">
-        <span>
-          {t('pitChart.costAndLimit', { cost: costBasis.toFixed(2), limit: limitPrice.toFixed(2) })}
-        </span>
-        <span className={revealed ? 'text-[var(--lime)]' : 'text-[var(--warn)]'}>
-          {revealed ? t('pitChart.filledNote') : t('pitChart.hiddenNote')}
-        </span>
       </div>
     </div>
   )
