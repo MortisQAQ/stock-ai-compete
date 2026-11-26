@@ -1,0 +1,1768 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-theme="light">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>openOutcry 产品设计文档 v2.0 — 五步闭环 · 训练配置 · 快慢双时钟</title>
+  <style>
+    /* ============================================================
+       openOutcry Design System — Editorial Paper + Signal Instrument
+       ============================================================ */
+    :root {
+      --bg: #f5f5f0;
+      --surface: #ffffff;
+      --surface-2: #eef1ea;
+      --surface-dark: #101914;
+      --surface-dark-2: #17241d;
+      --ink: #16241c;
+      --ink-2: #44564b;
+      --ink-3: #718378;
+      --line: #d9e0d5;
+      --line-strong: #bcc8b8;
+      --accent: #22543d;
+      --accent-soft: #e6f2ec;
+      --accent-bright: #16a34a;
+      --amber: #b45309;
+      --amber-soft: #fef3c7;
+      --red: #c0392b;
+      --red-soft: #fdecec;
+      --blue: #1d4ed8;
+      --blue-soft: #eff6ff;
+      --mono: "JetBrains Mono", "Cascadia Code", Consolas, "SFMono-Regular", monospace;
+      --sans: -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", "Segoe UI", Inter, sans-serif;
+      --serif: Georgia, "Noto Serif SC", "Songti SC", serif;
+      --radius: 12px;
+      --radius-sm: 8px;
+      --shadow: 0 1px 2px rgba(16, 25, 20, 0.04), 0 8px 24px rgba(16, 25, 20, 0.04);
+    }
+
+    [data-theme="dark"] {
+      --bg: #080d0a;
+      --surface: #101914;
+      --surface-2: #15221b;
+      --surface-dark: #060a08;
+      --surface-dark-2: #0d1511;
+      --ink: #ecf3ee;
+      --ink-2: #b1c2b7;
+      --ink-3: #7f9486;
+      --line: #213328;
+      --line-strong: #324c3c;
+      --accent: #4ade80;
+      --accent-soft: rgba(74, 222, 128, 0.12);
+      --accent-bright: #4ade80;
+      --amber: #fbbf24;
+      --amber-soft: rgba(251, 191, 36, 0.14);
+      --red: #f87171;
+      --red-soft: rgba(248, 113, 113, 0.14);
+      --blue: #60a5fa;
+      --blue-soft: rgba(96, 165, 250, 0.14);
+      --shadow: 0 2px 12px rgba(0, 0, 0, 0.35);
+    }
+
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--ink);
+      font-family: var(--sans);
+      font-size: 15px;
+      line-height: 1.72;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* Layout */
+    .shell {
+      display: grid;
+      grid-template-columns: 272px minmax(0, 1fr);
+      min-height: 100vh;
+    }
+
+    /* Sidebar TOC */
+    .toc {
+      position: sticky;
+      top: 0;
+      height: 100vh;
+      overflow-y: auto;
+      border-right: 1px solid var(--line);
+      background: var(--surface);
+      padding: 24px 18px 28px;
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+    }
+    .brand {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      padding-bottom: 14px;
+      border-bottom: 1px solid var(--line);
+    }
+    .brand-title {
+      font-family: var(--serif);
+      font-size: 20px;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .brand-dot {
+      width: 9px;
+      height: 9px;
+      border-radius: 999px;
+      background: var(--red);
+      display: inline-block;
+    }
+    .brand-sub {
+      font-family: var(--mono);
+      font-size: 11px;
+      color: var(--ink-3);
+      margin-top: 2px;
+    }
+    .theme-btn {
+      border: 1px solid var(--line-strong);
+      background: var(--surface-2);
+      color: var(--ink);
+      border-radius: 999px;
+      padding: 5px 10px;
+      font-family: var(--mono);
+      font-size: 11px;
+      cursor: pointer;
+      transition: 0.15s;
+      white-space: nowrap;
+    }
+    .theme-btn:hover { border-color: var(--accent); color: var(--accent); }
+
+    .toc-group-label {
+      font-family: var(--mono);
+      font-size: 10.5px;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--ink-3);
+      padding: 0 8px 6px;
+    }
+    .toc nav { display: flex; flex-direction: column; gap: 2px; }
+    .toc a {
+      display: flex;
+      align-items: baseline;
+      gap: 8px;
+      padding: 7px 9px;
+      border-radius: var(--radius-sm);
+      color: var(--ink-2);
+      text-decoration: none;
+      font-size: 13.5px;
+      line-height: 1.4;
+      transition: 0.15s;
+    }
+    .toc a .num {
+      font-family: var(--mono);
+      font-size: 11px;
+      color: var(--ink-3);
+      flex-shrink: 0;
+    }
+    .toc a:hover { background: var(--surface-2); color: var(--ink); }
+    .toc a.active {
+      background: var(--accent-soft);
+      color: var(--accent);
+      font-weight: 600;
+    }
+    .toc a.active .num { color: var(--accent); }
+
+    .toc-foot {
+      margin-top: auto;
+      padding-top: 14px;
+      border-top: 1px solid var(--line);
+      font-family: var(--mono);
+      font-size: 11px;
+      color: var(--ink-3);
+      line-height: 1.6;
+    }
+
+    /* Main Content */
+    .main {
+      max-width: 1040px;
+      width: 100%;
+      margin: 0 auto;
+      padding: 40px 44px 96px;
+    }
+
+    /* Hero */
+    .hero {
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      padding: 34px 36px;
+      box-shadow: var(--shadow);
+      margin-bottom: 36px;
+      position: relative;
+      overflow: hidden;
+    }
+    .hero::before {
+      content: "";
+      position: absolute;
+      inset: 0 0 auto 0;
+      height: 4px;
+      background: linear-gradient(90deg, var(--accent), var(--amber), var(--red));
+    }
+    .eyebrow {
+      font-family: var(--mono);
+      font-size: 11.5px;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--accent);
+      font-weight: 600;
+    }
+    .hero h1 {
+      font-family: var(--serif);
+      font-size: 32px;
+      line-height: 1.25;
+      margin: 10px 0 12px;
+      letter-spacing: -0.02em;
+    }
+    .hero-lead {
+      font-size: 16px;
+      color: var(--ink-2);
+      margin: 0 0 22px;
+      max-width: 78ch;
+    }
+    .meta-grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 12px;
+      padding-top: 18px;
+      border-top: 1px solid var(--line);
+    }
+    .meta-cell {
+      background: var(--surface-2);
+      border-radius: var(--radius-sm);
+      padding: 10px 12px;
+    }
+    .meta-cell dt {
+      font-family: var(--mono);
+      font-size: 10.5px;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--ink-3);
+    }
+    .meta-cell dd {
+      margin: 4px 0 0;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--ink);
+    }
+
+    /* Sections */
+    section.doc-sec {
+      margin-top: 48px;
+      scroll-margin-top: 24px;
+    }
+    .sec-head {
+      display: flex;
+      align-items: baseline;
+      gap: 12px;
+      border-bottom: 1px solid var(--line);
+      padding-bottom: 10px;
+      margin-bottom: 20px;
+    }
+    .sec-num {
+      font-family: var(--mono);
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--accent);
+      background: var(--accent-soft);
+      padding: 2px 8px;
+      border-radius: 6px;
+    }
+    h2 {
+      font-family: var(--serif);
+      font-size: 24px;
+      margin: 0;
+      letter-spacing: -0.015em;
+    }
+    h3 {
+      font-size: 17px;
+      margin: 24px 0 10px;
+      color: var(--ink);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    h4 {
+      font-size: 14.5px;
+      margin: 16px 0 8px;
+      color: var(--ink);
+    }
+    p { margin: 0 0 12px; color: var(--ink-2); }
+    strong { color: var(--ink); }
+
+    /* Callouts & Cards */
+    .callout {
+      border-left: 3.5px solid var(--accent);
+      background: var(--surface);
+      border-top: 1px solid var(--line);
+      border-right: 1px solid var(--line);
+      border-bottom: 1px solid var(--line);
+      border-radius: 0 var(--radius) var(--radius) 0;
+      padding: 16px 20px;
+      margin: 18px 0;
+    }
+    .callout.warn { border-left-color: var(--amber); background: var(--amber-soft); }
+    .callout.danger { border-left-color: var(--red); background: var(--red-soft); }
+    .callout-title {
+      font-family: var(--mono);
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: var(--ink);
+      margin-bottom: 6px;
+    }
+    .callout p:last-child { margin-bottom: 0; }
+
+    .card-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 16px;
+      margin: 16px 0;
+    }
+    .card-grid.three { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      padding: 18px 20px;
+      box-shadow: var(--shadow);
+    }
+    .card-kicker {
+      font-family: var(--mono);
+      font-size: 11px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 6px;
+      font-weight: 700;
+    }
+    .card h4 { margin-top: 0; font-size: 15.5px; }
+    .card ul { margin: 8px 0 0; padding-left: 18px; color: var(--ink-2); font-size: 13.8px; }
+    .card li { margin-bottom: 5px; }
+
+    /* Badges & Chips */
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      font-family: var(--mono);
+      font-size: 11px;
+      font-weight: 600;
+      padding: 2px 8px;
+      border-radius: 999px;
+      border: 1px solid var(--line-strong);
+      background: var(--surface-2);
+      color: var(--ink);
+      vertical-align: middle;
+    }
+    .badge.green { background: var(--accent-soft); color: var(--accent); border-color: transparent; }
+    .badge.amber { background: var(--amber-soft); color: var(--amber); border-color: transparent; }
+    .badge.red { background: var(--red-soft); color: var(--red); border-color: transparent; }
+    .badge.blue { background: var(--blue-soft); color: var(--blue); border-color: transparent; }
+
+    code {
+      font-family: var(--mono);
+      font-size: 0.86em;
+      background: var(--surface-2);
+      border: 1px solid var(--line);
+      padding: 1px 5px;
+      border-radius: 5px;
+      color: var(--ink);
+    }
+
+    /* Tables */
+    .table-wrap {
+      overflow-x: auto;
+      margin: 16px 0;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: var(--surface);
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13.6px;
+    }
+    th, td {
+      padding: 11px 14px;
+      text-align: left;
+      border-bottom: 1px solid var(--line);
+      vertical-align: top;
+    }
+    th {
+      background: var(--surface-2);
+      font-family: var(--mono);
+      font-size: 11.5px;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      color: var(--ink);
+      white-space: nowrap;
+    }
+    tr:last-child td { border-bottom: none; }
+    td.num { font-family: var(--mono); font-variant-numeric: tabular-nums; white-space: nowrap; }
+
+    /* Interactive 5-Step Journey Explorer */
+    .stepper-bar {
+      display: grid;
+      grid-template-columns: repeat(5, minmax(0, 1fr));
+      gap: 8px;
+      margin: 18px 0 14px;
+    }
+    .step-btn {
+      text-align: left;
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: var(--radius-sm);
+      padding: 12px 12px;
+      cursor: pointer;
+      transition: 0.16s;
+      color: var(--ink);
+      position: relative;
+    }
+    .step-btn:hover { border-color: var(--accent); transform: translateY(-1px); }
+    .step-btn.active {
+      background: var(--surface-dark);
+      color: #ecf3ee;
+      border-color: var(--accent);
+      box-shadow: 0 6px 18px rgba(16, 25, 20, 0.16);
+    }
+    .step-btn .s-num {
+      font-family: var(--mono);
+      font-size: 11px;
+      color: var(--accent);
+      font-weight: 700;
+    }
+    .step-btn.active .s-num { color: #4ade80; }
+    .step-btn .s-title { font-size: 14px; font-weight: 700; margin-top: 3px; }
+    .step-btn .s-route {
+      font-family: var(--mono);
+      font-size: 11px;
+      color: var(--ink-3);
+      margin-top: 2px;
+    }
+    .step-btn.active .s-route { color: #9eb5a6; }
+
+    .step-detail {
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      padding: 20px 22px;
+      box-shadow: var(--shadow);
+    }
+    .step-detail-grid {
+      display: grid;
+      grid-template-columns: 1.2fr 1fr;
+      gap: 18px;
+      margin-top: 12px;
+    }
+
+    /* Dark Instrument Panels (Signal Grid contrast layer) */
+    .instrument {
+      background: var(--surface-dark);
+      color: #e6f0ea;
+      border: 1px solid #24382c;
+      border-radius: var(--radius);
+      padding: 22px 24px;
+      margin: 18px 0;
+    }
+    .instrument h4, .instrument strong { color: #f6fbf8; }
+    .instrument p, .instrument li { color: #b5c7bc; }
+    .instrument code {
+      background: #1a2a21;
+      border-color: #2b4235;
+      color: #86efac;
+    }
+
+    /* Interactive Dual-Clock Explorer */
+    .clock-tabs {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin: 14px 0 16px;
+    }
+    .clock-tab {
+      background: #17251d;
+      color: #b5c7bc;
+      border: 1px solid #2b4235;
+      border-radius: 999px;
+      padding: 7px 14px;
+      font-family: var(--mono);
+      font-size: 12px;
+      cursor: pointer;
+      transition: 0.15s;
+    }
+    .clock-tab:hover { border-color: #4ade80; color: #ffffff; }
+    .clock-tab.active {
+      background: #16a34a;
+      border-color: #4ade80;
+      color: #06120a;
+      font-weight: 700;
+    }
+    .clock-stage {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+    }
+    .clock-lane {
+      background: #14211a;
+      border: 1px solid #273c30;
+      border-radius: var(--radius-sm);
+      padding: 15px 16px;
+    }
+    .clock-lane.fast { border-top: 3px solid #60a5fa; }
+    .clock-lane.slow { border-top: 3px solid #4ade80; }
+    .lane-tag {
+      font-family: var(--mono);
+      font-size: 11px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      margin-bottom: 6px;
+      font-weight: 700;
+    }
+    .clock-lane.slow .lane-tag { color: #4ade80; }
+    .clock-lane.fast .lane-tag { color: #60a5fa; }
+
+    /* Cost bars */
+    .bar-row {
+      display: grid;
+      grid-template-columns: 175px 1fr 120px;
+      align-items: center;
+      gap: 12px;
+      margin: 10px 0;
+      font-size: 13px;
+    }
+    .bar-track {
+      height: 10px;
+      background: #1d2e24;
+      border-radius: 999px;
+      overflow: hidden;
+    }
+    .bar-fill {
+      height: 100%;
+      border-radius: 999px;
+    }
+
+    /* Wireframe Blueprints */
+    .wireframe {
+      background: var(--surface);
+      border: 1px solid var(--line-strong);
+      border-radius: var(--radius);
+      overflow: hidden;
+      margin: 18px 0;
+      box-shadow: var(--shadow);
+    }
+    .wf-bar {
+      background: var(--surface-dark);
+      color: #e6f0ea;
+      padding: 10px 14px;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      font-family: var(--mono);
+      font-size: 11.5px;
+    }
+    .wf-pills { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
+    .wf-pill {
+      padding: 2px 8px;
+      border-radius: 999px;
+      background: #1c2e24;
+      border: 1px solid #2f4a3b;
+      color: #cfe0d6;
+    }
+    .wf-pill.on { background: #16a34a; color: #051109; border-color: #4ade80; font-weight: 700; }
+    .wf-pill.shield { background: rgba(251, 191, 36, 0.15); border-color: rgba(251, 191, 36, 0.45); color: #fde68a; }
+    .wf-pill.live { background: rgba(74, 222, 128, 0.16); border-color: #4ade80; color: #86efac; font-weight: 700; }
+
+    .wf-body {
+      display: grid;
+      grid-template-columns: 1fr 1.1fr;
+      gap: 14px;
+      padding: 16px;
+      background: var(--bg);
+    }
+    .wf-pane {
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: var(--radius-sm);
+      padding: 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .wf-pane-title {
+      font-family: var(--mono);
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--ink-3);
+      display: flex;
+      justify-content: space-between;
+      border-bottom: 1px solid var(--line);
+      padding-bottom: 6px;
+    }
+    .wf-box {
+      border: 1px dashed var(--line-strong);
+      border-radius: 6px;
+      padding: 9px 11px;
+      font-size: 12.8px;
+      color: var(--ink-2);
+      background: var(--surface-2);
+    }
+    .wf-box strong { font-size: 13px; display: block; margin-bottom: 3px; }
+    .wf-checks {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      font-family: var(--mono);
+      font-size: 11px;
+    }
+    .wf-check {
+      background: var(--accent-soft);
+      color: var(--accent);
+      padding: 2px 7px;
+      border-radius: 4px;
+      font-weight: 600;
+    }
+
+    /* Funnel Visual */
+    .funnel {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 12px;
+      margin: 16px 0;
+    }
+    .funnel-step {
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      padding: 16px;
+      position: relative;
+    }
+    .funnel-tier {
+      font-family: var(--mono);
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--accent);
+      margin-bottom: 4px;
+    }
+    .funnel-size {
+      font-family: var(--mono);
+      font-size: 22px;
+      font-weight: 700;
+      color: var(--ink);
+      margin: 4px 0 8px;
+    }
+
+    /* Page spec blocks */
+    .page-spec {
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      padding: 22px 24px;
+      margin: 20px 0;
+      box-shadow: var(--shadow);
+    }
+    .page-spec-hd {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid var(--line);
+      margin-bottom: 14px;
+    }
+    .page-spec-title {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 18px;
+      font-weight: 700;
+    }
+    .page-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+    }
+    .spec-list { margin: 6px 0 0; padding-left: 18px; color: var(--ink-2); font-size: 14px; }
+    .spec-list li { margin-bottom: 6px; }
+
+    /* Responsive */
+    @media (max-width: 1024px) {
+      .shell { grid-template-columns: 1fr; }
+      .toc { position: relative; height: auto; border-right: none; border-bottom: 1px solid var(--line); }
+      .main { padding: 24px 20px 64px; }
+      .meta-grid, .stepper-bar, .card-grid, .card-grid.three, .funnel, .clock-stage, .wf-body, .page-grid, .step-detail-grid {
+        grid-template-columns: 1fr;
+      }
+      .bar-row { grid-template-columns: 1fr; gap: 4px; }
+    }
+
+    @media print {
+      .toc, .theme-btn { display: none !important; }
+      .shell { display: block; }
+      .main { max-width: 100%; padding: 0; }
+      .hero, .card, .page-spec, .wireframe { box-shadow: none; break-inside: avoid; }
+    }
+  </style>
+</head>
+<body>
+<div class="shell">
+  <!-- ===================== STICKY SIDEBAR TOC ===================== -->
+  <aside class="toc" aria-label="文档目录">
+    <div class="brand">
+      <div>
+        <div class="brand-title"><span class="brand-dot"></span>openOutcry</div>
+        <div class="brand-sub">PRD v2.0 · 2026-11-26</div>
+      </div>
+      <button class="theme-btn" id="themeToggle" type="button" title="切换浅色/暗色主题">🌙 暗色</button>
+    </div>
+
+    <div>
+      <div class="toc-group-label">总览与竞品定位</div>
+      <nav>
+        <a href="#sec-00"><span class="num">00</span>产品定位与五步闭环</a>
+        <a href="#sec-01"><span class="num">01</span>竞品解剖与差异化护城河</a>
+      </nav>
+    </div>
+
+    <div>
+      <div class="toc-group-label">两大核心机制深挖</div>
+      <nav>
+        <a href="#sec-02"><span class="num">02</span>训练配置与标的池设计</a>
+        <a href="#sec-03"><span class="num">03</span>时间把控：快慢双时钟架构</a>
+      </nav>
+    </div>
+
+    <div>
+      <div class="toc-group-label">五页面产品与交互规范</div>
+      <nav>
+        <a href="#sec-04"><span class="num">04</span>01 Agent 库（/connect）</a>
+        <a href="#sec-05"><span class="num">05</span>02 训练委托（/studio）</a>
+        <a href="#sec-06"><span class="num">06</span>03 历史训练场（/training）</a>
+        <a href="#sec-07"><span class="num">07</span>04 复盘与对照（/review）</a>
+        <a href="#sec-08"><span class="num">08</span>05 实战工作台（/live）</a>
+      </nav>
+    </div>
+
+    <div>
+      <div class="toc-group-label">体验规范与边界</div>
+      <nav>
+        <a href="#sec-09"><span class="num">09</span>全局 UX 铁律与双语/投影规范</a>
+        <a href="#sec-10"><span class="num">10</span>MVP 边界与演进路线图</a>
+      </nav>
+    </div>
+
+    <div class="toc-foot">
+      项目：QXU2602 · FYP Term 1<br />
+      基线：重构自 MVP v1.0 &amp; A-1 会话设计<br />
+      参照：TraderHarness / 问财 / Alpha Arena / TV Replay / TOS OnDemand
+    </div>
+  </aside>
+
+  <!-- ===================== MAIN CONTENT ===================== -->
+  <main class="main">
+    <header class="hero">
+      <div class="eyebrow">Product Requirements &amp; Interaction Specification · v2.0</div>
+      <h1>openOutcry 产品设计文档：面向 A 股投资 Agent 的五步训战工作台</h1>
+      <p class="hero-lead">
+        openOutcry 不是再造一个荐股聊天框，也不是无人值守的黑盒赛马榜，而是一座<strong>让个人投资者与开发者“先在抗污染历史考场验清楚、再带进实盘镜像协同”的训战一体工作台</strong>。本文档以新版<strong>五页面单向因果架构</strong>重写全产品规范，重点攻克<strong>「如何科学配置一场训练（含标的池漏斗设计）」</strong>与<strong>「如何把控训练时间粒度（快慢双时钟解耦）」</strong>两大核心命题，并给出可直接指导 <code>openoutcry-web</code> 改造的交互蓝图。
+      </p>
+      <dl class="meta-grid">
+        <div class="meta-cell">
+          <dt>主线架构</dt>
+          <dd>5 页单向因果闭环 + 2 参考页降权</dd>
+        </div>
+        <div class="meta-cell">
+          <dt>核心市场与规则</dt>
+          <dd>中国 A 股（T+1 / 整手 / 涨跌停 / 停牌）</dd>
+        </div>
+        <div class="meta-cell">
+          <dt>标的池策略</dt>
+          <dd>全市场宽池可筛 + 焦点池动态聚焦</dd>
+        </div>
+        <div class="meta-cell">
+          <dt>时间引擎定调</dt>
+          <dd>MVP 日频三阶段 → 演进快慢双时钟</dd>
+        </div>
+      </dl>
+    </header>
+
+    <!-- ===================== SECTION 00 ===================== -->
+    <section id="sec-00" class="doc-sec">
+      <div class="sec-head">
+        <span class="sec-num">00</span>
+        <h2>产品定位与五步单向闭环</h2>
+      </div>
+      <p>
+        我们在访谈中发现，真正阻碍用户把真金白银交给投资 AI 的是两类截然不同但同源的卡点：<strong>老股民</strong>敢用 AI 看新闻，但看不到它在真实市场规则下的历史战绩，也没能力自己搭考场；<strong>懂技术的个人开发者</strong>能折腾 Prompt、模型与 Skill，但改完配置放到实盘跑两天，分不清赚钱是因为策略变强还是大盘碰巧涨了（“蒙眼拧螺丝”）。
+      </p>
+      <p>
+        因此，openOutcry 必须满足三项硬约束——<strong>容易接入、过程可理解、可重复对照</strong>，并通过严格的<strong>五步单向用户旅程</strong>贯穿始终（彻底告别旧版 7 页来回横跳的反直觉导航）：
+      </p>
+
+      <!-- Interactive 5-Step Explorer -->
+      <div class="stepper-bar" role="tablist" aria-label="五步用户旅程">
+        <button class="step-btn active" type="button" data-step="0" role="tab" aria-selected="true">
+          <div class="s-num">STEP 01</div>
+          <div class="s-title">Agent 库</div>
+          <div class="s-route">/connect</div>
+        </button>
+        <button class="step-btn" type="button" data-step="1" role="tab" aria-selected="false">
+          <div class="s-num">STEP 02</div>
+          <div class="s-title">训练委托</div>
+          <div class="s-route">/studio</div>
+        </button>
+        <button class="step-btn" type="button" data-step="2" role="tab" aria-selected="false">
+          <div class="s-num">STEP 03</div>
+          <div class="s-title">历史训练场</div>
+          <div class="s-route">/training</div>
+        </button>
+        <button class="step-btn" type="button" data-step="3" role="tab" aria-selected="false">
+          <div class="s-num">STEP 04</div>
+          <div class="s-title">复盘与对照</div>
+          <div class="s-route">/review</div>
+        </button>
+        <button class="step-btn" type="button" data-step="4" role="tab" aria-selected="false">
+          <div class="s-num">STEP 05</div>
+          <div class="s-title">实战工作台</div>
+          <div class="s-route">/live</div>
+        </button>
+      </div>
+
+      <div class="step-detail" id="stepDetailPanel">
+        <!-- Populated by JS on load & click -->
+      </div>
+
+      <div class="callout">
+        <div class="callout-title">导航降权原则</div>
+        <p>
+          <code>协议与 Skill (/protocol)</code> 与 <code>产品说明 (/guide)</code> 属于工程与参考资料，<strong>不再与 5 个业务页面平级混排</strong>，统一收拢至侧边栏底部无序号「参考 / Reference」分组，且清理 <code>Product Spec (MDX)</code> 等研发内部术语。
+        </p>
+      </div>
+    </section>
+
+    <!-- ===================== SECTION 01 ===================== -->
+    <section id="sec-01" class="doc-sec">
+      <div class="sec-head">
+        <span class="sec-num">01</span>
+        <h2>竞品解剖与差异化护城河</h2>
+      </div>
+      <p>
+        我们实机拆解了同赛道核心参照物——尤其是开源 A 股回测环境 <strong>TraderHarness</strong>（源码与本地 WebUI 实测）、商业金融技能平台 <strong>同花顺问财 SkillHub</strong>、实时竞技场 <strong>Alpha Arena / TradeRank</strong>、多角色投研框架 <strong>TradingAgents / ai-hedge-fund / PanWatch</strong>，以及面向真人的历史模拟盘标杆 <strong>TradingView Bar Replay / thinkorswim OnDemand / A 股 K 线训练营</strong>。
+      </p>
+
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>参照类别与代表</th>
+              <th>它们做对了什么（直接吸收）</th>
+              <th>致命局限 / 刻意不抄</th>
+              <th>openOutcry 如何转化</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>TraderHarness</strong><br /><span class="badge blue">A 股抗污染 Harness</span></td>
+              <td>
+                ① 五年全市场 A 股（~5,000 只）底库 + 活跃关注池分层；<br />
+                ② <strong>时点掩码 + 日期/实体双重匿名</strong>；<br />
+                ③ 三阶段渐进披露（盘前禁下单 → 开盘 → 尾盘）；<br />
+                ④ 唯一下单路径 <code>TradingBus.place_order()</code> + 不伪造隐藏推理；<br />
+                ⑤ 跨 run 叠加对比 + 逐笔 K 线证据联动。
+              </td>
+              <td>
+                纯自动批跑、<strong>完全无人机协同与审批</strong>；无实盘辅助工作台；像素办公室占首屏 55% 高度干扰判断；缺数据集直接甩 Python 异常原文。
+              </td>
+              <td>
+                吸收其抗污染、三阶段披露、单执行者委员会与对比工作台；<strong>补上独有的人机协同审批、插话引导、可动作阻断态与训战一体</strong>。
+              </td>
+            </tr>
+            <tr>
+              <td><strong>TradingView Bar Replay<br />thinkorswim OnDemand<br />同花顺 K 线训练营</strong><br /><span class="badge">真人历史模拟盘</span></td>
+              <td>
+                ① TV Replay 的<strong>未来截断线</strong>，推进一格才揭示新 K 线；<br />
+                ② TOS OnDemand 的<strong>全局时钟驱动整台终端</strong>；<br />
+                ③ A 股训练营的双盲隐藏股名、T+1 冻结与剩余交易日进度。
+              </td>
+              <td>
+                只服务真人手动点鼠标，无法接入外部 Agent，也没有研究证据链与多版本对照实验。
+              </td>
+              <td>
+                把“未来截断线解锁”“全局阶段推进灯”“A 股规则预检条”搬进历史训练场主屏，让评委一眼认出这是真懂交易的模拟器。
+              </td>
+            </tr>
+            <tr>
+              <td><strong>Alpha Arena / TradeRank<br />Hyper-Alpha-Arena</strong><br /><span class="badge amber">公开赛马 / 加密</span></td>
+              <td>
+                ① <strong>USER_PROMPT / CoT / TRADING_DECISIONS 三段折叠</strong>极度透明；<br />
+                ② 人设 × 模型矩阵（同一模型不同人设表现天差地别）；<br />
+                ③ 拆分 AI Trader（低频语义）与 Program Trader（规则触发）。
+              </td>
+              <td>
+                只支持极窄标的池（6–7 个币/美股），无 A 股；全自动无人干预；小样本排行榜极易误导散户。
+              </td>
+              <td>
+                事件详情采用三段折叠；复盘页刻意立起<strong>「样本不足（&lt;60 交易日）· 不排名」</strong>学术红线，反衬理性评估价值。
+              </td>
+            </tr>
+            <tr>
+              <td><strong>同花顺问财 SkillHub<br />Alpaca MCP / PanWatch</strong><br /><span class="badge green">轻接入 / 盯盘</span></td>
+              <td>
+                ① 问财复制一段 Prompt 即可装技能的极低门槛；<br />
+                ② Alpaca MCP 靠<strong>确定性风控闸门 + 人工审批弹窗</strong>防越权；<br />
+                ③ PanWatch 持仓表行内标注<strong>数据来源与过期状态</strong>。
+              </td>
+              <td>
+                问财只做单次选股无连续模拟账本；PanWatch 偏实时盯盘缺抗污染历史训练；无同口径重跑对照。
+              </td>
+              <td>
+                Agent 库接入向导提供「Agent Prompt / CLI」双页签一键复制；实战工作台融合镜像账本 + 新鲜度标注 + 双轨留痕。
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="callout">
+        <div class="callout-title">我们的唯一生态位</div>
+        <p>
+          其他产品要么是<strong>“无人值守的冷冰冰赛马场”</strong>（只能事后看净值），要么是<strong>“只给真人用的 K 线回放器”</strong>，要么是<strong>“只写研报不建账本的聊天框”</strong>。<strong>openOutcry 是唯一把「抗污染可审计的 A 股历史考场」+「人机协同（逐案审批 / 插话纠偏 / /goal 放手）」+「同构实战镜像工作台」打通的产品。</strong>
+        </p>
+      </div>
+    </section>
+
+    <!-- ===================== SECTION 02 (DEEP DIVE A) ===================== -->
+    <section id="sec-02" class="doc-sec">
+      <div class="sec-head">
+        <span class="sec-num">02</span>
+        <h2>深度专题 A：如何科学配置一场训练（标的池应该尽可能大吗？）</h2>
+      </div>
+      <p>
+        用户发起一次历史训练时，最容易踩的两个坑是：<strong>① 标的池太小导致“开卷作弊”</strong>（如果只放 5 只你事后知道涨得好的股票，Agent 闭着眼买都能赚钱，这就是学术界批判的 <em>Selection &amp; Survivorship Bias</em>）；<strong>② 标的池太大导致“上下文爆炸与算力失控”</strong>（把全 A 股 5,000 只股票的 K 线和公告全塞进 Prompt，既塞不下，也会让模型迷失在噪音里）。
+      </p>
+
+      <h3>2.1 核心解法：参考 TraderHarness 与真实模拟盘，采用「底层宽池 × 工具筛查 × 焦点池」三级漏斗</h3>
+      <p>
+        真人老股民在同花顺/东方财富模拟盘里，<strong>账户权限永远是全 A 股可买（5,000+ 只）</strong>，但没人会同时盯 5,000 只股票——真人是通过「看大盘宽度/板块异动 → 选股器初筛 → 加自选股 → 盯 5–15 只重点股交易」来工作的。TraderHarness 也在工程上验证了同一范式：<strong>本地底库覆盖五年全市场 A 股（~5,000 只含历史退市/停牌股）</strong>，但 Agent 通过受控工具按需筛选，而分钟级监控只跟踪 <strong>8–20 只焦点关注池（持仓 + 观察清单 + 条件单）</strong>。
+      </p>
+
+      <div class="funnel">
+        <div class="funnel-step">
+          <div class="funnel-tier">LAYER 1 · 可交易底池（Universe）</div>
+          <div class="funnel-size">尽可能宽 · 300 ~ 5,000 只</div>
+          <p style="font-size:13.2px;margin:0;">
+            <strong>考选股能力 + 防幸存者偏差。</strong>按模拟日期真实还原当时在市股票（保留当日后退市股、排除当时尚未上市股），显式标注 ST 与停牌状态。绝不一次性塞给 LLM。
+          </p>
+        </div>
+        <div class="funnel-step">
+          <div class="funnel-tier">LAYER 2 · 受控工具初筛（MCP Screener）</div>
+          <div class="funnel-size">按需查询 · 20 ~ 50 只</div>
+          <p style="font-size:13.2px;margin:0;">
+            盘前只向 Agent 推送<strong>市场宽度、指数与板块摘要</strong>；Agent 自主调用受控工具（<code>market.screen</code> / <code>research.announcements</code> / Python 沙箱）从底池中按自身策略筛出候选股。
+          </p>
+        </div>
+        <div class="funnel-step">
+          <div class="funnel-tier">LAYER 3 · 活跃焦点池（Watchlist）</div>
+          <div class="funnel-size">精准聚焦 · 5 ~ 20 只</div>
+          <p style="font-size:13.2px;margin:0;">
+            由<strong>当前持仓 + 盘前筛出的候选股 + 活动条件单标的</strong>动态组成。精细行情、公告深读、分钟级撮合与监控只覆盖这层，Token 与 I/O 成本恒定可控。
+          </p>
+        </div>
+      </div>
+
+      <h3>2.2 委托台应提供的三档标的池预设（覆盖全部真实场景）</h3>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>预设档位</th>
+              <th>范围与口径</th>
+              <th>考验什么能力</th>
+              <th>适用人群与实验场景</th>
+              <th>推荐度</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>① 全市场 A 股池</strong><br /><code>ALL_A_EX_ST</code></td>
+              <td>模拟日当日在市全部 A 股（~4,500–5,000 只），自动过滤当时 ST/退市整理/停牌，保留历史退市股</td>
+              <td><strong>完整“选股 + 择时 + 仓位”综合实战力</strong>，零人为选池偏差</td>
+              <td>严肃评测通用 Agent、对标真实模拟盘；配合 <code>market.screen</code> 工具自主选股</td>
+              <td><span class="badge green">标准考场 · 推荐</span></td>
+            </tr>
+            <tr>
+              <td><strong>② 指数成分池</strong><br /><code>CSI300 / CSI500</code></td>
+              <td>模拟日当期沪深 300（或中证 500 / 沪深 300 流动性前 50）历史真实成分股，直接对齐沪深 300 基准</td>
+              <td><strong>同口径横向对照（Run A vs Run B）</strong>与超额收益（Alpha）拆解</td>
+              <td>开发者改 Prompt / 换模型做 A/B 对照；预算有限时的快速基准（如默认演示池）</td>
+              <td><span class="badge blue">对照实验首选</span></td>
+            </tr>
+            <tr>
+              <td><strong>③ 专项 / 自选池</strong><br /><code>WATCHLIST_CUSTOM</code></td>
+              <td>用户自选 6–20 只股票、单一行业板块（如消费/半导体），或<strong>从实战工作台一键回炉的当前持仓池</strong></td>
+              <td><strong>纯“择时 + 仓位 + 风控”专项能力</strong>（排除选股干扰）</td>
+              <td>老股民测试自己常买的自选股；实盘某段行情失准后拉回历史场做定向压力测试</td>
+              <td><span class="badge amber">专项/回炉训练</span></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3>2.3 一次训练委托单（Mandate Ticket）的完整不可变契约</h3>
+      <p>
+        参考 TraderHarness 的 <code>RunForm</code> 与我们的实验可复现目标，<strong>一次训练委托单 = 最小实验单位</strong>，开具后全部参数冻结成不可变快照（Snapshot Hash），修改任何一项必须「复制配置重跑」生成新委托编号：
+      </p>
+      <div class="card-grid">
+        <div class="card">
+          <div class="card-kicker">契约组 01 · 时空与抗污染</div>
+          <h4>历史窗口 × 基准 × 双重遮罩</h4>
+          <ul>
+            <li><strong>历史区间</strong>：起止交易日 + 自动计算交易日数，低于 60 日实时提示“仅用于冒烟/演示，不纳入正式排名”；支持一键选经典考场（如 2024 震荡市 / 急跌魔鬼窗）。</li>
+            <li><strong>抗污染双开关</strong>：默认强制开启 <code>PIT 时点截断</code> + <code>日期/实体双盲遮罩（含固定 Seed）</code>；允许高阶用户显式切换为「配对实验（Masked vs Unmasked）」测模型是否在背题。</li>
+          </ul>
+        </div>
+        <div class="card">
+          <div class="card-kicker">契约组 02 · 标的池与筛选权限</div>
+          <h4>底池档位 × 关注池上限</h4>
+          <ul>
+            <li><strong>标的池</strong>：三档切换（全市场 A 股 / 沪深 300 / 专项自选），透明展示当时在市家数与剔除规则（ST、停牌、涨跌停一字板）。</li>
+            <li><strong>焦点池上限</strong>：默认单日重点深研不超过 12 只（防止单日 Token 失控），由 Agent 通过受控工具动态维护自选清单。</li>
+          </ul>
+        </div>
+        <div class="card">
+          <div class="card-kicker">契约组 03 · 团队与单执行者边界</div>
+          <h4>1–3 位 Agent × 职责隔离</h4>
+          <ul>
+            <li><strong>单 Agent 模式</strong>：全能研究与下单（默认）；</li>
+            <li><strong>多角色委员会（1–3 位）</strong>：借鉴 TraderHarness 单执行者原则——勾选第 1 位为<strong>主交易员（唯一持有 <code>trade.submit_order</code> 工具）</strong>，第 2/3 位为<strong>研究员 / 风控官（只读输出备忘录与否决建议）</strong>，杜绝多头同时改账导致归因混乱。</li>
+          </ul>
+        </div>
+        <div class="card">
+          <div class="card-kicker">契约组 04 · 资金、规则与时间节拍</div>
+          <h4>A 股规则 × 协作模式 × 预算闸门</h4>
+          <ul>
+            <li><strong>资金与成本</strong>：初始资金（如 ¥100,000 / ¥1,000,000）、佣金（万 2.5 最低 ¥5）、印花税（卖出千 0.5）、滑点（如 3 bps），成交一律使用<strong>未复权真实历史价</strong>（分红送转由引擎确定性入账）。</li>
+            <li><strong>决策节拍与协作</strong>：选定时间粒度（MVP 默认日频三阶段）+ <code>逐案确认 (HITL)</code> / <code>/goal 自主推进</code> + 单日最大工具调用与 Token 预算上限。</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===================== SECTION 03 (DEEP DIVE B) ===================== -->
+    <section id="sec-03" class="doc-sec">
+      <div class="sec-head">
+        <span class="sec-num">03</span>
+        <h2>深度专题 B：如何把控训练时间粒度（快慢双时钟解耦）</h2>
+      </div>
+      <p>
+        在股票市场中，历史行情最细可以精确到秒级/Tick，而一只 A 股单日最高点与最低点振幅动辄超过 10%–20%。但如果我们照搬高频量化策略让 LLM 逐秒决策，60 个交易日（约 288,000 个 3 秒快照）需要耗时 <strong>16 天以上、烧掉数千美元 API 费</strong>，且 A 股 T+1 制度决定了当天买入本就不能当天卖出，高频唤醒反而诱发大模型噪音交易。
+      </p>
+      <p>
+        因此，openOutcry 确立核心架构范式——<strong>「快慢双时钟解耦（Dual-Clock Harness）」</strong>：把「Agent 思考唤醒频率」与「市场撮合/风控扫描频率」彻底分开。
+      </p>
+
+      <!-- Interactive Dual-Clock Explorer -->
+      <div class="instrument">
+        <div style="display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:10px;">
+          <div>
+            <div class="eyebrow" style="color:#4ade80;">INTERACTIVE ARCHITECTURE · 点击切换单个交易日内的五个时刻</div>
+            <h4 style="margin:4px 0 0;font-size:17px;">一个交易日内，慢时钟（Agent）与快时钟（确定性引擎）如何协同？</h4>
+          </div>
+          <span class="badge green">0 Token 确定性撮合 + 低频高价值语义决策</span>
+        </div>
+
+        <div class="clock-tabs" role="tablist" aria-label="交易日阶段切换">
+          <button class="clock-tab active" type="button" data-phase="pre">09:15 盘前研究</button>
+          <button class="clock-tab" type="button" data-phase="open">09:30 开盘撮合</button>
+          <button class="clock-tab" type="button" data-phase="intraday">10:30 盘中急跌中断（二期）</button>
+          <button class="clock-tab" type="button" data-phase="close">14:30 尾盘窗口（二期）</button>
+          <button class="clock-tab" type="button" data-phase="settle">15:00 日终结算</button>
+        </div>
+
+        <div class="clock-stage" id="clockStage">
+          <!-- Populated by JS -->
+        </div>
+
+        <div style="margin-top:20px;padding-top:16px;border-top:1px solid #24382c;">
+          <div style="font-family:var(--mono);font-size:11.5px;color:#86efac;margin-bottom:8px;letter-spacing:0.06em;">60 交易日完整实验 · 算力与耗时硬账对比（按单次推理 5s / $0.02 估算）</div>
+          <div class="bar-row">
+            <span>秒级 Tick（3s 帧 · 不可行）</span>
+            <div class="bar-track"><div class="bar-fill" style="width:100%;background:#ef4444;"></div></div>
+            <span class="num" style="color:#fca5a5;">~16.7 天 / $5,760</span>
+          </div>
+          <div class="bar-row">
+            <span>逐分钟唤醒（240 次/日）</span>
+            <div class="bar-track"><div class="bar-fill" style="width:42%;background:#f59e0b;"></div></div>
+            <span class="num" style="color:#fde68a;">~20 小时 / $288</span>
+          </div>
+          <div class="bar-row">
+            <span><strong>双时钟（早晚双窗 + 异动中断）</strong></span>
+            <div class="bar-track"><div class="bar-fill" style="width:8%;background:#60a5fa;"></div></div>
+            <span class="num" style="color:#93c5fd;">~15 分钟 / ~$3.5</span>
+          </div>
+          <div class="bar-row">
+            <span><strong>MVP 日频三阶段（1 次决策/日）</strong></span>
+            <div class="bar-track"><div class="bar-fill" style="width:3.5%;background:#4ade80;"></div></div>
+            <span class="num" style="color:#86efac;">~5 分钟 / ~$1.2</span>
+          </div>
+        </div>
+      </div>
+
+      <h3>3.1 分阶段时间粒度演进策略（诚实划清 MVP 与二期边界）</h3>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>阶段</th>
+              <th>慢时钟（Agent 唤醒）</th>
+              <th>快时钟（数据与撮合引擎）</th>
+              <th>如何处理日内大振幅与限价单</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>MVP 首版（Term 1–2）</strong><br /><span class="badge green">当前原型与首版后端</span></td>
+              <td><strong>日频三阶段</strong>：<code>09:15 盘前研究（禁下单/出提案）→ 09:30 开盘撮合 → 15:00 尾盘结算</code></td>
+              <td>离线冷存储日线（<code>BaoStock + AKShare</code>），按未复权真实开盘价/收盘价确定性撮合</td>
+              <td>盘前出限价/市价提案，推进至 <code>09:30</code> 才揭示开盘价撮合；在复盘报告中明确披露<strong>“未建模盘中分钟级触价路径与冲击成本”</strong></td>
+            </tr>
+            <tr>
+              <td><strong>二期增强（对齐 TraderHarness）</strong><br /><span class="badge blue">架构已预留接口</span></td>
+              <td><strong>早盘（09:30）+ 尾盘（14:30）双窗口</strong>（契合 A 股 T+1 尾盘建仓习惯）+ <strong>快时钟异动事件唤醒</strong></td>
+              <td>焦点关注池（8–20 只）加载 <strong>5 分钟 / 1 分钟历史 K 线</strong>渐进揭示，纯代码微秒级逐 bar 扫描</td>
+              <td>Agent 下达结构化<strong>限价单 + 止盈/止损条件单 + 价格异动预警</strong>，交由快时钟按分钟线真实先后顺序精确撮合或唤醒 Agent，彻底消除日内路径歧义</td>
+            </tr>
+            <tr>
+              <td><strong>明确非目标</strong><br /><span class="badge red">不做</span></td>
+              <td>❌ 秒级 / 逐笔 Tick 高频 LLM 推理</td>
+              <td>❌ L2 订单簿队列排队与做市冲击模拟</td>
+              <td>高频微结构套利属于传统 C++/量化脚本赛道，非个人投资 LLM Agent 的合理边界</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- ===================== SECTION 04 (PAGE 01) ===================== -->
+    <section id="sec-04" class="doc-sec">
+      <div class="sec-head">
+        <span class="sec-num">04</span>
+        <h2>页面规范 01 · Agent 库（<code>/connect</code>）</h2>
+      </div>
+      <div class="page-spec">
+        <div class="page-spec-hd">
+          <div class="page-spec-title">
+            <span class="badge green">STEP 01</span>
+            <span>Agent 库 · Agent Roster</span>
+          </div>
+          <div>
+            <span class="badge">回应需求：第一，容易接入</span>
+            <span class="badge blue">目标布局：一屏主从视图</span>
+          </div>
+        </div>
+        <div class="page-grid">
+          <div>
+            <h4>用户体验与交互逻辑</h4>
+            <ul class="spec-list">
+              <li><strong>零滚屏主从架构</strong>：摒弃旧版“卡片 + JSON + 三步向导”纵向堆叠两屏半的冗长布局，改为<strong>左栏 Agent 列表（含内置只读模板 &amp; 已接入外部 Agent）+ 右栏透明 Agent 卡详情与 JSON 配置</strong>，1440×900 首屏完整呈现。</li>
+              <li><strong>高信号 Agent 卡四维指标</strong>（吸收 TraderHarness）：每张卡直出<code>风格标签</code>、<code>风险档位</code>、<code>持仓周期</code>、<code>单票仓位上限</code>与<code>工具白名单数量</code>，一眼判断“这个 Agent 有多激进”。</li>
+              <li><strong>来源与评测资格透明化</strong>（对齐 A-1 文档）：显示来源徽标（<code>内置只读 / 本地 ACP / 远程 Endpoint</code>），未声明模型标识的外部 Agent 明确标为<code>探索组</code>，平台绝不瞎猜或静默降级。</li>
+              <li><strong>轻量化接入向导（Modal / Drawer）</strong>：点击「+ 接入新 Agent」呼出弹窗，吸收问财 SkillHub 做法提供<strong>「Agent Prompt / CLI 命令」双页签</strong>——一键复制含 Runner 占位、权限边界与动作格式的真实指令，分步显示握手探测进度（<code>spawn → initialize → session/new → ping</code>），明确声明<strong>模型密钥不出本机</strong>。</li>
+            </ul>
+          </div>
+          <div>
+            <h4>关键流转与防穿帮约束</h4>
+            <ul class="spec-list">
+              <li><strong>正确下一步动线</strong>：选定 Agent 或模拟握手成功后，主 CTA 指向<strong>「用此 Agent 去开具委托单 →（<code>/studio</code>）」</strong>，修复旧版直接跳过委托台并硬重置为 Codex 的断链。</li>
+              <li><strong>可动作错误提示</strong>：若探测失败，不抛原始异常堆栈，按错误码给出明确修复动作（如 <code>LAUNCH_FAILED</code> 给复制安装命令、<code>AUTH_REQUIRED</code> 给本地登录指引）。</li>
+              <li><strong>统一资金口径</strong>：Agent 卡不再写死与委托台冲突的 <code>initialCash: 1,000,000</code>，改为「默认建议资金」且实际运行资金以 Step 2 委托单为准。</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===================== SECTION 05 (PAGE 02) ===================== -->
+    <section id="sec-05" class="doc-sec">
+      <div class="sec-head">
+        <span class="sec-num">05</span>
+        <h2>页面规范 02 · 训练委托（<code>/studio</code>）</h2>
+      </div>
+      <div class="page-spec">
+        <div class="page-spec-hd">
+          <div class="page-spec-title">
+            <span class="badge green">STEP 02</span>
+            <span>训练委托 · Training Desk</span>
+          </div>
+          <div>
+            <span class="badge">回应需求：公平起点与口径锁死</span>
+            <span class="badge blue">最小单位：不可变委托单</span>
+          </div>
+        </div>
+        <div class="page-grid">
+          <div>
+            <h4>首屏 2×2 委托单契约与台账</h4>
+            <ul class="spec-list">
+              <li><strong>压缩顶部 Hero 高度</strong>：确保 2×2 四格委托表单与「开具委托单」主按钮完整落在 1440×900 首屏内，下方紧接历史「训练台账」。</li>
+              <li><strong>01 时段与抗污染</strong>：选择起止交易日 + 实时显示交易日数与样本门槛提醒；明确勾选<code>🔒 PIT 截断</code>与<code>🛡 双盲匿名（Seed 42）</code>。</li>
+              <li><strong>02 标的池漏斗</strong>：支持切换<code>全市场 A 股（剔除 ST/停牌）</code>、<code>沪深 300 成分池</code>、<code>自选专项池</code>，并展示“底池自主筛查 → 活跃关注池 ≤12 只”说明。</li>
+              <li><strong>03 团队与单执行者分工</strong>：勾选 1–3 位 Agent，自动按序标注<code>交易（唯一有权下单）</code> / <code>研究（只读备忘录）</code> / <code>风控（只读否决）</code>。</li>
+              <li><strong>04 资金、节拍与协作</strong>：设定初始资金、手续费与滑点、协作模式（<code>逐案确认</code> / <code>/goal 自主推进</code>），并明示<code>决策节拍：日频三阶段（09:15 盘前 / 09:30 开盘 / 15:00 尾盘）</code>。</li>
+            </ul>
+          </div>
+          <div>
+            <h4>真实状态联动要求（修复假提交）</h4>
+            <ul class="spec-list">
+              <li><strong>真实创建委托记录</strong>：将表单从局部 <code>useState</code> 提升至全局状态机；点击「开具委托单」后，台账顶部真实新增 <code>№ 0043</code>，记录所选时段、标的池、团队成员与模式。</li>
+              <li><strong>真实传参进训练场</strong>：点击「进入训练场」跳转 <code>/training</code> 时，训练场顶栏与左栏真实读出刚选好的团队角色、资金与模式，不再出现“选了两位 Agent 进去只剩一个默认人”的穿帮。</li>
+              <li><strong>台账行可切换</strong>：点击下方历史训练台账任意一行，真正切换当前激活的任务视图（运行中进交互态，已完成进只读档案/复盘态）。</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===================== SECTION 06 (PAGE 03) ===================== -->
+    <section id="sec-06" class="doc-sec">
+      <div class="sec-head">
+        <span class="sec-num">06</span>
+        <h2>页面规范 03 · 历史训练场（<code>/training</code>）— 全产品核心高潮</h2>
+      </div>
+      <p>
+        历史训练场是整个产品的灵魂所在，承载「<strong>过程可理解</strong>」「<strong>抗污染可见</strong>」「<strong>批准 ≠ 成交</strong>」「<strong>人机协同</strong>」四项最强卖点。其桌面端采用 <strong>「顶部时间机器与合规仪器带 + 左栏阶段轨迹流 + 右栏模拟盘撮合与台账」</strong> 的黄金骨架：
+      </p>
+
+      <!-- Structural Wireframe Blueprint for Step 3 -->
+      <div class="wireframe" aria-label="历史训练场线框蓝图">
+        <div class="wf-bar">
+          <div class="wf-pills">
+            <span class="wf-pill">SIM · 历史模拟</span>
+            <span class="wf-pill">Day 3 / 20 · 2024-04-23 (D+0)</span>
+            <span class="wf-pill on">● 09:15 盘前研究</span>
+            <span class="wf-pill">○ 09:30 开盘撮合</span>
+            <span class="wf-pill">○ 15:00 尾盘结算</span>
+          </div>
+          <div class="wf-pills">
+            <span class="wf-pill shield">🔒 PIT 截止 04-22 23:59</span>
+            <span class="wf-pill shield">🛡 双盲匿名 · 公司-017</span>
+            <span class="wf-pill">逐案确认 (HITL)</span>
+            <span class="wf-pill">运行抽屉 ▸</span>
+          </div>
+        </div>
+
+        <div class="wf-body">
+          <!-- Left Pane -->
+          <div class="wf-pane">
+            <div class="wf-pane-title">
+              <span>左栏 · 阶段化可审计轨迹流（对话 + 事件）</span>
+              <span>筛选：全部 / 思考 / 工具 / 提案 / 人工 ｜ 暂停滚动</span>
+            </div>
+            <div class="wf-box" style="text-align:center;font-family:var(--mono);font-size:11px;padding:5px;">
+              ── Day 3 · 2024-04-23 · 09:15 盘前研究（只读禁下单） ──
+            </div>
+            <div class="wf-box">
+              <strong>🔍 工具调用卡 · search / read（可折叠 · 默认摘要）</strong>
+              命中 <code>ev_018</code>（经营披露 · 04-22 18:40 ✅ PIT 合格）与 <code>ev_024</code>（现金流补充 · 04-22 20:15 ✅ PIT 合格）<br />
+              <span style="color:var(--amber);font-family:var(--mono);font-size:11.5px;">⚠ 时点闸门已自动拦截 2 条 04-23 盘后披露，未返回给 Agent</span>
+            </div>
+            <div class="wf-box">
+              <strong>🧠 团队协作轨迹（单执行者委员会）</strong>
+              [研究员 · 只读备忘录] 提示应收回款周期延长风险 → [主交易员] 综合生成减仓判断，提出卖出 <code>公司-017</code> 100 股（限价 ¥20.30），支持点击展开「观察 / 思考 / 动作」三段折叠。
+            </div>
+            <div class="wf-box">
+              <strong>💬 底部人工干预框 + /goal 切换</strong>
+              支持随时插话纠偏（写入人工事件），或输入 <code>/goal</code> 切入自主推进模式跑完剩余交易日。
+            </div>
+          </div>
+
+          <!-- Right Pane -->
+          <div class="wf-pane">
+            <div class="wf-pane-title">
+              <span>右栏 · 真实模拟盘视图（行情截断 → 审批撮合 → 四页签账本）</span>
+              <span>同一中心状态机驱动</span>
+            </div>
+            <div class="wf-box">
+              <strong>① 四格资产仪器带（总资产 / 可用现金 / 净收益 / 累计费用）</strong>
+              批准瞬间数字<strong>纹丝不动</strong>，只有推进到 <code>09:30</code> 撮合后才同步刷新。
+            </div>
+            <div class="wf-box">
+              <strong>② 标的 PIT 截断走势条（借鉴 TradingView Bar Replay）</strong>
+              轻量 SVG 展示 <code>公司-017</code> 近 10 日收盘线 + 成本线 ¥18.20 + 垂直虚线 <code>PIT 截止 04-22</code>；右侧半透明遮罩标明「<code>04-23 开盘尚未揭示</code>」；点击撮合后遮罩解开，当场渲染 ¥20.36 开盘点与成交标记！
+            </div>
+            <div class="wf-box">
+              <strong>③ Order Proposal 提案票据 + A 股确定性规则预检</strong>
+              <div class="wf-checks" style="margin:6px 0;">
+                <span class="wf-check">✓ 100 股整手</span>
+                <span class="wf-check">✓ T+1 可卖 600 股</span>
+                <span class="wf-check">✓ ±10% 涨跌停内</span>
+                <span class="wf-check">预计费 ¥7.00</span>
+              </div>
+              待审态：<code>[− 100股 +]</code> <code>批准（3秒可撤）</code> <code>精确改单</code> <code>拒绝</code> <code>凭证</code><br />
+              已提交态：主按钮变为 <strong><code>推进至 09:30 开盘撮合 →</code></strong><br />
+              已成交态：自然出现 <strong><code>推进至 15:00 尾盘结算</code></strong> / <strong><code>/goal 跑完剩余 17 日 → 前往复盘</code></strong>
+            </div>
+            <div class="wf-box">
+              <strong>④ 四页签运行台账（账户 / 持仓 T+1 / 成交 / 预算与状态）</strong>
+              含工具调用额度进度条、事件速率、可动作阻断态横幅（数据缺失/预算耗尽时给修复按钮，不甩报错）。
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <h3>6.1 必须严格遵守的四条状态机不变量</h3>
+      <div class="card-grid">
+        <div class="card">
+          <div class="card-kicker">INVARIANT 01 · 审批 ≠ 成交</div>
+          <h4>四段独立订单生命周期</h4>
+          <p style="font-size:13.8px;margin:0;">
+            <code>order.proposed</code>（意图）→ <code>order.approved / submitted</code>（人机确认，<strong>现金与持仓零变化</strong>，附 3 秒撤销缓冲）→ <code>rule.checked</code>（确定性规则校验）→ <code>order.filled / rejected / unfilled</code>（推进时钟至撮合窗口后才更新账本）。
+          </p>
+        </div>
+        <div class="card">
+          <div class="card-kicker">INVARIANT 02 · 两套审批绝不混用</div>
+          <h4>协议级权限 vs 业务级订单</h4>
+          <p style="font-size:13.8px;margin:0;">
+            对齐 A-1 文档：外部 Agent 通过 ACP 发起的越权本地命令（如 <code>Bash</code>）一律自动拒绝并在输入框上方弹只读告知横幅；所有交易决策必须通过受控 MCP <code>trade.submit_order</code> 进入右侧订单票据审批，确保完全可审计。
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===================== SECTION 07 (PAGE 04) ===================== -->
+    <section id="sec-07" class="doc-sec">
+      <div class="sec-head">
+        <span class="sec-num">07</span>
+        <h2>页面规范 04 · 复盘与对照（<code>/review</code>）</h2>
+      </div>
+      <div class="page-spec">
+        <div class="page-spec-hd">
+          <div class="page-spec-title">
+            <span class="badge green">STEP 04</span>
+            <span>复盘与对照 · Review &amp; Compare</span>
+          </div>
+          <div>
+            <span class="badge">回应需求：第三，可重复对照</span>
+            <span class="badge amber">学术红线：样本不足不排名</span>
+          </div>
+        </div>
+        <div class="page-grid">
+          <div>
+            <h4>解决“蒙眼拧螺丝”的核心视图</h4>
+            <ul class="spec-list">
+              <li><strong>可信度与过拟合徽章条（借鉴 QuantConnect）</strong>：顶栏常驻 <code>样本不足（20/60 交易日）· 不排名</code>、<code>Deflated Sharpe：未评估</code>、<code>PIT 严格 · 双盲已审计</code>，拒绝短窗暴利榜单误导。</li>
+              <li><strong>图表三件套</strong>：净值曲线 vs 沪深 300 基准、水下回撤曲线（Underwater）、工具调用与行为分布（出手次数、空仓天数、拒单率、换手率）。</li>
+              <li><strong>同口径多版本对照表（Run A vs Run B）</strong>：将样式已就绪的 <code>.compare-table</code> 真正落地——锁定同一时段、标的池、初始资金与规则，并列展示改单一变量（如换模型或调严止损）后的累计收益、相对基准 Alpha、最大回撤、夏普、成交笔数与费用差值，直接拆分“策略能力”与“行情运气”。</li>
+            </ul>
+          </div>
+          <div>
+            <h4>逐笔溯源与两条闭环出口</h4>
+            <ul class="spec-list">
+              <li><strong>逐笔决策凭证（三段折叠）</strong>：点击任意成交记录，弹窗以 Alpha Arena 式<strong>「观察上下文 / 推理思考 / 最终动作与规则结果」</strong>三段折叠呈现，绝不伪造缺失的隐藏思维链，支持定位到对应证据编号与成交 K 线。</li>
+              <li><strong>出口 A · 复制配置重跑</strong>：弹窗顶部锁定展示“不可变实验口径（区间/池/资金/费率）”，下方仅高亮“本次修改的单一变量（模型 / 提示词 / 单票风控上限）”，一键发起新对照运行。</li>
+              <li><strong>出口 B · 应用到实战工作台（Promote to Live）</strong>：核验过关后，一键带着历史战绩与已验证配置跳转 <code>/live</code> 实战工作台。</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===================== SECTION 08 (PAGE 05) ===================== -->
+    <section id="sec-08" class="doc-sec">
+      <div class="sec-head">
+        <span class="sec-num">08</span>
+        <h2>页面规范 05 · 实战工作台（<code>/live</code>）</h2>
+      </div>
+      <div class="page-spec">
+        <div class="page-spec-hd">
+          <div class="page-spec-title">
+            <span class="badge green">STEP 05</span>
+            <span>实战工作台 · Live Workbench</span>
+          </div>
+          <div>
+            <span class="badge green">价值升华：训战一体</span>
+            <span class="badge red">合规红线：绝不代客下单</span>
+          </div>
+        </div>
+
+        <div class="wireframe" style="margin-top:0;">
+          <div class="wf-bar" style="background:#0d261a;border-bottom:1px solid #1f5138;">
+            <div class="wf-pills">
+              <span class="wf-pill live">● LIVE · 实盘辅助 · 仅给建议不代下单</span>
+              <span class="wf-pill">实时行情与公告已放开</span>
+              <span class="wf-pill">镜像账本新鲜度：手动校准 · 5 分钟前</span>
+            </div>
+            <div class="wf-pills">
+              <span class="wf-pill">已绑定战绩 Agent</span>
+              <span class="wf-pill">回炉历史训练 ↺</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="page-grid">
+          <div>
+            <h4>与历史训练场的“同构复用”与“本质反转”</h4>
+            <ul class="spec-list">
+              <li><strong>100% 复用操作心智</strong>：共享两栏工作台（左会话研究流 + 右资产带 / 主决策卡 / 四页签台账），用户在训练场养成的阅读与交互习惯零成本迁移。</li>
+              <li><strong>账本真相源反转（Shadow Ledger）</strong>：历史场由平台撮合器改账；实战场<strong>用户真实券商账户才是真相源</strong>，平台只维护用户的<strong>镜像台账</strong>（MVP 通过「+ 新增 / 调整持仓」弹窗轻量手动维护，二期演进截图 OCR / CSV / 只读采集）。</li>
+              <li><strong>强视觉防呆隔离</strong>：顶栏拉起醒目的绿色安全边界横幅，彻底与模拟盘冷灰/琥珀态拉开区分；删除把系统说明伪装成“用户聊天气泡”的旧瑕疵，改为独立系统状态条。</li>
+            </ul>
+          </div>
+          <div>
+            <h4>调仓建议单与双轨复盘闭环</h4>
+            <ul class="spec-list">
+              <li><strong>去下单化交互</strong>：右上方主卡命名为<strong>「Advisory Proposal · 调仓建议单」</strong>，提供方向、标的、参考价格区间与失效/止损条件；<strong>移除易引发“直接下单”误解的 <code>−/+</code> 步进器</strong>。</li>
+              <li><strong>双轨决策留痕</strong>：操作收敛为三个清晰动作——<strong><code>按建议记账</code></strong>（去券商下单后按建议快速更新镜像）、<strong><code>按实际录入</code></strong>（回填真实成交价与股数）、<strong><code>暂不采纳</code></strong>。平台同时保留 AI 原始建议与人类实际操作，分口径独立复盘，区分“AI 判错”还是“人没守纪律”。</li>
+              <li><strong>异常回炉闭环</strong>：禁用 <code>/goal</code> 无确认自动下单；当发现 Agent 在实盘某类行情判断失准时，支持将对应持仓与时间窗带回 <code>/studio</code> 历史训练场重跑改进。</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===================== SECTION 09 ===================== -->
+    <section id="sec-09" class="doc-sec">
+      <div class="sec-head">
+        <span class="sec-num">09</span>
+        <h2>全局 UX 铁律、双语化与教室投影规范</h2>
+      </div>
+      <div class="card-grid three">
+        <div class="card">
+          <div class="card-kicker">UX 01 · 信息架构零冗余</div>
+          <h4>侧边栏减负与真相唯一</h4>
+          <ul>
+            <li>主导航严格按 <code>01 → 05</code> 顺排，移除顶部重复的「+ 新建训练」按钮。</li>
+            <li>移除点切换不换内容的假子会话层级；任务树聚焦当前工作区。</li>
+            <li>全站跨页资金、日期、交易日数与净值横轴由单一数据源派生，严禁口径打架。</li>
+          </ul>
+        </div>
+        <div class="card">
+          <div class="card-kicker">UX 02 · 中英双语与涨跌习惯</div>
+          <h4>全站 <code>ZH / EN</code> 切换</h4>
+          <ul>
+            <li>覆盖主线 5 页、弹窗、事件流、图表标签，支持 <code>?lang=en</code> 直达英文态。</li>
+            <li><strong>涨跌色习惯适配</strong>：中文态默认 A 股<strong>红涨绿跌</strong>；英文态默认切换国际习惯<strong>绿涨红跌</strong>（并带显式图例），避免国际评委对红色正收益产生误判。</li>
+          </ul>
+        </div>
+        <div class="card">
+          <div class="card-kicker">UX 03 · 投影可读与诚实态</div>
+          <h4>高对比主题 + 可动作阻断</h4>
+          <ul>
+            <li>提供<strong>亮色纸感高对比主题开关</strong>（<code>?theme=light</code>），防止明亮教室投影仪下暗色界面发灰糊成一片。</li>
+            <li>1280×720 / 1440×900 首屏压实，消灭演示中多余滚屏。</li>
+            <li>数据未就绪/预算耗尽时展示<strong>带修复按钮的黄色阻断条</strong>，绝不甩原始异常堆栈。</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===================== SECTION 10 ===================== -->
+    <section id="sec-10" class="doc-sec">
+      <div class="sec-head">
+        <span class="sec-num">10</span>
+        <h2>MVP 范围边界与分期路线图</h2>
+      </div>
+      <div class="callout danger">
+        <div class="callout-title">不可触碰的合规与学术诚实红线</div>
+        <p>
+          ① <strong>不连接真实券商、不托管账号密码、不代客自动下单、不承诺收益</strong>；② 历史模拟净值与实盘镜像记录严格分口径、禁止混算；③ 当前 Term 1 前端原型使用虚构演示数据验证五步交互闭环与状态机联动，不冒充已实证的历史回测绩效。
+        </p>
+      </div>
+
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>阶段</th>
+              <th>核心交付物</th>
+              <th>验证标准</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>Phase 1 · Term 1 期末原型重构</strong><br /><span class="badge green">当前冲刺</span></td>
+              <td>
+                五步单向导航与数据口径统一；Agent 库主从一屏与委托单真实传参；历史训练场顶栏时钟/阶段灯/双盲盾牌/PIT 截断走势条/规则预检；复盘同口径对照表；实战边界打磨；全站 <code>ZH/EN</code> 双语与亮色高对比投影主题。
+              </td>
+              <td>英文亮色模式完整走通 <code>01 → 05</code> 零断链、零中文残留、3 分 45 秒内丝滑演示完毕。</td>
+            </tr>
+            <tr>
+              <td><strong>Phase 2 · Term 2 真实后端与日频闭环</strong><br /><span class="badge blue">下一学期首期</span></td>
+              <td>
+                Node.js (TS) / Python 确定性回测引擎 + <code>BaoStock / AKShare</code> 离线冷库；ACP 客户端 + MCP 受控 PIT 研究网关；A 股完整规则引擎（T+1 / 停牌 / 涨跌停 / 费用）；JSONL 轨迹持久化与无 Key 指纹回放。
+              </td>
+              <td>通过 4 层验证：状态机单测、A 股规则核对、人为注入未来公告防泄漏测试、完成至少一组 60 交易日同口径 Run A vs Run B 受控对照实验。</td>
+            </tr>
+            <tr>
+              <td><strong>Phase 3 · 快慢双时钟与实战增强</strong><br /><span class="badge amber">二期演进</span></td>
+              <td>
+                焦点关注池 5 分钟 K 线渐进撮合 + 条件单/盘中急跌异动唤醒；Masked vs Unmasked 抗背题配对实验；实战工作台截图 OCR / CSV 交割单导入与只读持仓对账确认单。
+              </td>
+              <td>验证日内大振幅下的精确触价撮合顺序，并跑通“实盘异常片段一键回炉历史训练场”完整飞轮。</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+  </main>
+</div>
+
+<script>
+  // 1. Theme Toggle
+  const root = document.documentElement;
+  const themeBtn = document.getElementById('themeToggle');
+  function syncThemeBtn() {
+    const dark = root.getAttribute('data-theme') === 'dark';
+    themeBtn.textContent = dark ? '☀️ 浅色' : '🌙 暗色';
+  }
+  themeBtn.addEventListener('click', () => {
+    const next = root.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+    root.setAttribute('data-theme', next);
+    syncThemeBtn();
+  });
+  syncThemeBtn();
+
+  // 2. Interactive 5-Step Journey Explorer
+  const STEPS = [
+    {
+      num: 'STEP 01 · /connect',
+      name: 'Agent 库（接入与透明化）',
+      goal: '回应「第一，容易接入」——让老股民零门槛挑内置模板，让开发者三步接入本地外部 Agent。',
+      userFlow: [
+        '打开即见主从一屏：左侧浏览「内置只读模板」与「已接入外部 Agent」，右侧直接审查 Agent 卡配置与 JSON。',
+        '每张卡明示风格、风险档、持仓周期、单票仓位上限与工具数量，未上报字段系统绝不猜测。',
+        '点击「+ 接入新 Agent」打开向导弹窗，提供「复制接入 Prompt / CLI」双页签，密钥全程不出本机。',
+        '选好或握手完成后，主按钮顺滑引导进入 Step 02 训练委托。'
+      ],
+      guardrails: [
+        '严禁跳过委托台直接重置进入训练场。',
+        '探测失败必须按错误码给出可复制的修复指令，禁止静默降级模型。',
+        '统一资金口径，不与委托单打架。'
+      ]
+    },
+    {
+      num: 'STEP 02 · /studio',
+      name: '训练委托（锁死考场与实验口径）',
+      goal: '把「一次不可变的训练委托单」作为最小实验单位，确保后续对照实验公平可复现。',
+      userFlow: [
+        '首屏 2×2 四格契约锁死：历史时段（含 60 日门槛提醒 + 双重抗污染）× 标的池漏斗（全 A 股 / 沪深 300 / 自选专项）× 单执行者团队（1–3 位分工）× 资金与日频三阶段节拍。',
+        '明确标出「底层池可宽可全，Agent 通过工具筛选进入 ≤12 只活跃关注池」的设计逻辑。',
+        '点击「开具委托单」，真实向全局状态写入新任务 № 0043 并展示在下方训练台账。',
+        '点击「进入训练场」，将所选团队、标的池与口径原封不动带入 Step 03。'
+      ],
+      guardrails: [
+        '委托单提交后不可篡改，修改任何变量必须复制为新版本。',
+        '多 Agent 团队只允许第 1 位主交易员下单，研究/风控严格只读。',
+        '1440×900 首屏必须一眼看到提交按钮，消灭多余 Hero 留白。'
+      ]
+    },
+    {
+      num: 'STEP 03 · /training',
+      name: '历史训练场（全片核心高潮 · 过程可理解）',
+      goal: '回应「第二，过程可理解」——让用户亲眼见证从 PIT 受控取证、规则校验、人工审批到推进时钟撮合的完整因果链。',
+      userFlow: [
+        '顶部常驻「时间机器与合规仪器带」：交易日进度、三阶段推进灯（09:15 盘前 → 09:30 开盘 → 15:00 尾盘）、PIT 截止与双盲匿名盾牌。',
+        '左栏按交易日/阶段分节展示轨迹流；展开工具卡可见带发布时间的 PIT 合格证据，以及“已自动拦截 2 条盘后披露”提示。',
+        '右栏展示标的 PIT 截断走势条（虚线右侧未来遮罩）+ Order Proposal 票据（含 A 股整手/T+1/涨跌停确定性预检）。',
+        '点「批准」后账户资金持仓零变化（3 秒可撤）；点「推进至 09:30 开盘撮合」后阶段灯跳变、走势遮罩解锁、四页签账本同步刷新；随后可推进尾盘或 /goal 跑完剩余交易日。'
+      ],
+      guardrails: [
+        '严格坚持「批准 ≠ 成交」与「平台掌握账本最终权威」。',
+        '协议越权命令（ACP）与业务交易审批（MCP）两条通道绝不混用。',
+        '消灭开发注释式文案与“演示撮合”等 Mock 感命名。'
+      ]
+    },
+    {
+      num: 'STEP 04 · /review',
+      name: '复盘与对照（拆解策略能力与行情运气）',
+      goal: '回应「第三，可重复对照」——用同口径单变量对照表与学术克制红线，终结“蒙眼拧螺丝”。',
+      userFlow: [
+        '第一眼展示「样本不足（20/60 交易日）· 不排名」与 Deflated Sharpe 状态，立住学术克制感。',
+        '浏览净值 vs 沪深 300、水下回撤图、工具使用分布，以及核心的「Run A vs Run B 同口径多版本对照表」。',
+        '点击任意成交弹出「观察 / 思考 / 动作」三段折叠溯源凭证，赢要明白、亏要找到病根。',
+        '点「复制配置重跑」锁死口径只改单一变量；验证通过后点「应用到实战工作台」带战绩上岗。'
+      ],
+      guardrails: [
+        '不伪造缺失的隐藏思维链；回放轨迹绝不重新联网调用大模型。',
+        '探索运行（无法验证环境隔离）与严格运行分口径，禁止混排。'
+      ]
+    },
+    {
+      num: 'STEP 05 · /live',
+      name: '实战工作台（训战一体 · 守住合规红线）',
+      goal: '零学习成本复用两栏工作台，把验证过的 Agent 带入真实 A 股行情辅助决策，并实现异常回炉闭环。',
+      userFlow: [
+        '顶栏切为醒目的绿色安全边界横幅「LIVE · 实盘辅助 · 仅给建议不代下单」，放开实时行情与最新公告。',
+        '底层切换为用户的「实盘镜像台账（Shadow Ledger）」，支持手动维护持仓与可用现金并标注校准新鲜度。',
+        '右上方主卡切换为「调仓建议单」（含参考价格区间与失效条件），用户去券商端自主决策后回来点「按建议记账 / 按实际录入 / 暂不采纳」。',
+        'AI 原始建议与人类真实操作双轨留档；发现实盘某类行情判断失准，一键带回历史训练场回炉验证。'
+      ],
+      guardrails: [
+        '绝不连接真实券商、绝不代客下单、禁用 /goal 自动执行。',
+        '建议单移除下单样式的 −/+ 步进器，系统边界说明绝不伪装成用户气泡。',
+        '实盘记录与历史模拟净值严格分口径，禁止混算。'
+      ]
+    }
+  ];
+
+  const stepBtns = document.querySelectorAll('.step-btn');
+  const stepPanel = document.getElementById('stepDetailPanel');
+
+  function renderStep(idx) {
+    const s = STEPS[idx];
+    stepBtns.forEach((b, i) => {
+      b.classList.toggle('active', i === idx);
+      b.setAttribute('aria-selected', String(i === idx));
+    });
+    stepPanel.innerHTML = `
+      <div style="display:flex;flex-wrap:wrap;justify-content:space-between;align-items:baseline;gap:8px;">
+        <div>
+          <span class="badge green">${s.num}</span>
+          <strong style="font-size:17px;margin-left:8px;">${s.name}</strong>
+        </div>
+      </div>
+      <p style="margin:10px 0 0;font-size:14.5px;color:var(--ink);"><strong>核心使命：</strong>${s.goal}</p>
+      <div class="step-detail-grid">
+        <div>
+          <h4 style="margin-top:4px;">真实用户体验流程</h4>
+          <ul class="spec-list">${s.userFlow.map(x => `<li>${x}</li>`).join('')}</ul>
+        </div>
+        <div>
+          <h4 style="margin-top:4px;">关键防呆与产品红线</h4>
+          <ul class="spec-list">${s.guardrails.map(x => `<li>${x}</li>`).join('')}</ul>
+        </div>
+      </div>
+    `;
+  }
+  stepBtns.forEach((btn) => {
+    btn.addEventListener('click', () => renderStep(Number(btn.dataset.step)));
+  });
+  renderStep(0);
+
+  // 3. Interactive Dual-Clock Explorer
+  const PHASES = {
+    pre: {
+      slowTitle: '慢时钟 · Agent 唤醒（盘前研究 · 禁止成交）',
+      slowItems: [
+        '接收截至昨日收盘（D-1 23:59）的 PIT 市场宽度、板块摘要与只读持仓视图。',
+        '通过受控 MCP 工具从宽池筛出候选股进入活跃关注池，深读 PIT 合格公告与财务摘要。',
+        '输出结构化交易意图（Order Proposal）：标的、方向、限价、数量，以及可选的盘中止损/预警条件。',
+        '若为 HITL 逐案确认模式，阻塞等待用户审批（批准/改单/拒绝）；批准仅转入“待撮合”，账户不变。'
+      ],
+      fastTitle: '快时钟 · 确定性规则引擎（预检与闸门）',
+      fastItems: [
+        '数据出口强制执行 <code>date &lt; D+0</code> 与 <code>pub_date &lt;= D-1 23:59</code>，自动拦截当日盘后未公开信息。',
+        '对 Agent 提案做确定性 A 股预检：100 股整手、T+1 可卖股数、可用资金、停牌与 ±10%/±20% 价格笼子。',
+        '此刻<strong>不揭示</strong>今日开盘价与日内高低点，保持走势图右侧未来遮罩锁定。',
+        'Token 消耗：0（纯代码规则校验）。'
+      ]
+    },
+    open: {
+      slowTitle: '慢时钟 · Agent 休眠或接收撮合回执',
+      slowItems: [
+        'MVP 日频模式下，盘前已获批的委托在 09:30 自动交由引擎撮合，Agent 无需重复推理省 Token。',
+        '二期早盘窗口（09:30–10:00）下，Agent 可根据逐步揭示的 5 分钟开盘量价确认突破或撤单。',
+        '收到 <code>order.filled</code> / <code>order.unfilled</code> 不可篡改回执，写入跨日工作记忆。'
+      ],
+      fastTitle: '快时钟 · 揭晓开盘行情并确定性撮合',
+      fastItems: [
+        '模拟时钟推进至 <code>09:30</code>，解开行情遮罩并按未复权真实开盘价（含滑点与佣金/印花税）撮合。',
+        '校验开盘一字涨跌停与停牌：若买单撞一字涨停或卖单撞一字跌停，诚实记为 <code>unfilled</code> 而非强行成交。',
+        '唯一账本路径原子更新：扣减/增加现金、刷新持仓与 T+1 冻结股数、记录已实现盈亏并推送事件流。',
+        'Token 消耗：0。'
+      ]
+    },
+    intraday: {
+      slowTitle: '慢时钟 · 平时休眠，仅在“异动中断”时按需唤醒（二期）',
+      slowItems: [
+        '盘中 95% 的平淡波动时间里 Agent 保持休眠，不浪费 Token，也不被分钟噪音诱发过度交易。',
+        '仅当快时钟触发预设中断条件（如持仓股急跌超 -5%、5 分钟放量异动、重大突发快讯）时，立刻唤醒 Agent 做盘中应急评估。',
+        '每次中断唤醒计入单日调用预算上限，防止极端行情下失控刷单。'
+      ],
+      fastTitle: '快时钟 · 5 分钟 / 1 分钟级连续扫描焦点关注池（二期）',
+      fastItems: [
+        '纯代码沿焦点关注池（8–20 只）的 5 分钟/1 分钟历史 K 线微秒级推进，<strong>彻底解决日内大振幅与路径先后歧义</strong>。',
+        '精确按时间先后判定：盘中是先触及限价止盈、还是先跌破条件止损。',
+        '持续记录盘中真实最大回撤与价格预警命中事件，超过阈值即向慢时钟抛出 <code>market.interrupt</code> 事件。',
+        'Token 消耗：0。'
+      ]
+    },
+    close: {
+      slowTitle: '慢时钟 · 尾盘决策窗口（14:30–15:00 · 二期）',
+      slowItems: [
+        '极度契合 A 股 T+1 实战规律：老股民与专业策略最常在尾盘趋势明朗时建仓，最大限度规避当日盘中买套。',
+        'Agent 查看截至 14:30 已完成的盘中 5 分钟聚合走势、成交量比与日内新发合规快讯，决定是否尾盘调仓或留过夜仓。',
+        '输出尾盘提案，走同一条审批与规则预检通道。'
+      ],
+      fastTitle: '快时钟 · 尾盘渐进揭示与最终撮合（二期）',
+      fastItems: [
+        '按 5 分钟子窗口渐进揭示 14:30–15:00 行情：先给截至 14:35 的价格让 Agent 决策，再以之后窗口价格撮合，防止偷看收盘价。',
+        '当日新买入股数立刻标记为 <code>sellable = 0</code>（T+1 锁定），直到下一交易日才解冻。',
+        '未成交的当日限价单在收盘后自动撤单失效并留痕。'
+      ]
+    },
+    settle: {
+      slowTitle: '慢时钟 · 日终复盘摘要（可选低成本压缩）',
+      slowItems: [
+        '记录当日交易反思与未采纳理由（若有人工干预，同步写入协作差异日志）。',
+        '推进至下一交易日 <code>D+1 09:15</code>，或在 <code>/goal</code> 自主模式下自动开启下一日循环；抵达结束日后自动生成 Step 04 复盘报告。'
+      ],
+      fastTitle: '快时钟 · 确定性日终清算与账本快照',
+      fastItems: [
+        '按当日未复权真实收盘价重估全部持仓市值，计算当日净值、浮动盈亏、相对沪深 300 超额与水下回撤。',
+        '确定性处理分红、送转股等公司行动，并解冻今日买入股份的 T+1 可卖额度供次日使用。',
+        '将完整事件、请求指纹与账户快照持久化为不可篡改的 JSONL 轨迹（支持后续无 Key 确定性回放）。'
+      ]
+    }
+  };
+
+  const clockTabs = document.querySelectorAll('.clock-tab');
+  const clockStage = document.getElementById('clockStage');
+
+  function renderPhase(key) {
+    const p = PHASES[key];
+    clockTabs.forEach((t) => t.classList.toggle('active', t.dataset.phase === key));
+    clockStage.innerHTML = `
+      <div class="clock-lane slow">
+        <div class="lane-tag">SLOW CLOCK · LLM AGENT</div>
+        <h4 style="margin:0 0 8px;font-size:15px;">${p.slowTitle}</h4>
+        <ul class="spec-list" style="color:#c6d8cd;font-size:13.4px;">${p.slowItems.map(i => `<li>${i}</li>`).join('')}</ul>
+      </div>
+      <div class="clock-lane fast">
+        <div class="lane-tag">FAST CLOCK · DETERMINISTIC ENGINE</div>
+        <h4 style="margin:0 0 8px;font-size:15px;">${p.fastTitle}</h4>
+        <ul class="spec-list" style="color:#c6d8cd;font-size:13.4px;">${p.fastItems.map(i => `<li>${i}</li>`).join('')}</ul>
+      </div>
+    `;
+  }
+  clockTabs.forEach((tab) => {
+    tab.addEventListener('click', () => renderPhase(tab.dataset.phase));
+  });
+  renderPhase('pre');
+
+  // 4. TOC Scroll-Spy
+  const tocLinks = Array.from(document.querySelectorAll('.toc nav a'));
+  const sections = tocLinks.map(a => document.querySelector(a.getAttribute('href'))).filter(Boolean);
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach((entry) => {
+      if (entry.isIntersecting) {
+        const id = '#' + entry.target.id;
+        tocLinks.forEach((link) => link.classList.toggle('active', link.getAttribute('href') === id));
+      }
+    });
+  }, { rootMargin: '-15% 0px -70% 0px' });
+  sections.forEach((sec) => observer.observe(sec));
+</script>
+</body>
+</html>
