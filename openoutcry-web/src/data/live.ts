@@ -1,0 +1,164 @@
+import type { AgentId, Holding, RunState, Trade, TrainingTask } from '../types'
+
+/** 实战工作台演示持仓（全部为明显标注的虚构数据，与历史训练场隔离） */
+const LIVE_HOLDINGS: Holding[] = [
+  { name: '示例-电力A', quantity: 1200, sellable: 1200, cost: 24.4, price: 25.15, entryFee: 18 },
+  { name: '示例-制造B', quantity: 800, sellable: 800, cost: 36.1, price: 37.9, entryFee: 16 },
+  { name: '示例-红利ETF', quantity: 6000, sellable: 6000, cost: 3.12, price: 3.19, entryFee: 11 },
+]
+
+const LIVE_TRADES: Trade[] = [
+  {
+    id: 'live-buy-a',
+    name: '示例-电力A',
+    side: '买入',
+    quantity: 1200,
+    price: 24.4,
+    fee: 18,
+    time: '3 日前 · 10:12',
+    pnl: null,
+    reason: '高股息底仓配置，手动回填实盘成交。',
+    evidence: 'live_ev_001',
+    status: '已记录',
+  },
+  {
+    id: 'live-buy-b',
+    name: '示例-制造B',
+    side: '买入',
+    quantity: 800,
+    price: 36.1,
+    fee: 16,
+    time: '昨日 · 14:35',
+    pnl: null,
+    reason: '跟踪行业排产改善建立弹性仓位，单票占净值约 20%。',
+    evidence: 'live_ev_002',
+    status: '已记录',
+  },
+  {
+    id: 'live-sell-c',
+    name: '示例-消费C',
+    side: '卖出',
+    quantity: 500,
+    price: 41.2,
+    fee: 40,
+    time: '上周 · 14:50',
+    pnl: 1840,
+    reason: '采纳止盈建议单，在券商端分批卖出后按实际成交价回填。',
+    evidence: 'live_ev_000',
+    status: '已记录',
+  },
+]
+
+const LIVE_EVENTS = [
+  {
+    kind: 'system' as const,
+    title: '实盘镜像基线已对齐（手动维护模式）',
+    body: '已录入 3 只示例持仓与可用现金 ¥74,915.00。平台不连接真实券商、绝不代客下单，AI 原始建议与你的实盘操作将分开留档。',
+    meta: 'mirror.baseline · 14:15',
+    at: '14:15',
+  },
+  {
+    kind: 'tool' as const,
+    title: '拉取盘中实时行情与最新公告',
+    body: '读取实时快照与近 7 日公告摘要（live_ev_003）。实战工作台开放实时资料检索，不受历史 PIT 截断限制。',
+    meta: 'live.quote / announcement · 14:18',
+    at: '14:18',
+  },
+  {
+    kind: 'agent' as const,
+    title: '持仓诊断：示例-制造B 波动放大，建议适度兑现浮盈',
+    body: '当前示例-制造B 浮盈约 +5.0%，单票集中度接近上限。建议先减仓 200 股锁定部分利润，其余仓位保留观察。',
+    meta: 'advisory.analysis · live_ev_003',
+    at: '14:20',
+  },
+  {
+    kind: 'order' as const,
+    title: '生成调仓建议单 · 卖出 示例-制造B 200 股',
+    body: '参考区间 ¥37.60 – ¥38.10；失效条件：放量站稳 ¥38.80 可暂缓减仓。仅为决策建议，需自行在券商端确认是否下单。',
+    meta: 'advisory.proposed · 14:20',
+    at: '14:20',
+  },
+]
+
+export function createInitialLiveRun(agent: AgentId = 'native'): RunState {
+  return {
+    kind: 'live',
+    agent,
+    initial: 150000,
+    cash: 74915,
+    realized: 1840,
+    fees: 85,
+    status: 'active',
+    mode: 'approval',
+    collaboration: '人工确认',
+    proposal: {
+      status: 'pending',
+      asset: '示例-制造B',
+      side: '卖出',
+      original: 200,
+      quantity: 200,
+      price: 37.9,
+      priceBand: '¥37.60 – ¥38.10',
+      invalidation: '放量站稳 ¥38.80 可暂缓减仓',
+      evidence: 'live_ev_003',
+      reason: '单票仓位偏高且短期波动放大，建议先减仓 200 股兑现部分浮盈，其余继续观察。',
+    },
+    clock: '今日 14:20',
+    syncLabel: '手动维护 · 今日 14:15',
+    marketSession: 'A 股连续竞价 · 实时快照',
+    holdings: LIVE_HOLDINGS.map((h) => ({ ...h })),
+    trades: LIVE_TRADES.map((t) => ({ ...t })),
+    events: LIVE_EVENTS.map((e, i) => ({ ...e, id: i + 1 })),
+  }
+}
+
+/** 实战账户下的只读归档记录（复用 ArchiveBody 渲染） */
+export const LIVE_ARCHIVE_TASKS: TrainingTask[] = [
+  {
+    id: 'live-weekly',
+    name: '实盘周复盘 · 上周',
+    kind: 'live',
+    conversations: [
+      { id: 'live-weekly-conv-1', name: '建议采纳对照', meta: '上周五 · 3 条建议单', status: 'done' },
+      { id: 'live-weekly-conv-2', name: '仓位集中度检查', meta: '上周五 · 已存档', status: 'done' },
+    ],
+    assignee: { kind: 'agent', name: 'openOutcry · 研究员' },
+    startAt: '上周一 09:30',
+    endAt: '上周五 15:00',
+    windowLabel: '上周 · 实盘建议留痕归档',
+    status: 'done',
+    live: false,
+    decisions: 0,
+    fills: 0,
+    archive: {
+      equity: 151840,
+      net: 1840,
+      cash: 74960,
+      market: 76880,
+      decisions: 5,
+      fills: 1,
+      log: [
+        {
+          kind: 'agent',
+          title: '盘后检查消费板块估值分位',
+          body: '示例-消费C 接近阶段目标区间，建议兑现 500 股并控制单票回撤。',
+          at: '周四 15:05',
+        },
+        {
+          kind: 'order',
+          title: '采纳建议并回填实盘成交 · 示例-消费C',
+          body: '用户按 ¥41.20 自主卖出 500 股，含费用已实现净收益 +¥1,840.00。',
+          at: '周五 14:50',
+        },
+        {
+          kind: 'user',
+          title: '记录复盘备注',
+          body: '保留高股息底仓不动，下周继续跟踪制造板块订单披露。',
+          at: '周五 15:20',
+        },
+      ],
+      trades: ['卖出 示例-消费C · 500 股 @ ¥41.20（已记录）'],
+      note: '实盘归档只读：同时保留 AI 原始建议单与用户回填的实际执行结果，用于对照决策偏差。',
+    },
+  },
+]
