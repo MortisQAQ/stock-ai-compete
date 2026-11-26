@@ -752,11 +752,78 @@
   border-radius: 18px;
   background: var(--bg-0);
   padding: 10px 12px 8px;
-  transition: border-color 0.14s ease;
+  transition: border-color 0.14s ease, box-shadow 0.14s ease;
 }
 
 .conv-input:focus-within {
   border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--accent-soft);
+}
+
+.conv-input textarea {
+  display: block;
+  width: 100%;
+  min-height: 26px;
+  padding: 2px 4px;
+  border: 0;
+  outline: 0;
+  resize: none;
+  background: transparent;
+  color: var(--fg-0);
+  font: 400 var(--fs-sm) / 1.55 var(--sans);
+}
+
+.conv-input textarea::placeholder {
+  color: var(--fg-2);
+  opacity: 1;
+}
+
+.conv-input textarea:focus-visible {
+  outline: none;
+}
+
+.conv-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-top: 6px;
+  padding-top: 4px;
+}
+
+.conv-plus,
+.conv-send {
+  display: grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 999px;
+  transition: background-color 0.14s ease, color 0.14s ease, opacity 0.14s ease;
+}
+
+.conv-plus {
+  background: var(--bg-2);
+  color: var(--fg-1);
+}
+
+.conv-plus:hover:not(:disabled) {
+  background: var(--bg-3);
+  color: var(--fg-0);
+}
+
+.conv-send {
+  background: var(--accent);
+  color: #04070d;
+}
+
+.conv-send:hover:not(:disabled) {
+  background: var(--accent-hover);
+}
+
+.conv-plus:disabled,
+.conv-send:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
 }
 
 /* ---------- 右：工作台 ---------- */

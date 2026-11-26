@@ -233,7 +233,7 @@ export function WorkbenchPane({ task, className }: { task: TrainingTask; classNa
                 </span>
 
                 <details className="relative">
-                  <summary className="inline-flex list-none items-center gap-1 rounded-md bg-[var(--bg-2)] px-2.5 py-1 font-medium text-[var(--fg-1)] transition-colors hover:bg-[var(--bg-3)] hover:text-[var(--fg-0)] [&::-webkit-details-marker]:hidden">
+                  <summary className="inline-flex min-h-8 cursor-pointer list-none items-center gap-1 rounded-md bg-[var(--bg-2)] px-2.5 py-1 font-medium text-[var(--fg-1)] transition-colors hover:bg-[var(--bg-3)] hover:text-[var(--fg-0)] [&::-webkit-details-marker]:hidden">
                     <Shield size={13} aria-hidden className="text-[var(--lime)]" />
                     <span>
                       {team.length > 1

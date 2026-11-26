@@ -26,7 +26,7 @@ export function AssistantFab({ expanded, onOpen, fabRef }: FabProps) {
       className="fixed bottom-5 right-4 z-[70] flex size-16 flex-col items-center justify-center gap-0.5 rounded-full border border-[var(--accent)] bg-[var(--bg-2)] text-[var(--accent)] transition-transform duration-150 ease-[var(--ease-out-quart)] active:translate-y-px"
     >
       <Sparkles aria-hidden size={20} />
-      <span className="font-mono text-micro font-semibold tracking-[0.12em]">{t('training.mobile.fabLabel')}</span>
+      <span className="font-sans text-micro font-medium">{t('training.mobile.fabLabel')}</span>
     </button>
   )
 }
@@ -66,7 +66,7 @@ export function AssistantSheet({ open, onClose, returnFocusRef }: SheetProps) {
             <div className="min-w-0 flex-1">
               <div className="flex items-center gap-2">
                 <span className="label">{isLive ? t('training.mobile.liveSession') : t('training.mobile.simSession')}</span>
-                <span className="font-mono text-micro font-semibold tracking-[0.1em] text-[var(--ink-3)]">
+                <span className="font-sans text-micro font-medium text-[var(--fg-2)]">
                   {isLive ? t('training.mobile.liveConnected') : t('training.mobile.simConnected')}
                 </span>
               </div>

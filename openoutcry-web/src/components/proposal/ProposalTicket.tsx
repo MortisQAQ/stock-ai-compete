@@ -100,8 +100,8 @@ export function ProposalTicket() {
 
         {/* 渐进披露：一行通过指示器 + 折叠的 A 股规则预检与详细说明 */}
         {!isLive ? (
-          <details className="mt-4 rounded-lg border border-[var(--line-soft)] bg-[var(--bg-1)] px-3.5 py-2.5">
-            <summary className="flex list-none items-center justify-between gap-2 text-micro font-medium text-[var(--lime)] [&::-webkit-details-marker]:hidden">
+          <details className="mt-4 rounded-lg border border-[var(--line-soft)] bg-[var(--bg-1)] px-3.5 py-1.5">
+            <summary className="flex min-h-9 cursor-pointer list-none items-center justify-between gap-2 py-1 text-micro font-medium text-[var(--lime)] [&::-webkit-details-marker]:hidden">
               <span className="inline-flex items-center gap-1.5">
                 <CheckCircle2 size={14} aria-hidden />
                 {t('proposal.precheckSummary')}
@@ -125,8 +125,8 @@ export function ProposalTicket() {
             </div>
           </details>
         ) : (
-          <details className="mt-4 rounded-lg border border-[var(--line-soft)] bg-[var(--bg-1)] px-3.5 py-2.5">
-            <summary className="flex list-none items-center justify-between gap-2 text-micro font-medium text-[var(--fg-1)] [&::-webkit-details-marker]:hidden">
+          <details className="mt-4 rounded-lg border border-[var(--line-soft)] bg-[var(--bg-1)] px-3.5 py-1.5">
+            <summary className="flex min-h-9 cursor-pointer list-none items-center justify-between gap-2 py-1 text-micro font-medium text-[var(--fg-1)] [&::-webkit-details-marker]:hidden">
               <span className="truncate">
                 {view.invalidation
                   ? t('proposal.invalidationSummary', { text: view.invalidation })

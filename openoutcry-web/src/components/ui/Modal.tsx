@@ -33,28 +33,28 @@ export function Modal({ open, kicker, title, onClose, children, footer, width }:
           }
         }}
       >
-        <div className="flex items-start justify-between gap-4 border-b border-black bg-ink px-4 py-3 text-primary-foreground">
+        <div className="flex items-start justify-between gap-4 border-b border-[var(--line-soft)] bg-[var(--bg-1)] px-5 py-4">
           <div className="min-w-0">
-            <div className="font-mono text-micro font-semibold uppercase leading-none tracking-[0.2em] text-primary-foreground/50">
+            <div className="font-sans text-micro font-medium leading-snug text-[var(--fg-2)]">
               {kicker}
             </div>
-            <DialogTitle className="mt-1.5 text-primary-foreground">{title}</DialogTitle>
+            <DialogTitle className="mt-1 text-[var(--fg-0)]">{title}</DialogTitle>
           </div>
           <DialogClose
             aria-label={t('dialogs.close')}
             className={cn(
-              'grid size-8 shrink-0 place-items-center rounded-xs border border-primary-foreground/35',
-              'text-primary-foreground/80 transition-colors hover:border-[var(--up)] hover:bg-[var(--up)] hover:text-[#04070d]',
+              'grid size-8 shrink-0 place-items-center rounded-md border border-[var(--control-line)] bg-[var(--bg-2)]',
+              'text-[var(--fg-1)] transition-colors hover:border-[var(--accent)] hover:text-[var(--fg-0)]',
             )}
           >
             <XIcon className="size-4" />
           </DialogClose>
         </div>
 
-        <div className="min-h-0 overflow-y-auto px-4 py-4">{children}</div>
+        <div className="min-h-0 overflow-y-auto px-5 py-5">{children}</div>
 
         {footer ? (
-          <div className="flex flex-wrap items-center justify-end gap-2 border-t border-border bg-bone/50 px-4 py-3">
+          <div className="flex flex-wrap items-center justify-end gap-2.5 border-t border-[var(--line-soft)] bg-[var(--bg-1)] px-5 py-3.5">
             {footer}
           </div>
         ) : (

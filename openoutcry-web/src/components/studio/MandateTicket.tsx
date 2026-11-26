@@ -296,8 +296,8 @@ export function MandateTicket() {
               ))}
             </div>
 
-            <details className="mt-4 rounded-lg border border-[var(--line-soft)] bg-[var(--bg-2)] px-3.5 py-2.5">
-              <summary className="flex list-none items-center justify-between gap-2 text-micro font-medium text-[var(--fg-1)] [&::-webkit-details-marker]:hidden">
+            <details className="mt-4 rounded-lg border border-[var(--line-soft)] bg-[var(--bg-2)] px-3.5 py-1.5">
+              <summary className="flex min-h-9 cursor-pointer list-none items-center justify-between gap-2 py-1 text-micro font-medium text-[var(--fg-1)] [&::-webkit-details-marker]:hidden">
                 <span>{t('mandate.rulesDrawerSummary')}</span>
                 <ChevronDown size={14} aria-hidden className="text-[var(--fg-2)]" />
               </summary>

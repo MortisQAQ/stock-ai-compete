@@ -299,7 +299,7 @@ export function ConversationPane({ className, hideHeader = false }: Props) {
                       {view.body ? (
                         e.evidenceItems && e.evidenceItems.length > 0 ? (
                           <details className="pt-1">
-                            <summary className="text-micro text-[var(--fg-2)] hover:text-[var(--fg-0)]">
+                            <summary className="inline-flex min-h-8 cursor-pointer items-center text-micro text-[var(--fg-2)] hover:text-[var(--fg-0)]">
                               {t('training.conv.showRawPayload')}
                             </summary>
                             <p className="mt-2 whitespace-pre-wrap rounded-md bg-[var(--well)] p-2.5 font-mono text-micro leading-relaxed text-[var(--fg-2)]">
