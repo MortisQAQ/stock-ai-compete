@@ -1,6 +1,7 @@
 import { useTranslation } from 'react-i18next'
 
 import { areaPath, drawdownSeries, linePath, project } from '../../lib/chart'
+import { WidgetErrorBoundary } from '../ui/WidgetErrorBoundary'
 
 interface Props {
   nav: number[]
@@ -9,7 +10,7 @@ interface Props {
 
 const W = 380
 
-export function DrawdownChart({ nav, height = 250 }: Props) {
+function DrawdownChartInner({ nav, height = 250 }: Props) {
   const { t } = useTranslation()
   const H = height
   const P = { l: 64, r: 16, t: 16, b: 30 }
@@ -58,5 +59,13 @@ export function DrawdownChart({ nav, height = 250 }: Props) {
         {t('review.charts.drawdownDays', { count: nav.length })}
       </text>
     </svg>
+  )
+}
+
+export function DrawdownChart(props: Props) {
+  return (
+    <WidgetErrorBoundary title="回撤曲线渲染异常">
+      <DrawdownChartInner {...props} />
+    </WidgetErrorBoundary>
   )
 }

@@ -1,3 +1,4 @@
+import { useId } from 'react'
 import { useTranslation } from 'react-i18next'
 
 import { PIT_PRICE_HISTORY, PIT_REVEALED_OPEN } from '../../data/run'
@@ -13,6 +14,7 @@ interface PitPriceStripProps {
 }
 
 export function PitPriceStrip({ asset, costBasis, limitPrice, phase, filled }: PitPriceStripProps) {
+  const hatchId = 'pit-mask-hatch-' + useId().replace(/:/g, '')
   const { t } = useTranslation()
   const revealed = phase !== 'pre_market' || filled
   const settled = phase === 'close_settle'
@@ -82,7 +84,7 @@ export function PitPriceStrip({ asset, costBasis, limitPrice, phase, filled }: P
           aria-label={t('pitChart.chartAria')}
         >
           <defs>
-            <pattern id="pit-mask-hatch" width="8" height="8" patternUnits="userSpaceOnUse" patternTransform="rotate(35)">
+            <pattern id={hatchId} width="8" height="8" patternUnits="userSpaceOnUse" patternTransform="rotate(35)">
               <line x1="0" y1="0" x2="0" y2="8" stroke="var(--warn)" strokeOpacity="0.22" strokeWidth="2" />
             </pattern>
           </defs>
@@ -116,7 +118,7 @@ export function PitPriceStrip({ asset, costBasis, limitPrice, phase, filled }: P
               y={0}
               width={W - cutoffX}
               height={H}
-              fill="url(#pit-mask-hatch)"
+              fill={`url(#${hatchId})`}
             />
           ) : (
             <>

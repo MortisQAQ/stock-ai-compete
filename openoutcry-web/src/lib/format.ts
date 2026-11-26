@@ -1,9 +1,23 @@
-const moneyFmt = new Intl.NumberFormat('zh-CN', {
-  minimumFractionDigits: 2,
-  maximumFractionDigits: 2,
-})
+export type MoneyLocale = 'zh-CN' | 'en-US'
 
-export const money = (v: number) => '¥' + moneyFmt.format(v)
+const moneyFmtCache = new Map<MoneyLocale, Intl.NumberFormat>()
+
+function getMoneyFormatter(locale: MoneyLocale): Intl.NumberFormat {
+  let fmt = moneyFmtCache.get(locale)
+  if (!fmt) {
+    fmt = new Intl.NumberFormat(locale, {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    })
+    moneyFmtCache.set(locale, fmt)
+  }
+  return fmt
+}
+
+export const formatMoney = (v: number, locale: MoneyLocale = 'zh-CN') =>
+  '¥' + getMoneyFormatter(locale).format(v)
+
+export const money = (v: number) => formatMoney(v, 'zh-CN')
 
 /** 带符号金额，负数用排版减号 */
 export const signed = (v: number) => (v >= 0 ? '+' : '−') + money(Math.abs(v))
@@ -31,7 +45,7 @@ export const round = (v: number, digits = 2): number => {
   return Number(`${Math.round(shifted)}e${-digits}`)
 }
 
-/** 数字正负 → A 股配色类名（红涨绿跌） */
+/** 数字正负 → 语义方向类名（pos / neg / flat），涨跌配色由 [data-market-colors] 决定 */
 export const tone = (v: number) => (v > 0 ? 'pos' : v < 0 ? 'neg' : 'flat')
 
 /** 事件序号：0001 */

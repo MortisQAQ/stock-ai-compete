@@ -1,3 +1,5 @@
+import { createElement } from 'react'
+import { renderToStaticMarkup } from 'react-dom/server'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { createInitialRun } from '../data/run'
@@ -5,9 +7,9 @@ import { createInitialLiveRun } from '../data/live'
 import { TRAINING_SEED } from '../data/trainings'
 import { useDialogStore } from './DialogProvider'
 import { useLocaleStore } from './LocaleProvider'
-import { useRunStore } from './RunProvider'
+import { WorkbenchScopeProvider, useRunStore } from './RunProvider'
 import { useToastStore } from './ToastProvider'
-import { useTrainingStore } from './TrainingProvider'
+import { useActiveWorkbenchTask, useTraining, useTrainingStore } from './TrainingProvider'
 import { LIVE_TASK_ID, LIVE_WORKSPACE_ID } from './trainingTasks'
 
 function resetAllStores() {
@@ -143,6 +145,41 @@ describe('Zustand global stores', () => {
 
       useTrainingStore.getState().selectLiveTask(LIVE_WORKSPACE_ID)
       expect(useTrainingStore.getState().liveConvId).toBe('live-conv-check')
+    })
+
+    it('resolves scoped tasks via useActiveWorkbenchTask and useTraining selectors without cross-scope bleed', () => {
+      function ActiveProbe() {
+        const { task, conversation } = useActiveWorkbenchTask()
+        return createElement('span', null, `${task.id}::${conversation.id}`)
+      }
+
+      function TrainingSummaryProbe() {
+        const ctx = useTraining()
+        return createElement(
+          'span',
+          null,
+          `${ctx.nextMandateNo}|${ctx.current.id}|${ctx.liveCurrent.id}|${ctx.records.length}`,
+        )
+      }
+
+      const renderScoped = (kind: 'training' | 'live') =>
+        renderToStaticMarkup(
+          createElement(WorkbenchScopeProvider, { kind } as never, createElement(ActiveProbe)),
+        )
+
+      const trainingHtml = renderScoped('training')
+      const liveHtml = renderScoped('live')
+
+      expect(trainingHtml).toContain(`${LIVE_TASK_ID}::`)
+      expect(liveHtml).toContain(`${LIVE_WORKSPACE_ID}::`)
+
+      // Updating live selection must not change training scope result
+      useTrainingStore.getState().selectLiveConversation(LIVE_WORKSPACE_ID, 'live-conv-check')
+      const trainingAfterLiveUpdate = renderScoped('training')
+      expect(trainingAfterLiveUpdate).toBe(trainingHtml)
+
+      const summaryHtml = renderToStaticMarkup(createElement(TrainingSummaryProbe))
+      expect(summaryHtml).toContain(`№ 0043|${LIVE_TASK_ID}|${LIVE_WORKSPACE_ID}|${TRAINING_SEED.length}`)
     })
   })
 

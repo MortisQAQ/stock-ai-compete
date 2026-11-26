@@ -1,11 +1,17 @@
 import { describe, expect, it } from 'vitest'
 
-import { money, round, seq, signed, signedPct, tone } from './format'
+import { formatMoney, money, round, seq, signed, signedPct, tone } from './format'
 
 describe('format', () => {
   it('金额固定两位小数并带货币符号', () => {
     expect(money(1234.5)).toBe('¥1,234.50')
     expect(money(-0.004)).toBe('¥-0.00')
+  })
+
+  it('formatMoney 支持按 locale 格式化且与 money 口径一致', () => {
+    expect(formatMoney(12345.6, 'zh-CN')).toBe('¥12,345.60')
+    expect(formatMoney(12345.6, 'en-US')).toBe('¥12,345.60')
+    expect(formatMoney(12345.6)).toBe(money(12345.6))
   })
 
   it('带符号金额用排版减号，不用连字符', () => {
