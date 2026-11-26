@@ -23,17 +23,16 @@
 
 .clock-sub {
   margin-top: 8px;
-  font: 600 var(--fs-micro)/1.5 var(--mono);
-  letter-spacing: 0.06em;
+  font: 500 var(--fs-micro)/1.5 var(--sans);
+  letter-spacing: 0.01em;
   color: var(--fg-2);
-  text-transform: uppercase;
 }
 
 /* 键值行 */
 .kv {
   display: flex;
   align-items: baseline;
-  padding: 17px 0;
+  padding: 16px 0;
   border-bottom: 1px solid var(--line-soft);
   font-size: var(--fs-sm);
 }
@@ -71,8 +70,7 @@
 }
 
 .holding-top b {
-  font: 600 var(--fs-sm)/1 var(--mono);
-  letter-spacing: 0.03em;
+  font: 600 var(--fs-sm)/1.2 var(--sans);
 }
 
 .holding-top em {
@@ -86,21 +84,20 @@
   justify-content: space-between;
   gap: 8px;
   margin-top: 8px;
-  font: 600 var(--fs-micro)/1.4 var(--mono);
+  font: 500 var(--fs-micro)/1.4 var(--mono);
   color: var(--fg-2);
-  letter-spacing: 0.03em;
+  letter-spacing: 0.01em;
 }
 
 .tag {
   display: inline-block;
-  padding: 3px 6px;
+  padding: 3px 8px;
   border: 0;
   border-radius: var(--radius-sm);
   background: var(--bg-3);
-  font: 600 var(--fs-micro)/1 var(--mono);
-  letter-spacing: 0.08em;
+  font: 500 var(--fs-micro)/1.2 var(--sans);
+  letter-spacing: 0.01em;
   color: var(--fg-1);
-  text-transform: uppercase;
 }
 
 .tag.lock {
@@ -109,14 +106,11 @@
 }
 
 /* ---------- 决策台账 ---------- */
-/* 台账 = 「板」：只有一根上边线（酸橙 13%），左右不出线。
-   四边全包会把它读成「又一个卡片」，而这其实是页面上的一块读表区。 */
 .ledger {
   position: relative;
   display: flex;
   flex-direction: column;
-  border: 0;
-  border-top: 1px solid var(--line-lime-soft);
+  border: 1px solid var(--line-soft);
   border-radius: var(--radius-lg);
   background-color: var(--bg-1);
   margin: 8px;
@@ -136,8 +130,8 @@
 }
 
 .ledger-hd b {
-  font: 600 var(--fs-micro)/1 var(--mono);
-  letter-spacing: 0.12em;
+  font: 500 var(--fs-micro)/1.2 var(--mono);
+  font-variant-numeric: tabular-nums;
   color: var(--fg-1);
 }
 
@@ -145,7 +139,7 @@
   display: flex;
   gap: 8px;
   flex-wrap: wrap;
-  padding: 10px 18px;
+  padding: 12px 20px;
   border-bottom: 1px solid var(--line-soft);
 }
 
@@ -154,13 +148,12 @@
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  padding: 7px 11px;
+  padding: 7px 12px;
   border: 0;
   border-radius: var(--radius-md);
   background: var(--bg-2);
-  font: 600 var(--fs-micro)/1 var(--mono);
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
+  font: 500 var(--fs-micro)/1.2 var(--sans);
+  letter-spacing: 0.01em;
   color: var(--fg-1);
   transition: color 0.12s, background 0.12s;
 }
@@ -170,7 +163,6 @@
   color: var(--fg-0);
 }
 
-/* 选中 = 酸橙底 + 左侧 2px 竖条：和委托单里的 chip、回放列表同一套选中语言。 */
 .ledger-filters button[aria-pressed='true'] {
   background: var(--lime-soft);
   color: var(--fg-0);
@@ -188,24 +180,24 @@
 }
 
 .ledger-filters button span {
+  font-family: var(--mono);
   font-size: var(--fs-micro);
-  opacity: 0.7;
+  font-variant-numeric: tabular-nums;
+  opacity: 0.72;
 }
 
 .ledger-body {
   height: clamp(264px, calc(100vh - 690px), 468px);
   overflow: auto;
-  padding: 2px 0;
+  padding: 4px 0;
   -webkit-mask-image: linear-gradient(to bottom, transparent 0, #000 16px);
   mask-image: linear-gradient(to bottom, transparent 0, #000 16px);
 }
 
 .ledger-empty {
-  padding: 28px 16px;
+  padding: 32px 16px;
   text-align: center;
-  font: 600 var(--fs-micro)/1.6 var(--mono);
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
+  font: 500 var(--fs-sm)/1.6 var(--sans);
   color: var(--fg-2);
 }
 
@@ -213,7 +205,7 @@
   display: grid;
   grid-template-columns: 52px minmax(0, 1fr);
   gap: 14px;
-  padding: 14px 18px;
+  padding: 16px 20px;
   border-bottom: 1px solid var(--line-soft);
   position: relative;
 }
@@ -266,10 +258,9 @@
 }
 
 .chip {
-  font: 600 var(--fs-micro)/1 var(--mono);
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
-  padding: 4px 7px;
+  font: 500 var(--fs-micro)/1.2 var(--sans);
+  letter-spacing: 0.01em;
+  padding: 3px 8px;
   border: 0;
   border-radius: var(--radius-sm);
   background: var(--bg-2);
@@ -302,8 +293,8 @@
 }
 
 .ev-time {
-  font: 600 var(--fs-micro)/1 var(--mono);
-  letter-spacing: 0.1em;
+  font: 500 var(--fs-micro)/1.2 var(--mono);
+  letter-spacing: 0.02em;
   color: var(--fg-2);
 }
 
@@ -317,17 +308,16 @@
 .ev-text {
   margin-top: 4px;
   font-size: var(--fs-body);
-  line-height: 1.5;
+  line-height: 1.55;
   color: var(--fg-1);
   white-space: pre-wrap;
 }
 
 .ev-link {
-  margin-top: 7px;
+  margin-top: 8px;
   display: inline-block;
-  font: 600 var(--fs-micro)/1 var(--mono);
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
+  font: 500 var(--fs-micro)/1.2 var(--sans);
+  letter-spacing: 0.01em;
   color: var(--accent);
   border-bottom: 1px solid var(--accent-soft);
   padding-bottom: 2px;
@@ -338,11 +328,10 @@
   justify-content: space-between;
   gap: 10px;
   align-items: center;
-  padding: 14px 18px;
+  padding: 14px 20px;
   border-top: 1px solid var(--line-soft);
-  font: 600 var(--fs-micro)/1 var(--mono);
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
+  font: 500 var(--fs-micro)/1.2 var(--sans);
+  letter-spacing: 0.01em;
   color: var(--fg-2);
 }
 
@@ -359,63 +348,64 @@
   right: 16px;
   bottom: 58px;
   z-index: 2;
-  padding: 6px 10px;
+  padding: 6px 12px;
   background: var(--bg-3);
   color: var(--fg-0);
-  border: 1px solid var(--line-strong);
-  font: 600 var(--fs-micro)/1 var(--mono);
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
+  font: 500 var(--fs-micro)/1.2 var(--sans);
+  letter-spacing: 0.01em;
 }
 
 /* ---------- 审批票：卡壳由 Card 提供，内部版式留在这里 ---------- */
 .proposal-facts {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 16px;
-  padding: 12px 0 14px;
+  gap: 20px;
+  padding: 16px 0 18px;
   border-bottom: 1px solid var(--line-soft);
 }
 
 .proposal-facts dt {
-  font: 600 var(--fs-micro)/1 var(--mono);
-  letter-spacing: 0.16em;
-  text-transform: uppercase;
+  font: 500 var(--fs-micro)/1.3 var(--sans);
+  letter-spacing: 0.01em;
   color: var(--fg-2);
-  margin-bottom: 5px;
+  margin-bottom: 6px;
 }
 
 .proposal-facts dd {
   font: 600 var(--fs-body)/1.2 var(--mono);
   font-variant-numeric: tabular-nums;
-  letter-spacing: -0.3px;
+  letter-spacing: -0.01em;
 }
 
 .proposal-note {
-  margin-top: 11px;
+  margin-top: 12px;
   font-size: var(--fs-sm);
-  line-height: 1.6;
-  color: var(--fg-2);
+  line-height: 1.65;
+  color: var(--fg-1);
 }
 
 .proposal-actions {
   display: flex;
-  gap: 8px;
+  gap: 10px;
   flex-wrap: wrap;
   align-items: center;
-  margin-top: 13px;
+  margin-top: 16px;
 }
 
 .stepper {
   display: inline-flex;
   align-items: center;
-  height: 28px;
+  height: 32px;
   border: 1px solid var(--control-line);
+  border-radius: var(--radius-sm);
+  overflow: hidden;
   background: var(--bg-2);
 }
 
 .stepper button {
-  width: 26px;
+  width: 28px;
   height: 100%;
   display: grid;
   place-items: center;
@@ -432,9 +422,9 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  min-width: 62px;
+  min-width: 66px;
   height: 100%;
-  padding: 0 6px;
+  padding: 0 8px;
   border-left: 1px solid var(--line);
   border-right: 1px solid var(--line);
   font: 600 var(--fs-micro)/1 var(--mono);
@@ -447,24 +437,24 @@
   gap: 12px;
   flex-wrap: wrap;
   padding: 0 12px 10px;
-  font: 600 var(--fs-micro)/1.4 var(--mono);
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
+  font: 500 var(--fs-micro)/1.4 var(--sans);
+  letter-spacing: 0.01em;
   color: var(--fg-2);
 }
 
 .composer-hint kbd {
-  font: 600 var(--fs-micro)/1 var(--mono);
-  padding: 2px 5px;
+  font: 500 var(--fs-micro)/1 var(--mono);
+  padding: 2px 6px;
   border: 1px solid var(--line);
+  border-radius: var(--radius-xs);
   background: var(--well);
   color: var(--fg-1);
 }
 
 /* 详情页签 */
 .tabpane {
-  padding: 8px 18px 16px;
-  max-height: 290px;
+  padding: 12px 22px 20px;
+  max-height: 310px;
   overflow: auto;
 }
 
@@ -478,7 +468,7 @@
   display: grid;
   grid-template-columns: 14px minmax(0, 1fr);
   gap: 10px;
-  padding: 12px 0;
+  padding: 14px 0;
   border-bottom: 1px solid var(--line-soft);
   align-items: start;
 }
@@ -490,7 +480,7 @@
 .trust-dot {
   width: 7px;
   height: 7px;
-  margin-top: 5px;
+  margin-top: 6px;
   background: var(--down);
   border-radius: 50%;
 }
@@ -511,10 +501,9 @@
 
 .trust-row small {
   display: block;
-  margin-top: 3px;
-  font: 600 var(--fs-micro)/1.5 var(--mono);
+  margin-top: 4px;
+  font: 400 var(--fs-micro)/1.5 var(--sans);
   color: var(--fg-2);
-  letter-spacing: 0.03em;
 }
 
 /* 矮屏压缩：只服务训练场。
@@ -661,7 +650,7 @@
 @media (min-width: 1024px) {
   .bench-grid {
     display: grid;
-    grid-template-columns: 384px minmax(0, 1fr);
+    grid-template-columns: clamp(330px, 27vw, 410px) minmax(0, 1fr);
     height: 100dvh;
     min-height: 0;
   }
@@ -697,8 +686,7 @@
   height: 34px;
   border-radius: 999px;
   background: var(--bg-3);
-  font: 600 var(--fs-micro) / 1 var(--mono);
-  text-transform: uppercase;
+  font: 600 var(--fs-micro) / 1 var(--sans);
   color: var(--fg-1);
 }
 
@@ -720,9 +708,9 @@
   display: flex;
   align-items: center;
   gap: 6px;
-  margin-top: 3px;
-  font: 500 var(--fs-micro) / 1.3 var(--mono);
-  letter-spacing: 0.04em;
+  margin-top: 4px;
+  font: 500 var(--fs-micro) / 1.3 var(--sans);
+  letter-spacing: 0.01em;
   color: var(--fg-2);
 }
 
@@ -811,8 +799,8 @@
 
 .bench-hd-meta {
   margin-top: 4px;
-  font: 500 var(--fs-micro) / 1.4 var(--mono);
-  letter-spacing: 0.04em;
+  font: 500 var(--fs-micro) / 1.4 var(--sans);
+  letter-spacing: 0.01em;
   color: var(--fg-2);
 }
 
@@ -821,13 +809,13 @@
   align-items: center;
   gap: 7px;
   flex: 0 0 auto;
-  height: 32px;
-  padding: 0 13px;
+  height: 34px;
+  padding: 0 14px;
   border-radius: var(--radius-md);
   background: var(--bg-2);
   color: var(--fg-1);
-  font: 600 var(--fs-micro) / 1 var(--sans);
-  letter-spacing: 0.02em;
+  font: 500 var(--fs-micro) / 1 var(--sans);
+  letter-spacing: 0.01em;
   transition: background 0.14s ease, color 0.14s ease;
 }
 
@@ -850,11 +838,12 @@
 }
 
 .bench-band .band-cell {
-  padding: 18px 20px 20px;
+  padding: 18px 16px 20px;
 }
 
 .bench-band .band-cell b {
-  font-size: var(--fs-kpi);
+  font-size: calc(var(--fs-kpi) * 0.88);
+  letter-spacing: -0.04em;
 }
 
 .bench-body {
@@ -945,10 +934,9 @@
 }
 
 .side-sec-hd {
-  margin-bottom: 6px;
-  font: 600 var(--fs-micro) / 1 var(--cond);
-  letter-spacing: 0.2em;
-  text-transform: uppercase;
+  margin-bottom: 8px;
+  font: 500 var(--fs-micro) / 1.3 var(--sans);
+  letter-spacing: 0.02em;
   color: var(--fg-2);
 }
 

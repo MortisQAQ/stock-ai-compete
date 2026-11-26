@@ -139,12 +139,11 @@
 }
 
 .mdx-table-wrap th {
-  font: 600 var(--fs-micro) / 1.3 var(--mono);
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
+  font: 500 var(--fs-micro) / 1.3 var(--sans);
+  letter-spacing: 0.01em;
   color: var(--fg-2);
   background: var(--bg-2);
-  border-bottom: 1px solid var(--line-strong);
+  border-bottom: 1px solid var(--line);
 }
 
 /* ---------- Mermaid 图表框 ---------- */
@@ -187,6 +186,15 @@
 .mdx-diagram svg span {
   fill: var(--fg-0) !important;
   color: var(--fg-0) !important;
+}
+
+.mdx-diagram svg .edgeLabel,
+.mdx-diagram svg .edgeLabel span,
+.mdx-diagram svg .edgeLabel p,
+.mdx-diagram svg .noteText,
+.mdx-diagram svg .loopText,
+.mdx-diagram svg .sequenceNumber {
+  font-size: var(--fs-micro) !important;
 }
 
 /* 节点 = 抬升一档的表面，靠 1px 线定形，与卡片同一套语言 */
