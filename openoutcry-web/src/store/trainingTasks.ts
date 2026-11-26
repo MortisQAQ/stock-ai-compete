@@ -37,6 +37,15 @@ export function trainingTasksOf(state: RunState): TrainingTask[] {
     id: LIVE_TASK_ID,
     name: `${mandateNo} · ${state.universeLabel ?? '沪深 300 成分池'}`,
     kind: 'training',
+    mandateNo,
+    universeId: state.universeId ?? 'csi300',
+    universeLabel: state.universeLabel ?? '沪深 300 成分池',
+    cadenceId: state.cadenceId ?? 'daily-3phase',
+    cadenceLabel: state.cadenceLabel ?? '日频三阶段',
+    day: state.day ?? 17,
+    totalDays: state.totalDays ?? 20,
+    clock: state.clock,
+    clockKey: state.clockKey,
     conversations: [
       {
         id: 'conv-main',
@@ -47,8 +56,8 @@ export function trainingTasksOf(state: RunState): TrainingTask[] {
     ],
     assignee:
       teamIds.length > 1
-        ? { kind: 'team', name: teamNames.join(' + '), members: teamNames }
-        : { kind: 'agent', name: agent.name },
+        ? { kind: 'team', name: teamNames.join(' + '), memberIds: teamIds, members: teamNames }
+        : { kind: 'agent', name: agent.name, agentId: state.agent },
     startAt: '2024-04-01 09:15',
     endAt: '2024-04-26 15:00',
     windowLabel: `2024-04-01 → 04-26 · Day ${state.day ?? 17}/${state.totalDays ?? 20}`,
@@ -71,6 +80,12 @@ export function liveTasksOf(state: RunState): TrainingTask[] {
     id: LIVE_WORKSPACE_ID,
     name: 'A 股主仓 · 实时辅助',
     kind: 'live',
+    clock: state.clock,
+    clockKey: state.clockKey,
+    syncKey: state.syncKey,
+    syncLabel: state.syncLabel,
+    marketSessionKey: state.marketSessionKey,
+    marketSession: state.marketSession,
     conversations: [
       {
         id: 'live-conv-check',
@@ -85,7 +100,7 @@ export function liveTasksOf(state: RunState): TrainingTask[] {
         status,
       },
     ],
-    assignee: { kind: 'agent', name: agent.name },
+    assignee: { kind: 'agent', name: agent.name, agentId: state.agent },
     startAt: '今日 09:30',
     endAt: '实时',
     windowLabel: (state.marketSession ?? 'A 股实时行情') + ' · ' + (state.syncLabel ?? '手动维护'),
@@ -97,8 +112,3 @@ export function liveTasksOf(state: RunState): TrainingTask[] {
 
   return [activeAccount, ...LIVE_ARCHIVE_TASKS]
 }
-
-export const progressLabel = (task: TrainingTask) => `${task.decisions} 条决策 · ${task.fills} 笔成交`
-
-export const assigneeLabel = (task: TrainingTask) =>
-  task.assignee.kind === 'team' ? `团队 · ${task.assignee.name}` : `Agent · ${task.assignee.name}`

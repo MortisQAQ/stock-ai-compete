@@ -1,25 +1,28 @@
+import { useTranslation } from 'react-i18next'
 import { useNavigate } from 'react-router-dom'
+
+import { formatAgent, formatCollab, formatStateClock } from '../../i18n/helpers'
 import { useRun } from '../../store/RunProvider'
 import { useDialog } from '../../store/DialogProvider'
 import { Modal } from '../ui/Modal'
 import { Prose } from '../ui/Prose'
 import { Button } from '../ui/Button'
-import { agentOf } from '../../data/agents'
 import type { AgentId } from '../../types'
 
 export function AbortDialog({ open }: { open: boolean }) {
   const { actions } = useRun()
   const { close } = useDialog()
+  const { t } = useTranslation()
   return (
     <Modal
       open={open}
-      kicker="Abort"
-      title="中止本次运行？"
+      kicker={t('dialogs.abort.kicker')}
+      title={t('dialogs.abort.title')}
       onClose={close}
       footer={
         <>
           <Button size="sm" variant="ghost" onClick={close}>
-            继续运行
+            {t('dialogs.abort.btnContinue')}
           </Button>
           <Button
             size="sm"
@@ -29,15 +32,13 @@ export function AbortDialog({ open }: { open: boolean }) {
               close()
             }}
           >
-            确认中止
+            {t('dialogs.abort.btnConfirm')}
           </Button>
         </>
       }
     >
-      <Prose>
-        中止后，未完成的提案会被标记为已终止，账户与轨迹保留，可继续复盘但不能续跑。
-      </Prose>
-      <div className="note">已发生的成交与费用不会回滚。</div>
+      <Prose>{t('dialogs.abort.body')}</Prose>
+      <div className="note">{t('dialogs.abort.note')}</div>
     </Modal>
   )
 }
@@ -45,16 +46,17 @@ export function AbortDialog({ open }: { open: boolean }) {
 export function GoalDialog({ open }: { open: boolean }) {
   const { actions } = useRun()
   const { close } = useDialog()
+  const { t } = useTranslation()
   return (
     <Modal
       open={open}
-      kicker="Autonomy"
-      title="继续自主运行"
+      kicker={t('dialogs.goal.kicker')}
+      title={t('dialogs.goal.title')}
       onClose={close}
       footer={
         <>
           <Button size="sm" variant="ghost" onClick={close}>
-            取消
+            {t('dialogs.cancel')}
           </Button>
           <Button
             size="sm"
@@ -64,15 +66,13 @@ export function GoalDialog({ open }: { open: boolean }) {
               close()
             }}
           >
-            确认进入自主推进
+            {t('dialogs.goal.btnConfirm')}
           </Button>
         </>
       }
     >
-      <Prose>
-        进入自主推进后，Agent 会连续处理后续交易日，订单不再逐单等待人工确认。你仍然可以随时追加带时间戳的指导，但不能再改写已经提交的动作。
-      </Prose>
-      <div className="note">自主运行会被标记为「自主运行」协作方式，报告中与人工确认运行分开统计。</div>
+      <Prose>{t('dialogs.goal.body')}</Prose>
+      <div className="note">{t('dialogs.goal.note')}</div>
     </Modal>
   )
 }
@@ -80,18 +80,19 @@ export function GoalDialog({ open }: { open: boolean }) {
 export function SwitchAgentDialog({ open, agentId }: { open: boolean; agentId: AgentId }) {
   const { state, actions } = useRun()
   const { close } = useDialog()
+  const { t } = useTranslation()
   const navigate = useNavigate()
-  const agent = agentOf(agentId)
+  const agent = formatAgent(agentId, t)
   return (
     <Modal
       open={open}
-      kicker="Switch Agent"
-      title={'切换到「' + agent.name + '」？'}
+      kicker={t('dialogs.switchAgent.kicker')}
+      title={t('dialogs.switchAgent.title', { name: agent.name })}
       onClose={close}
       footer={
         <>
           <Button size="sm" variant="ghost" onClick={close}>
-            取消
+            {t('dialogs.cancel')}
           </Button>
           <Button
             size="sm"
@@ -102,15 +103,18 @@ export function SwitchAgentDialog({ open, agentId }: { open: boolean; agentId: A
               navigate('/training')
             }}
           >
-            开始新会话
+            {t('dialogs.switchAgent.btnConfirm')}
           </Button>
         </>
       }
     >
       <Prose>
-        当前会话（{state.clock} · {state.collaboration}）会被重置为新的演示运行。已归档的历史运行不受影响。
+        {t('dialogs.switchAgent.body', {
+          clock: formatStateClock(state, t),
+          collab: formatCollab(state.collaboration, t),
+        })}
       </Prose>
-      <div className="note">切换只影响本浏览器内的演示状态，不会写入任何服务端记录。</div>
+      <div className="note">{t('dialogs.switchAgent.note')}</div>
     </Modal>
   )
 }

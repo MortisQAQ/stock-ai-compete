@@ -1,11 +1,12 @@
+import { useTranslation } from 'react-i18next'
 import { useNavigate } from 'react-router-dom'
 import { ArrowUpRight } from 'lucide-react'
 
-import { agentOf } from '../../data/agents'
 import type { TrainingRecord } from '../../data/trainings'
+import { formatAgent, formatTrainingRecord } from '../../i18n/helpers'
 import { useLocale } from '../../store/LocaleProvider'
 import { useTraining } from '../../store/TrainingProvider'
-import { TRAINING_STATUS_TEXT, TRAINING_STATUS_TEXT_EN } from '../../store/selectors'
+import { trainingStatusText } from '../../store/selectors'
 import { LIVE_TASK_ID } from '../../store/trainingTasks'
 import type { TrainingStatus } from '../../types'
 import { cn } from '../../lib/utils'
@@ -18,21 +19,17 @@ const TONE: Record<TrainingStatus, string> = {
   done: 'text-[var(--fg-2)]',
 }
 
-/**
- * 训练台账：读取全局 TrainingProvider.records，新开具的 № 0043 会立刻出现在首行；
- * 点击任意行可真实切换当前训练任务并跳转至 /training。
- */
 export function TrainingLedger() {
   const navigate = useNavigate()
   const { records, tasks, selectTask } = useTraining()
-  const { isEn, bi } = useLocale()
-  const running = records.filter((t) => t.status === 'running').length
+  const { t } = useTranslation()
+  const running = records.filter((r) => r.status === 'running').length
 
   const openRecord = (rec: TrainingRecord) => {
     if (rec.status === 'running') {
       selectTask(LIVE_TASK_ID)
     } else {
-      const archiveTask = tasks.find((t) => !t.live)
+      const archiveTask = tasks.find((task) => !task.live)
       selectTask(archiveTask ? archiveTask.id : LIVE_TASK_ID)
     }
     navigate('/training')
@@ -41,10 +38,10 @@ export function TrainingLedger() {
   return (
     <section aria-labelledby="ledger-h" className="mt-9">
       <div className="section-hd">
-        <h2 id="ledger-h">{bi('训练台账', 'Training Ledger')}</h2>
+        <h2 id="ledger-h">{t('ledger.title')}</h2>
         <div className="section-hd-side">
           <span className="count">
-            {bi(`${records.length} 次委托 · ${running} 进行中`, `${records.length} mandates · ${running} running`)}
+            {t('ledger.countSummary', { total: records.length, running })}
           </span>
         </div>
       </div>
@@ -54,17 +51,17 @@ export function TrainingLedger() {
           className="hidden items-center gap-4 px-[var(--sp-5)] pb-[var(--sp-3)] pt-[var(--sp-4)] md:flex"
           aria-hidden
         >
-          <Col className="flex-1">{bi('训练委托', 'Mandate')}</Col>
-          <Col className="w-[148px] shrink-0">{bi('团队', 'Team')}</Col>
-          <Col className="w-[176px] shrink-0">{bi('时段', 'Window')}</Col>
-          <Col className="w-[96px] shrink-0 text-right">{bi('进度', 'Progress')}</Col>
-          <Col className="w-[88px] shrink-0 text-right">{bi('状态', 'Status')}</Col>
+          <Col className="flex-1">{t('ledger.colMandate')}</Col>
+          <Col className="w-[148px] shrink-0">{t('ledger.colTeam')}</Col>
+          <Col className="w-[176px] shrink-0">{t('ledger.colWindow')}</Col>
+          <Col className="w-[96px] shrink-0 text-right">{t('ledger.colProgress')}</Col>
+          <Col className="w-[88px] shrink-0 text-right">{t('ledger.colStatus')}</Col>
           <span className="w-4 shrink-0" />
         </div>
 
         <ul className="mt-2">
-          {records.map((t) => (
-            <TrainingRow key={t.id} training={t} isEn={isEn} onOpen={() => openRecord(t)} />
+          {records.map((rec) => (
+            <TrainingRow key={rec.id} training={rec} onOpen={() => openRecord(rec)} />
           ))}
         </ul>
       </div>
@@ -78,16 +75,16 @@ function Col({ children, className }: { children: React.ReactNode; className?: s
 
 function TrainingRow({
   training,
-  isEn,
   onOpen,
 }: {
   training: TrainingRecord
-  isEn: boolean
   onOpen: () => void
 }) {
+  const { lang } = useLocale()
+  const { t } = useTranslation()
   const pct = Math.round((training.day / training.days) * 100)
   const active = training.status === 'running'
-  const statusMap = isEn ? TRAINING_STATUS_TEXT_EN : TRAINING_STATUS_TEXT
+  const view = formatTrainingRecord(training, t)
 
   return (
     <li className="relative border-b border-[var(--line-soft)] last:border-b-0">
@@ -103,14 +100,14 @@ function TrainingRow({
               {training.no}
             </span>
             <span className="line-clamp-2 min-w-0 font-sans text-row font-semibold leading-snug tracking-[-0.02em] text-ink md:truncate">
-              {training.title}
+              {view.title}
             </span>
           </span>
           <span className="mt-1 flex flex-wrap items-center gap-x-2 gap-y-0.5 text-note text-[var(--fg-2)]">
             <span className="md:hidden">
               {training.from.slice(5)} → {training.to.slice(5)}
             </span>
-            <span>{training.universe}</span>
+            <span>{view.universe}</span>
             {training.result ? (
               <span
                 className={cn(
@@ -128,7 +125,7 @@ function TrainingRow({
           {training.team.map((id) => (
             <span
               key={id}
-              title={agentOf(id).name}
+              title={formatAgent(id, t).name}
               className="grid size-8 place-items-center border border-[var(--rule)] bg-[var(--bg-1)] font-mono text-micro font-semibold uppercase text-ink-2"
             >
               {AGENT_CODE[id] ?? id.slice(0, 2)}
@@ -150,7 +147,7 @@ function TrainingRow({
         </span>
 
         <span className={cn('w-[88px] shrink-0 text-right font-mono text-micro font-semibold', TONE[training.status])}>
-          {statusMap[training.status]}
+          {trainingStatusText(training.status, lang)}
         </span>
 
         <ArrowUpRight

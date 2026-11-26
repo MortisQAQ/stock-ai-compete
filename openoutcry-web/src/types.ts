@@ -1,3 +1,8 @@
+import type { ParseKeys } from 'i18next'
+
+export type TranslationKey = ParseKeys<'translation'>
+export type I18nParams = Record<string, string | number | undefined>
+
 export type AgentId = 'codex' | 'native' | 'kimi' | 'custom'
 
 export type WorkspaceKind = 'training' | 'live'
@@ -42,27 +47,43 @@ export type EventKind = 'agent' | 'tool' | 'order' | 'user' | 'error' | 'system'
 export interface EvidenceItem {
   id: string
   title: string
+  titleKey?: TranslationKey
   publishedAt: string
   pitPass: boolean
   summary: string
+  summaryKey?: TranslationKey
 }
 
 export interface RunEvent {
   id: number
   kind: EventKind
   title: string
+  titleKey?: TranslationKey
   body: string
+  bodyKey?: TranslationKey
   meta: string
+  metaKey?: TranslationKey
   /** 事件产生时的模拟时钟，用于台账时间列 */
   at: string
+  atKey?: TranslationKey
   /** 可选阶段分隔条文案（渲染在该事件之前） */
   divider?: string
+  dividerKey?: TranslationKey
   /** 可选角色标识（多 Agent 团队时区分 主交易员 / 研究员 / 风控官） */
   speakerRole?: string
+  speakerRoleKey?: TranslationKey
+  speakerAgentId?: AgentId
   /** 可选 PIT 证据卡片列表（用于工具调用条展开） */
   evidenceItems?: EvidenceItem[]
   /** 可选时点闸门拦截提示 */
   interceptedNote?: string
+  interceptedKey?: TranslationKey
+  /** 结构化 i18n 插值参数与实体引用，支持运行中实时中英切换 */
+  i18nParams?: I18nParams
+  actorKey?: TranslationKey
+  assetRef?: string
+  sideRef?: '买入' | '卖出'
+  agentRef?: AgentId
 }
 
 export type ProposalStatus = 'pending' | 'submitted' | 'rejected' | 'filled' | 'cancelled'
@@ -80,8 +101,10 @@ export interface Proposal {
   /** 实战工作台参考价区间与失效条件 */
   priceBand?: string
   invalidation?: string
+  invalidationKey?: TranslationKey
   evidence?: string
   reason?: string
+  reasonKey?: TranslationKey
   /** 实盘回填时记录的实际成交价 */
   executedPrice?: number
 }
@@ -104,11 +127,14 @@ export interface Trade {
   price: number
   fee: number
   time: string
+  timeKey?: TranslationKey
   /** null = 仅建仓，未实现 */
   pnl: number | null
   reason: string
+  reasonKey?: TranslationKey
   evidence: string
   status: string
+  statusKey?: TranslationKey
 }
 
 export type RunStatus = 'active' | 'paused' | 'aborted' | 'disconnected'
@@ -138,7 +164,9 @@ export interface RunState {
   /** 当前委托单号与口径元数据（历史训练场） */
   mandateNo?: string
   team?: AgentId[]
+  universeId?: string
   universeLabel?: string
+  cadenceId?: string
   cadenceLabel?: string
   day?: number
   totalDays?: number
@@ -155,10 +183,13 @@ export interface RunState {
   collaboration: Collaboration
   proposal: Proposal
   clock: string
+  clockKey?: TranslationKey
   /** 实战工作台：镜像持仓维护时间说明 */
   syncLabel?: string
+  syncKey?: TranslationKey
   /** 实战工作台：实时市场阶段说明 */
   marketSession?: string
+  marketSessionKey?: TranslationKey
   holdings: Holding[]
   trades: Trade[]
   events: RunEvent[]
@@ -175,7 +206,11 @@ export interface ToastMessage {
   id: number
   kind: 'info' | 'success' | 'warn'
   text: string
+  textKey?: TranslationKey
+  i18nParams?: I18nParams
+  assetRef?: string
   actionLabel?: string
+  actionLabelKey?: TranslationKey
   onAction?: () => void
 }
 
@@ -195,6 +230,8 @@ export interface BandItem {
 export interface TrainingAssignee {
   kind: 'agent' | 'team'
   name: string
+  agentId?: AgentId
+  memberIds?: AgentId[]
   /** 团队任务才有的成员名单 */
   members?: string[]
 }
@@ -250,5 +287,19 @@ export interface TrainingTask {
   kind?: WorkspaceKind
   decisions: number
   fills: number
+  /** 供前端按当前语言实时组装文案的轻量元数据 */
+  mandateNo?: string
+  universeId?: string
+  universeLabel?: string
+  cadenceId?: string
+  cadenceLabel?: string
+  day?: number
+  totalDays?: number
+  clock?: string
+  clockKey?: TranslationKey
+  syncKey?: TranslationKey
+  syncLabel?: string
+  marketSessionKey?: TranslationKey
+  marketSession?: string
   archive?: TaskArchive
 }

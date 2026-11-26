@@ -1,22 +1,27 @@
 import { useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import { PanelRightOpen, X } from 'lucide-react'
 import { Dialog as DialogPrimitive } from 'radix-ui'
 
+import {
+  formatAgent,
+  formatMarketSession,
+  formatStateClock,
+  formatSyncLabel,
+} from '../../i18n/helpers'
 import { useRun, useWorkspaceKind } from '../../store/RunProvider'
 import { useDialog } from '../../store/DialogProvider'
-import { useLocale } from '../../store/LocaleProvider'
 import { useToast } from '../../store/ToastProvider'
-import { agentOf } from '../../data/agents'
 import { exportRun } from '../../lib/exportRun'
 
 export function RunDrawer() {
   const kind = useWorkspaceKind()
   const { state, totals, actions } = useRun()
   const { open: openDialog } = useDialog()
-  const { bi } = useLocale()
-  const { notify } = useToast()
+  const { notifyKey } = useToast()
+  const { t } = useTranslation()
   const [open, setOpen] = useState(false)
-  const agent = agentOf(state.agent)
+  const agent = formatAgent(state.agent, t)
   const aborted = state.status === 'aborted'
   const isLive = state.kind === 'live'
 
@@ -29,7 +34,7 @@ export function RunDrawer() {
     <>
       <button type="button" className="bench-act" onClick={() => setOpen(true)} aria-haspopup="dialog">
         <PanelRightOpen size={15} aria-hidden />
-        <span>{isLive ? bi('工作台', 'Desk') : bi('运行', 'Run')}</span>
+        <span>{isLive ? t('drawer.triggerLive') : t('drawer.triggerSim')}</span>
       </button>
 
       <DialogPrimitive.Root open={open} onOpenChange={setOpen}>
@@ -44,90 +49,90 @@ export function RunDrawer() {
             }
           >
             <DialogPrimitive.Title className="sr-only">
-              {isLive ? '实战工作台口径与操作' : '运行口径与操作'}
+              {isLive ? t('drawer.titleLive') : t('drawer.titleSim')}
             </DialogPrimitive.Title>
 
             <header className="side-drawer-hd">
               <div>
-                <span className="label">{isLive ? 'Live Workbench' : 'Run'}</span>
+                <span className="label">{isLive ? t('drawer.labelLive') : t('drawer.labelSim')}</span>
                 <p className="side-drawer-title">{agent.name}</p>
               </div>
-              <DialogPrimitive.Close aria-label="关闭抽屉" className="side-drawer-x">
+              <DialogPrimitive.Close aria-label={t('drawer.closeAria')} className="side-drawer-x">
                 <X size={18} aria-hidden />
               </DialogPrimitive.Close>
             </header>
 
             <div className="side-drawer-body">
               <section className="side-sec">
-                <h3 className="side-sec-hd">口径</h3>
+                <h3 className="side-sec-hd">{t('drawer.secContract')}</h3>
                 {isLive ? (
                   <>
                     <div className="kv">
-                      <span>市场阶段</span>
+                      <span>{t('drawer.marketSession')}</span>
                       <span className="dots" />
-                      <b>{state.marketSession ?? '实时快照'}</b>
+                      <b>{formatMarketSession(state.marketSessionKey, state.marketSession, t)}</b>
                     </div>
                     <div className="kv">
-                      <span>研究出口</span>
+                      <span>{t('drawer.researchAccess')}</span>
                       <span className="dots" />
-                      <b>实时开放</b>
+                      <b>{t('drawer.realtimeOpen')}</b>
                     </div>
                     <div className="kv">
-                      <span>账本来源</span>
+                      <span>{t('drawer.ledgerSource')}</span>
                       <span className="dots" />
-                      <b>用户镜像 · 手动维护</b>
+                      <b>{t('drawer.ledgerMirrorManual')}</b>
                     </div>
                     <div className="kv">
-                      <span>执行权限</span>
+                      <span>{t('drawer.execPermission')}</span>
                       <span className="dots" />
-                      <b>仅建议 · 不代下单</b>
+                      <b>{t('drawer.advisoryOnly')}</b>
                     </div>
                     <div className="kv">
-                      <span>维护时间</span>
+                      <span>{t('drawer.syncTime')}</span>
                       <span className="dots" />
-                      <b>{state.syncLabel ?? state.clock}</b>
+                      <b>{formatSyncLabel(state.syncKey, state.syncLabel, t)}</b>
                     </div>
                   </>
                 ) : (
                   <>
                     <div className="kv">
-                      <span>资料时点</span>
+                      <span>{t('drawer.dataCutoff')}</span>
                       <span className="dots" />
                       <b>2024-04-22 23:59:58</b>
                     </div>
                     <div className="kv">
-                      <span>研究出口</span>
+                      <span>{t('drawer.researchAccess')}</span>
                       <span className="dots" />
-                      <b>受控</b>
+                      <b>{t('drawer.controlled')}</b>
                     </div>
                     <div className="kv">
-                      <span>轨迹完整性</span>
+                      <span>{t('drawer.traceIntegrity')}</span>
                       <span className="dots" />
                       <b>100%</b>
                     </div>
                     <div className="kv">
-                      <span>评测资格</span>
+                      <span>{t('drawer.qualification')}</span>
                       <span className="dots" />
                       <b>{agent.qualification}</b>
                     </div>
                     <div className="kv">
-                      <span>模拟时钟</span>
+                      <span>{t('drawer.simClock')}</span>
                       <span className="dots" />
-                      <b>{state.clock}</b>
+                      <b>{formatStateClock(state, t)}</b>
                     </div>
                   </>
                 )}
               </section>
 
               <section className="side-sec">
-                <h3 className="side-sec-hd">操作</h3>
+                <h3 className="side-sec-hd">{t('drawer.secActions')}</h3>
                 {isLive ? (
                   <button
                     type="button"
                     className="side-act"
                     onClick={() => act(() => openDialog({ kind: 'editHolding', scope: kind }))}
                   >
-                    新增 / 调整持仓与现金
+                    {t('drawer.actEditHoldings')}
                   </button>
                 ) : null}
                 <button
@@ -135,14 +140,14 @@ export function RunDrawer() {
                   className="side-act"
                   onClick={() => act(() => openDialog({ kind: 'replay', scope: kind }))}
                 >
-                  {isLive ? '回看决策与建议记录' : '回放轨迹'}
+                  {isLive ? t('drawer.actReplayLive') : t('drawer.actReplaySim')}
                 </button>
                 <button
                   type="button"
                   className="side-act"
                   onClick={() => act(() => openDialog({ kind: 'snapshot', scope: kind }))}
                 >
-                  {isLive ? '工作台配置快照' : '运行快照'}
+                  {isLive ? t('drawer.actSnapshotLive') : t('drawer.actSnapshotSim')}
                 </button>
                 {!isLive ? (
                   <button
@@ -151,7 +156,7 @@ export function RunDrawer() {
                     disabled={aborted}
                     onClick={() => act(() => actions.togglePause())}
                   >
-                    {state.status === 'paused' ? '继续运行' : '暂停运行'}
+                    {state.status === 'paused' ? t('drawer.actResume') : t('drawer.actPause')}
                   </button>
                 ) : null}
                 <button
@@ -160,11 +165,11 @@ export function RunDrawer() {
                   onClick={() =>
                     act(() => {
                       exportRun(state, totals)
-                      notify('已导出 JSON', 'success')
+                      notifyKey('toasts.jsonExported', 'success')
                     })
                   }
                 >
-                  导出 JSON
+                  {t('drawer.actExportJson')}
                 </button>
                 {!isLive ? (
                   <button
@@ -173,7 +178,7 @@ export function RunDrawer() {
                     disabled={aborted}
                     onClick={() => act(() => openDialog({ kind: 'abort', scope: kind }))}
                   >
-                    中止运行
+                    {t('drawer.actAbort')}
                   </button>
                 ) : null}
               </section>

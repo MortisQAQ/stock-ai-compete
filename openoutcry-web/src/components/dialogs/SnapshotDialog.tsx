@@ -1,38 +1,59 @@
+import { useTranslation } from 'react-i18next'
+
+import { formatAgent, formatCollab, formatMarketSession } from '../../i18n/helpers'
 import { useRun } from '../../store/RunProvider'
 import { useDialog } from '../../store/DialogProvider'
 import { Modal } from '../ui/Modal'
 import { Prose } from '../ui/Prose'
 import { Button } from '../ui/Button'
-import { agentOf } from '../../data/agents'
+import { money } from '../../lib/format'
 
 export function SnapshotDialog({ open }: { open: boolean }) {
   const { state } = useRun()
   const { close } = useDialog()
-  const agent = agentOf(state.agent)
+  const { t } = useTranslation()
+  const agent = formatAgent(state.agent, t)
+  const collab = formatCollab(state.collaboration, t)
+  const isLive = state.kind === 'live'
 
-  const rows: Array<[string, string]> = [
-    ['Agent', agent.name + ' / ' + agent.version],
-    ['会话 / 运行', 'sess_demo_001 / run_demo_001'],
-    ['窗口', '2024-04-01 至 04-30'],
-    ['初始资金', '¥100,000.00'],
-    ['股票池', '固定 3 标的 + 历史已平仓样例'],
-    ['数据 / 资料库', 'market-demo-v1 / evidence-demo-v2'],
-    ['规则', '日频 A 股 · D-1 资料 · T+1'],
-    ['预算', '12 / 20 次，额度固定'],
-    ['费用模型', '单次卖出 ¥7；历史记录逐笔列明'],
-    ['当前类型', state.collaboration + ' · ' + agent.qualification],
-  ]
+  const rows: Array<[string, string]> = isLive
+    ? [
+        [t('dialogs.snapshot.live.boundAgent'), agent.name + ' / ' + agent.version],
+        [t('dialogs.snapshot.live.mode'), t('dialogs.snapshot.live.modeVal')],
+        [t('dialogs.snapshot.live.marketSession'), formatMarketSession(state.marketSessionKey, state.marketSession, t)],
+        [t('dialogs.snapshot.live.research'), t('dialogs.snapshot.live.researchVal')],
+        [t('dialogs.snapshot.live.ledger'), t('dialogs.snapshot.live.ledgerVal')],
+        [t('dialogs.snapshot.live.cash'), money(state.cash)],
+        [t('dialogs.snapshot.live.boundary'), t('dialogs.snapshot.live.boundaryVal')],
+        [t('dialogs.snapshot.live.collab'), t('dialogs.snapshot.live.collabVal', { collab })],
+      ]
+    : [
+        [t('dialogs.snapshot.sim.agent'), agent.name + ' / ' + agent.version],
+        [t('dialogs.snapshot.sim.sessionRun'), 'sess_demo_001 / run_demo_001'],
+        [t('dialogs.snapshot.sim.window'), t('dialogs.snapshot.sim.windowVal')],
+        [t('dialogs.snapshot.sim.capital'), money(state.initial)],
+        [t('dialogs.snapshot.sim.pool'), t('dialogs.snapshot.sim.poolVal')],
+        [t('dialogs.snapshot.sim.data'), 'market-demo-v1 / evidence-demo-v2'],
+        [t('dialogs.snapshot.sim.rules'), t('dialogs.snapshot.sim.rulesVal')],
+        [t('dialogs.snapshot.sim.budget'), t('dialogs.snapshot.sim.budgetVal')],
+        [t('dialogs.snapshot.sim.fee'), t('dialogs.snapshot.sim.feeVal')],
+        [t('dialogs.snapshot.sim.type'), collab + ' · ' + agent.qualification],
+      ]
 
   return (
     <Modal
       open={open}
-      kicker="Run Snapshot"
-      title="运行配置 · 已锁定"
+      kicker={isLive ? t('dialogs.snapshot.kickerLive') : t('dialogs.snapshot.kickerSim')}
+      title={isLive ? t('dialogs.snapshot.titleLive') : t('dialogs.snapshot.titleSim')}
       onClose={close}
-      footer={<Button size="sm" variant="ghost" onClick={close}>关闭</Button>}
+      footer={
+        <Button size="sm" variant="ghost" onClick={close}>
+          {t('dialogs.close')}
+        </Button>
+      }
     >
       <Prose className="mb-2.5 text-note text-ink-3">
-        以下参数在运行时不能修改；需要改参数请复制配置后重跑。
+        {isLive ? t('dialogs.snapshot.descLive') : t('dialogs.snapshot.descSim')}
       </Prose>
       <dl className="snapshot-list">
         {rows.map(([k, v]) => (

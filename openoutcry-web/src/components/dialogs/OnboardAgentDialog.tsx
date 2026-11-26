@@ -1,31 +1,32 @@
 import { useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import { useNavigate } from 'react-router-dom'
 import { Check, Copy, ShieldCheck, Terminal } from 'lucide-react'
 
 import { AGENT_ORDER, AGENTS, isAgentId } from '../../data/agents'
+import { formatAgent } from '../../i18n/helpers'
 import { useDialog } from '../../store/DialogProvider'
-import { useLocale } from '../../store/LocaleProvider'
 import { useToast } from '../../store/ToastProvider'
 import { useTraining } from '../../store/TrainingProvider'
-import type { AgentId } from '../../types'
+import type { AgentId, TranslationKey } from '../../types'
 import { Badge } from '../ui/Badge'
 import { Button } from '../ui/Button'
 import { Modal } from '../ui/Modal'
 import { Select } from '../ui/Select'
 import { cn } from '../../lib/utils'
 
-const PROBE_STEPS = [
-  { id: 'spawn', zh: 'spawn 本地进程', en: 'spawn local process' },
-  { id: 'init', zh: 'initialize ACP 协议握手', en: 'initialize ACP handshake' },
-  { id: 'session', zh: 'session/new 创建受控会话', en: 'session/new sandboxed session' },
-  { id: 'ping', zh: 'ping MCP 工具白名单校验', en: 'ping MCP tool whitelist' },
-] as const
+const PROBE_STEPS: ReadonlyArray<{ id: string; labelKey: TranslationKey }> = [
+  { id: 'spawn', labelKey: 'onboard.steps.spawn' },
+  { id: 'init', labelKey: 'onboard.steps.init' },
+  { id: 'session', labelKey: 'onboard.steps.session' },
+  { id: 'ping', labelKey: 'onboard.steps.ping' },
+]
 
 export function OnboardAgentDialog({ open }: { open: boolean }) {
   const { close } = useDialog()
-  const { notify } = useToast()
+  const { notifyKey } = useToast()
   const { setDraftAgent } = useTraining()
-  const { isEn, bi } = useLocale()
+  const { t } = useTranslation()
   const navigate = useNavigate()
 
   const [tab, setTab] = useState<'prompt' | 'cli'>('prompt')
@@ -39,10 +40,7 @@ export function OnboardAgentDialog({ open }: { open: boolean }) {
     close()
   }
 
-  const promptSnippet = isEn
-    ? `Connect to my local openOutcry Runner (ws://127.0.0.1:7420/acp).\nRules: read market/evidence ONLY via openOutcry MCP tools; never access live broker APIs; submit orders strictly via trade.submit_order JSON schema.`
-    : `连接到我本机的 openOutcry Runner（ws://127.0.0.1:7420/acp）。\n规则：仅通过 openOutcry MCP 受控工具读取行情与证据；禁止直接触碰券商接口；所有下单意图必须通过 trade.submit_order 结构化提交。`
-
+  const promptSnippet = t('onboard.promptSnippet')
   const cliSnippet = `npx @openoutcry/runner start --agent ${source} --acp-port 7420 --sandbox pit-strict`
   const snippet = tab === 'prompt' ? promptSnippet : cliSnippet
 
@@ -50,16 +48,16 @@ export function OnboardAgentDialog({ open }: { open: boolean }) {
     try {
       await navigator.clipboard.writeText(snippet)
       setCopied(true)
-      notify(bi('已复制到剪贴板', 'Copied to clipboard'), 'success')
+      notifyKey('toasts.copiedClipboard', 'success')
       window.setTimeout(() => setCopied(false), 1600)
     } catch {
-      notify(bi('剪贴板不可用，请手动复制', 'Clipboard unavailable, copy manually'), 'warn')
+      notifyKey('toasts.clipboardUnavailable', 'warn')
     }
   }
 
   const runHandshake = () => {
     setConnected(true)
-    notify(bi('模拟预检完成（未启动真实本地进程）', 'Simulated preflight passed (no local process spawned)'), 'success')
+    notifyKey('toasts.preflightSimulated', 'success')
   }
 
   const proceedToDesk = () => {
@@ -71,21 +69,21 @@ export function OnboardAgentDialog({ open }: { open: boolean }) {
   return (
     <Modal
       open={open}
-      kicker={bi('Agent Onboarding · ACP + MCP', 'Agent Onboarding · ACP + MCP')}
-      title={bi('接入新外部 Agent', 'Connect External Agent')}
+      kicker={t('onboard.kicker')}
+      title={t('onboard.title')}
       onClose={handleClose}
       footer={
         <>
           <Button size="sm" variant="ghost" onClick={handleClose}>
-            {bi('关闭', 'Close')}
+            {t('onboard.btnClose')}
           </Button>
           {connected ? (
             <Button size="sm" variant="solid" onClick={proceedToDesk}>
-              {bi('前往训练委托 →', 'Go to Training Desk →')}
+              {t('onboard.btnGoToDesk')}
             </Button>
           ) : (
             <Button size="sm" variant="solid" onClick={runHandshake}>
-              {bi('模拟握手与预检', 'Simulate Handshake & Preflight')}
+              {t('onboard.btnSimulate')}
             </Button>
           )}
         </>
@@ -95,16 +93,15 @@ export function OnboardAgentDialog({ open }: { open: boolean }) {
         <div className="flex flex-wrap items-center justify-between gap-2 rounded-lg bg-[var(--bg-2)] px-3.5 py-2.5">
           <span className="flex items-center gap-2 text-note text-[var(--fg-1)]">
             <ShieldCheck size={16} aria-hidden className="text-[var(--lime)]" />
-            {bi('模型 API Key 与凭据全程留在你的本机，平台不碰密钥。', 'Model API keys stay strictly on your local machine.')}
+            {t('onboard.keySafetyNote')}
           </span>
-          <Badge variant="outline">{bi('本地 Runner', 'Local Runner')}</Badge>
+          <Badge variant="outline">{t('onboard.localRunnerBadge')}</Badge>
         </div>
 
-        {/* Step 1: Select local agent & copy Prompt/CLI */}
         <div className="flex flex-col gap-2">
           <div className="flex flex-wrap items-center justify-between gap-2">
             <span className="font-mono text-micro font-semibold text-[var(--fg-1)]">
-              {bi('01 · 选择目标 Agent 与接入方式', '01 · Pick Target Agent & Install Method')}
+              {t('onboard.step1Title')}
             </span>
             <div className="flex items-center gap-1 rounded-md bg-[var(--bg-2)] p-0.5">
               <button
@@ -115,7 +112,7 @@ export function OnboardAgentDialog({ open }: { open: boolean }) {
                   tab === 'prompt' ? 'bg-[var(--lime-soft)] font-semibold text-[var(--fg-0)]' : 'text-[var(--fg-2)]',
                 )}
               >
-                {bi('Agent Prompt', 'Agent Prompt')}
+                {t('onboard.tabPrompt')}
               </button>
               <button
                 type="button"
@@ -125,13 +122,13 @@ export function OnboardAgentDialog({ open }: { open: boolean }) {
                   tab === 'cli' ? 'bg-[var(--lime-soft)] font-semibold text-[var(--fg-0)]' : 'text-[var(--fg-2)]',
                 )}
               >
-                {bi('CLI 命令', 'CLI Command')}
+                {t('onboard.tabCli')}
               </button>
             </div>
           </div>
 
           <Select
-            aria-label={bi('选择外部 Agent', 'Select External Agent')}
+            aria-label={t('onboard.selectAgentAria')}
             value={source}
             onChange={(e) => {
               const v = e.target.value
@@ -139,11 +136,14 @@ export function OnboardAgentDialog({ open }: { open: boolean }) {
               setConnected(false)
             }}
           >
-            {AGENT_ORDER.filter((id) => !AGENTS[id].builtin).map((id) => (
-              <option key={id} value={id}>
-                {AGENTS[id].name} ({AGENTS[id].tag})
-              </option>
-            ))}
+            {AGENT_ORDER.filter((id) => !AGENTS[id].builtin).map((id) => {
+              const meta = formatAgent(id, t)
+              return (
+                <option key={id} value={id}>
+                  {meta.name} ({meta.tag})
+                </option>
+              )
+            })}
           </Select>
 
           <div className="relative rounded-lg border border-[var(--line)] bg-[var(--well)] p-3">
@@ -153,22 +153,19 @@ export function OnboardAgentDialog({ open }: { open: boolean }) {
             <div className="mt-2.5 flex items-center justify-between border-t border-[var(--line-soft)] pt-2">
               <span className="flex items-center gap-1.5 font-mono text-micro text-[var(--fg-2)]">
                 <Terminal size={13} aria-hidden />
-                {tab === 'prompt'
-                  ? bi('粘贴到 Claude Code / Codex / Cursor 即可接入', 'Paste into Claude Code / Codex / Cursor')
-                  : bi('在本机终端启动受控 ACP 适配器', 'Run local sandboxed ACP adapter')}
+                {tab === 'prompt' ? t('onboard.hintPrompt') : t('onboard.hintCli')}
               </span>
               <Button type="button" size="sm" variant="ghost" onClick={copySnippet}>
                 {copied ? <Check size={14} aria-hidden /> : <Copy size={14} aria-hidden />}
-                {copied ? bi('已复制', 'Copied') : bi('复制', 'Copy')}
+                {copied ? t('onboard.btnCopied') : t('onboard.btnCopy')}
               </Button>
             </div>
           </div>
         </div>
 
-        {/* Step 2: Handshake & Preflight status */}
         <div className="flex flex-col gap-2">
           <span className="font-mono text-micro font-semibold text-[var(--fg-1)]">
-            {bi('02 · 四步握手与评测资格预检', '02 · 4-Step Handshake & Preflight')}
+            {t('onboard.step2Title')}
           </span>
           <div className="grid grid-cols-1 gap-1.5 sm:grid-cols-2">
             {PROBE_STEPS.map((st, idx) => (
@@ -184,24 +181,14 @@ export function OnboardAgentDialog({ open }: { open: boolean }) {
                 <span className={connected ? 'text-[var(--lime)]' : 'text-[var(--fg-2)]'}>
                   {connected ? '✓' : `0${idx + 1}`}
                 </span>
-                <span className="truncate">{isEn ? st.en : st.zh}</span>
+                <span className="truncate">{t(st.labelKey)}</span>
               </div>
             ))}
           </div>
           {connected ? (
-            <p className="text-note text-[var(--lime)]">
-              {bi(
-                '演示预检通过：未启动真实本地进程；因未验证环境隔离，该外部 Agent 将标记为「探索组」，现可直接前往训练委托台编排实验。',
-                'Demo preflight passed (no real process launched). Marked as Exploratory until sandbox isolation is verified; ready to configure a mandate.',
-              )}
-            </p>
+            <p className="text-note text-[var(--lime)]">{t('onboard.passedNote')}</p>
           ) : (
-            <p className="note">
-              {bi(
-                '未上报模型标识或未验证网络隔离的外部 Agent 一律归入探索组，不混入严格评测排名。',
-                'External agents with unreported models or unverified isolation are placed in the Exploratory group.',
-              )}
-            </p>
+            <p className="note">{t('onboard.exploratoryNote')}</p>
           )}
         </div>
       </div>

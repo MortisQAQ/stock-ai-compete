@@ -1,109 +1,110 @@
-import type { BandItem, RunState, Totals, TrainingTask } from '../types'
+import { fixedT } from '../i18n'
+import type { Lang } from '../i18n/detectLang'
+import { formatSyncLabel } from '../i18n/helpers'
+import type { BandItem, RunState, Totals, TrainingStatus, TrainingTask } from '../types'
 import { money, round, signed, tone } from '../lib/format'
 
 /**
  * 派生数据（选择器）—— 页面只负责布局，口径都在这里。
- *
- * 同一个数字在页面上出现两次，就必须是同一个函数算出来的：
- * 复盘页与训练场工作台的「四格表头」曾各写一遍，持仓盈亏曾在两个组件里各算一遍。
  */
 
-/* ---------------- 训练状态文案 ---------------- */
-
-/** 训练 / 训练任务共用的状态文案（此前 data/trainings.ts 与 store/trainingTasks.ts 各有一份） */
-export const TRAINING_STATUS_TEXT = {
-  running: '进行中',
-  pending: '待确认',
-  done: '已结束',
-} as const
-
-export const TRAINING_STATUS_TEXT_EN = {
-  running: 'Running',
-  pending: 'Pending',
-  done: 'Completed',
-} as const
+export function trainingStatusText(status: TrainingStatus, lang: Lang = 'zh'): string {
+  const t = fixedT(lang)
+  switch (status) {
+    case 'running':
+      return t('status.task.running')
+    case 'pending':
+      return t('status.task.pending')
+    case 'done':
+      return t('status.task.done')
+  }
+}
 
 /* ---------------- 账户表头 ---------------- */
 
-export function accountBandItems(state: RunState, totals: Totals, lang: 'zh' | 'en' = 'zh'): BandItem[] {
+export function accountBandItems(state: RunState, totals: Totals, lang: Lang = 'zh'): BandItem[] {
+  const t = fixedT(lang)
   const cashPct = totals.equity ? ((state.cash / totals.equity) * 100).toFixed(1) : '0.0'
   const netPct = state.initial ? ((totals.net / state.initial) * 100).toFixed(2) : '0.00'
-  const en = lang === 'en'
 
   if (state.kind === 'live') {
     return [
       {
-        label: en ? 'Mirror Equity (Est.)' : '总资产（估算）',
+        label: t('tabs.accountBand.liveEquity'),
         value: money(totals.equity),
-        note: en ? 'Manual mirror' : (state.syncLabel ?? '手动维护'),
+        note: formatSyncLabel(state.syncKey, state.syncLabel, t),
       },
       {
-        label: en ? 'Net PnL' : '累计净收益',
+        label: t('tabs.accountBand.netPnl'),
         value: signed(totals.net),
-        note: netPct + (en ? '% · net of fees' : '% · 已扣费用'),
+        note: t('tabs.accountBand.netPnlNote', { pct: netPct }),
         tone: totals.net >= 0 ? 'up' : 'dn',
       },
       {
-        label: en ? 'Available Cash' : '可用现金',
+        label: t('tabs.accountBand.cash'),
         value: money(state.cash),
-        note: (en ? 'Share ' : '占总资产 ') + cashPct + '%',
+        note: t('tabs.accountBand.cashShareNote', { pct: cashPct }),
       },
       {
-        label: en ? 'Market Value' : '持仓市值',
+        label: t('tabs.accountBand.marketValue'),
         value: money(totals.market),
-        note: state.holdings.length + (en ? ' positions · live ref' : ' 个标的 · 实时参考'),
+        note: t('tabs.accountBand.liveMarketNote', { count: state.holdings.length }),
       },
     ]
   }
 
   return [
     {
-      label: en ? 'Account Equity' : '账户净值',
+      label: t('tabs.accountBand.simEquity'),
       value: money(totals.equity),
-      note: (en ? 'Initial ' : '初始资金 ') + money(state.initial),
+      note: t('tabs.accountBand.initialNote', { amount: money(state.initial) }),
     },
     {
-      label: en ? 'Net PnL' : '累计净收益',
+      label: t('tabs.accountBand.netPnl'),
       value: signed(totals.net),
-      note: netPct + (en ? '% · net of fees' : '% · 已扣费用'),
+      note: t('tabs.accountBand.netPnlNote', { pct: netPct }),
       tone: totals.net >= 0 ? 'up' : 'dn',
     },
     {
-      label: en ? 'Available Cash' : '可用现金',
+      label: t('tabs.accountBand.cash'),
       value: money(state.cash),
-      note: (en ? 'Share ' : '占总资产 ') + cashPct + '%',
+      note: t('tabs.accountBand.cashShareNote', { pct: cashPct }),
     },
     {
-      label: en ? 'Market Value' : '持仓市值',
+      label: t('tabs.accountBand.marketValue'),
       value: money(totals.market),
-      note: state.holdings.length + (en ? ' positions · mark-to-market' : ' 个标的 · 当前估值'),
+      note: t('tabs.accountBand.simMarketNote', { count: state.holdings.length }),
     },
   ]
 }
 
 /** 已结束任务用冻结档案，不读实时账户 */
-export function archiveBandItems(task: TrainingTask, lang: 'zh' | 'en' = 'zh'): BandItem[] {
+export function archiveBandItems(task: TrainingTask, lang: Lang = 'zh'): BandItem[] {
   const archive = task.archive
   if (!archive) return []
+  const t = fixedT(lang)
   const liveArchive = task.kind === 'live'
-  const en = lang === 'en'
   return [
     {
-      label: liveArchive ? (en ? 'Snapshot Equity' : '总资产快照') : (en ? 'Final Equity' : '账户净值'),
+      label: liveArchive ? t('tabs.accountBand.archiveLiveEquity') : t('tabs.accountBand.archiveSimEquity'),
       value: money(archive.equity),
-      note: liveArchive ? (en ? 'Mirror archive' : '归档时镜像') : (en ? 'Frozen at close' : '任务结束时冻结'),
+      note: liveArchive ? t('tabs.accountBand.archiveLiveNote') : t('tabs.accountBand.archiveSimNote'),
     },
     {
-      label: en ? 'Net PnL' : '累计净收益',
+      label: t('tabs.accountBand.netPnl'),
       value: signed(archive.net),
-      note: liveArchive ? (en ? 'Net of fees · live' : '已扣费用 · 实盘记录') : (en ? 'Net of fees' : '已扣费用 · 含全部平仓'),
+      note: liveArchive ? t('tabs.accountBand.archiveLiveNetNote') : t('tabs.accountBand.archiveSimNetNote'),
       tone: archive.net >= 0 ? 'up' : 'dn',
     },
-    { label: en ? 'Cash' : '可用现金', value: money(archive.cash), note: en ? 'End snapshot' : '结束时快照' },
     {
-      label: en ? 'Market Value' : '持仓市值',
+      label: t('tabs.accountBand.archiveCash'),
+      value: money(archive.cash),
+      note: t('tabs.accountBand.archiveEndSnapshot'),
+    },
+    {
+      label: t('tabs.accountBand.marketValue'),
       value: money(archive.market),
-      note: archive.market === 0 ? (en ? 'Fully closed' : '已全部平仓') : (en ? 'End snapshot' : '结束时快照'),
+      note: archive.market === 0 ? t('tabs.accountBand.archiveFullyClosed') : t('tabs.accountBand.archiveEndSnapshot'),
     },
   ]
 }
@@ -113,7 +114,7 @@ export function bandItemsFor(
   task: TrainingTask,
   state: RunState,
   totals: Totals,
-  lang: 'zh' | 'en' = 'zh',
+  lang: Lang = 'zh',
 ): BandItem[] {
   return task.live ? accountBandItems(state, totals, lang) : archiveBandItems(task, lang)
 }

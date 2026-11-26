@@ -1,3 +1,5 @@
+import { useTranslation } from 'react-i18next'
+
 import { areaPath, bounds, gridLevels, linePath, project } from '../../lib/chart'
 
 interface Props {
@@ -6,14 +8,12 @@ interface Props {
   height?: number
 }
 
-const W = 720
+const W = 600
 
-/**
- * 净值 vs 基准。配色在 review.css 的 .chart-* 里，色值来自 tokens.css。
- */
 export function EquityChart({ nav, bench, height = 250 }: Props) {
+  const { t } = useTranslation()
   const H = height
-  const P = { l: 68, r: 16, t: 16, b: 26 }
+  const P = { l: 74, r: 16, t: 16, b: 30 }
   const sc = bounds([nav, bench])
   const aPts = project(nav, W, H, P, sc)
   const bPts = project(bench, W, H, P, sc)
@@ -22,7 +22,7 @@ export function EquityChart({ nav, bench, height = 250 }: Props) {
   const last = aPts[aPts.length - 1]
 
   return (
-    <svg viewBox={'0 0 ' + W + ' ' + H} role="img" aria-label="账户净值与沪深 300 对比曲线">
+    <svg viewBox={'0 0 ' + W + ' ' + H} role="img" aria-label={t('review.charts.equityAria')}>
       <defs>
         <linearGradient id="equity-area" x1="0" y1="0" x2="0" y2="1">
           <stop offset="0%" className="chart-area-top" />

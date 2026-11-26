@@ -1,3 +1,5 @@
+import type { TranslationKey } from '../types'
+
 /** 全部为虚构演示数据，不代表真实行情。 */
 
 /** 20 个交易日的账户净值 */
@@ -12,18 +14,17 @@ export const BENCH_SERIES = [
   98860, 99040, 99320, 99180, 98940, 99260, 99540, 99320, 99060, 99240,
 ]
 
-export const TOOL_USAGE: Array<{ label: string; count: number }> = [
-  { label: '行情快照', count: 22 },
-  { label: '受控搜索', count: 14 },
-  { label: '公告与财报读取', count: 9 },
-  { label: '计划与自检', count: 6 },
-  { label: '风控拒单', count: 3 },
-]
+export interface ToolUsageItem {
+  id: string
+  labelKey: TranslationKey
+  count: number
+  isRisk?: boolean
+}
 
-export const TOOL_USAGE_EN: Array<{ label: string; count: number }> = [
-  { label: 'Quote Snapshot', count: 22 },
-  { label: 'PIT Search', count: 14 },
-  { label: 'Filings & Cashflow', count: 9 },
-  { label: 'Plan & Self-Check', count: 6 },
-  { label: 'Risk Rejections', count: 3 },
+export const TOOL_USAGE_ITEMS: ToolUsageItem[] = [
+  { id: 'quote', labelKey: 'review.charts.toolUsage.quote', count: 22 },
+  { id: 'search', labelKey: 'review.charts.toolUsage.search', count: 14 },
+  { id: 'filings', labelKey: 'review.charts.toolUsage.filings', count: 9 },
+  { id: 'plan', labelKey: 'review.charts.toolUsage.plan', count: 6 },
+  { id: 'risk', labelKey: 'review.charts.toolUsage.risk', count: 3, isRisk: true },
 ]

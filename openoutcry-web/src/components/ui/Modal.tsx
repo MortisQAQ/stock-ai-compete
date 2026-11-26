@@ -1,4 +1,5 @@
 import type { ReactNode } from 'react'
+import { useTranslation } from 'react-i18next'
 import { XIcon } from 'lucide-react'
 
 import { Dialog, DialogClose, DialogContent, DialogTitle } from '@/components/ui/Dialog'
@@ -14,14 +15,8 @@ interface Props {
   width?: number
 }
 
-/**
- * 站内通用弹窗：在 shadcn Dialog 之上固定「墨线卡头 + 纸面正文 + 底部操作条」的版式。
- *
- * ESC、点遮罩、焦点陷阱、滚动锁定由 Radix 提供；
- * 焦点归还由 DialogProvider 统一处理（它在 open() 的事件回调里记录了触发元素），
- * 组件本身不再碰 DOM —— 之前在这里于渲染期读写 ref，属于 React 反模式。
- */
 export function Modal({ open, kicker, title, onClose, children, footer, width }: Props) {
+  const { t } = useTranslation()
   return (
     <Dialog open={open} onOpenChange={(next) => (!next ? onClose() : undefined)}>
       <DialogContent
@@ -46,13 +41,13 @@ export function Modal({ open, kicker, title, onClose, children, footer, width }:
             <DialogTitle className="mt-1.5 text-primary-foreground">{title}</DialogTitle>
           </div>
           <DialogClose
-            aria-label="关闭"
+            aria-label={t('dialogs.close')}
             className={cn(
-              'grid size-7 shrink-0 place-items-center rounded-xs border border-primary-foreground/35',
+              'grid size-8 shrink-0 place-items-center rounded-xs border border-primary-foreground/35',
               'text-primary-foreground/80 transition-colors hover:border-[var(--up)] hover:bg-[var(--up)] hover:text-[#04070d]',
             )}
           >
-            <XIcon className="size-3.5" />
+            <XIcon className="size-4" />
           </DialogClose>
         </div>
 

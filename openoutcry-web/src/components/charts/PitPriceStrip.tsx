@@ -1,5 +1,7 @@
+import { useTranslation } from 'react-i18next'
+
 import { PIT_PRICE_HISTORY, PIT_REVEALED_OPEN } from '../../data/run'
-import { useLocale } from '../../store/LocaleProvider'
+import { formatAsset } from '../../i18n/helpers'
 import type { TrainingPhase } from '../../types'
 
 interface PitPriceStripProps {
@@ -10,17 +12,11 @@ interface PitPriceStripProps {
   filled: boolean
 }
 
-/**
- * 标的 PIT 截断走势条（借鉴 TradingView Bar Replay）：
- * - 盘前研究态：垂直虚线右侧覆半透明未来遮罩，标明「04-23 开盘尚未揭示」；
- * - 推进至 09:30 开盘撮合后：遮罩解开，实时渲染 ¥20.36 开盘成交点与标记；
- * - 推进至 15:00 尾盘结算后：同步显示收盘价 ¥20.18。
- * 所有文字标签均使用 HTML 令牌（>=14px），严格满足 check-type-floor 约束。
- */
 export function PitPriceStrip({ asset, costBasis, limitPrice, phase, filled }: PitPriceStripProps) {
-  const { bi } = useLocale()
+  const { t } = useTranslation()
   const revealed = phase !== 'pre_market' || filled
   const settled = phase === 'close_settle'
+  const assetLabel = formatAsset(asset, t)
 
   const allValues = [
     ...PIT_PRICE_HISTORY.map((p) => p.close),
@@ -61,19 +57,20 @@ export function PitPriceStrip({ asset, costBasis, limitPrice, phase, filled }: P
   const closeY = yOf(PIT_REVEALED_OPEN.close)
   const lastHist = histPoints[histPoints.length - 1]
 
+  const closePart = settled
+    ? t('pitChart.revealedClosePart', { close: PIT_REVEALED_OPEN.close.toFixed(2) })
+    : ''
+
   return (
     <div className="mb-3 rounded-lg border border-[var(--line)] bg-[var(--well)] p-3">
       <div className="mb-2 flex flex-wrap items-center justify-between gap-2">
         <span className="font-mono text-micro font-semibold text-[var(--fg-0)]">
-          {asset} · {bi('PIT 历史可见走势', 'PIT Visible Price Tape')}
+          {assetLabel} · {t('pitChart.titleSuffix')}
         </span>
         <span className="font-mono text-micro text-[var(--fg-2)]">
           {revealed
-            ? bi(
-                `04-23 开盘已揭示 ¥${PIT_REVEALED_OPEN.open.toFixed(2)}${settled ? ` · 收 ¥${PIT_REVEALED_OPEN.close.toFixed(2)}` : ''}`,
-                `04-23 Open Revealed ¥${PIT_REVEALED_OPEN.open.toFixed(2)}${settled ? ` · Close ¥${PIT_REVEALED_OPEN.close.toFixed(2)}` : ''}`,
-              )
-            : bi('截至 04-22 收盘 ¥20.30 · 今日未揭示', 'As-of 04-22 Close ¥20.30 · Today Masked')}
+            ? t('pitChart.revealedStatus', { open: PIT_REVEALED_OPEN.open.toFixed(2), closePart })
+            : t('pitChart.maskedStatus')}
         </span>
       </div>
 
@@ -82,7 +79,7 @@ export function PitPriceStrip({ asset, costBasis, limitPrice, phase, filled }: P
           viewBox={`0 0 ${W} ${H}`}
           className="block h-[96px] w-full"
           role="img"
-          aria-label={bi('标的 PIT 截断走势图', 'PIT truncated price chart')}
+          aria-label={t('pitChart.chartAria')}
         >
           <defs>
             <pattern id="pit-mask-hatch" width="8" height="8" patternUnits="userSpaceOnUse" patternTransform="rotate(35)">
@@ -90,7 +87,6 @@ export function PitPriceStrip({ asset, costBasis, limitPrice, phase, filled }: P
             </pattern>
           </defs>
 
-          {/* 成本参考虚线 */}
           <line
             x1={padL}
             y1={costY}
@@ -101,11 +97,9 @@ export function PitPriceStrip({ asset, costBasis, limitPrice, phase, filled }: P
             strokeDasharray="4 4"
           />
 
-          {/* 截至 04-22 可见历史走势 */}
           <path d={histPath} fill="none" stroke="var(--chart-agent)" strokeWidth="2.2" strokeLinejoin="round" />
           <circle cx={lastHist.x} cy={lastHist.y} r="3.5" fill="var(--chart-agent)" />
 
-          {/* PIT 截断红/琥珀垂直虚线 */}
           <line
             x1={cutoffX}
             y1={0}
@@ -156,7 +150,7 @@ export function PitPriceStrip({ asset, costBasis, limitPrice, phase, filled }: P
         {!revealed ? (
           <div className="pointer-events-none absolute inset-y-0 right-0 flex w-[26%] items-center justify-center px-1.5 text-center">
             <span className="rounded bg-[var(--bg-0)]/85 px-1.5 py-0.5 font-mono text-micro font-semibold text-[var(--warn)]">
-              {bi('未揭示', 'Masked')}
+              {t('pitChart.maskedBadge')}
             </span>
           </div>
         ) : null}
@@ -164,12 +158,10 @@ export function PitPriceStrip({ asset, costBasis, limitPrice, phase, filled }: P
 
       <div className="mt-2 flex flex-wrap items-center justify-between gap-2 font-mono text-micro text-[var(--fg-2)]">
         <span>
-          {bi(`成本线 ¥${costBasis.toFixed(2)} · 限价 ¥${limitPrice.toFixed(2)}`, `Cost ¥${costBasis.toFixed(2)} · Limit ¥${limitPrice.toFixed(2)}`)}
+          {t('pitChart.costAndLimit', { cost: costBasis.toFixed(2), limit: limitPrice.toFixed(2) })}
         </span>
         <span className={revealed ? 'text-[var(--lime)]' : 'text-[var(--warn)]'}>
-          {revealed
-            ? bi('✓ 已按 09:30 开盘价 ¥20.36 撮合', '✓ Filled at 09:30 Open ¥20.36')
-            : bi('┆ 虚线右侧 04-23 行情对 Agent 不可见', '┆ Future bars right of line hidden')}
+          {revealed ? t('pitChart.filledNote') : t('pitChart.hiddenNote')}
         </span>
       </div>
     </div>

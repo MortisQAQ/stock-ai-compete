@@ -19,7 +19,7 @@ const buttonVariants = cva(
     'transition-[background-color,border-color,color,transform] duration-150 ease-[var(--ease-out-quart)]',
     'disabled:pointer-events-none disabled:opacity-40',
     'aria-invalid:border-destructive',
-    "[&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-3.5",
+    "[&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4",
   ],
   {
     variants: {
@@ -51,7 +51,7 @@ const buttonVariants = cva(
         md: 'h-[var(--control-h-md)] px-3.5',
         xs: 'h-[var(--control-h-xs)] gap-1 px-2 text-micro',
         sm: 'h-[var(--control-h-sm)] px-2.5',
-        lg: 'h-[var(--control-h-lg)] px-5 text-note',
+        lg: 'h-[var(--control-h-lg)] px-5 text-body',
         icon: 'size-[var(--control-h-md)] px-0',
         'icon-sm': 'size-[var(--control-h-sm)] px-0',
       },

@@ -1,3 +1,5 @@
+import { useTranslation } from 'react-i18next'
+
 import { areaPath, drawdownSeries, linePath, project } from '../../lib/chart'
 
 interface Props {
@@ -5,11 +7,12 @@ interface Props {
   height?: number
 }
 
-const W = 420
+const W = 380
 
 export function DrawdownChart({ nav, height = 250 }: Props) {
+  const { t } = useTranslation()
   const H = height
-  const P = { l: 56, r: 16, t: 16, b: 26 }
+  const P = { l: 64, r: 16, t: 16, b: 30 }
   const dd = drawdownSeries(nav)
   const worst = Math.min(...dd, -0.1)
   const min = worst * 1.18
@@ -19,7 +22,7 @@ export function DrawdownChart({ nav, height = 250 }: Props) {
   const deepest = dd.indexOf(worst)
 
   return (
-    <svg viewBox={'0 0 ' + W + ' ' + H} role="img" aria-label="水下回撤曲线">
+    <svg viewBox={'0 0 ' + W + ' ' + H} role="img" aria-label={t('review.charts.drawdownAria')}>
       {[0, 1, 2, 3].map((i) => {
         const y = P.t + (H - P.t - P.b) * (i / 3)
         const value = sc.max - (sc.span * i) / 3
@@ -38,7 +41,6 @@ export function DrawdownChart({ nav, height = 250 }: Props) {
       <line className="chart-zero-line" x1={P.l} y1={baseY} x2={W - P.r} y2={baseY} />
       {deepest >= 0 && pts[deepest] ? (
         <g>
-          {/* 圆点单独成组：标注文字落在舱面上，不压在圆点上 */}
           <g>
             <circle className="chart-drawdown-dot" cx={pts[deepest].x} cy={pts[deepest].y} r="2.6" />
           </g>
@@ -53,7 +55,7 @@ export function DrawdownChart({ nav, height = 250 }: Props) {
         </g>
       ) : null}
       <text className="chart-axis-label" x={W - P.r} y={H - 8} textAnchor="end">
-        {nav.length} 交易日
+        {t('review.charts.drawdownDays', { count: nav.length })}
       </text>
     </svg>
   )

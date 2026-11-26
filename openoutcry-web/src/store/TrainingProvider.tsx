@@ -4,15 +4,17 @@ import { create } from 'zustand'
 import { TRAINING_SEED, type TrainingRecord } from '../data/trainings'
 import { useRunStore, useWorkspaceKind } from './RunProvider'
 import { LIVE_TASK_ID, LIVE_WORKSPACE_ID, liveTasksOf, trainingTasksOf } from './trainingTasks'
-import type { AgentId, MandatePayload, TrainingConversation, TrainingTask } from '../types'
+import type { AgentId, I18nParams, MandatePayload, TrainingConversation, TrainingTask, TranslationKey } from '../types'
 
 export interface CompareRunItem {
   id: string
   no: string
   label: string
-  labelEn: string
+  labelKey?: TranslationKey
+  labelParams?: I18nParams
   variableChanged: string
-  variableChangedEn: string
+  variableChangedKey?: TranslationKey
+  variableChangedParams?: I18nParams
   returnPct: number
   alphaPct: number
   maxDrawdownPct: number
@@ -26,9 +28,9 @@ const INITIAL_COMPARE_RUNS: CompareRunItem[] = [
     id: 'run-a',
     no: '№ 0042',
     label: 'Run A · 当前基线（事件驱动 · 均衡）',
-    labelEn: 'Run A · Current Baseline (Event-Driven · Balanced)',
+    labelKey: 'compare.runA.label',
     variableChanged: '基线版本（单票上限 25% · 止损 -5%）',
-    variableChangedEn: 'Baseline (Max single pos 25% · Stop -5%)',
+    variableChangedKey: 'compare.runA.variable',
     returnPct: 3.76,
     alphaPct: 4.52,
     maxDrawdownPct: -1.18,
@@ -40,9 +42,9 @@ const INITIAL_COMPARE_RUNS: CompareRunItem[] = [
     id: 'run-b',
     no: '№ 0041',
     label: 'Run B · 同口径对照（仅改止损线）',
-    labelEn: 'Run B · Controlled Variant (Tighter Stop Only)',
+    labelKey: 'compare.runB.label',
     variableChanged: '单一改动：止损阈值 -5% → -3%（同区间/资金/池）',
-    variableChangedEn: 'Single change: Stop-loss -5% → -3% (same window/cash/pool)',
+    variableChangedKey: 'compare.runB.variable',
     returnPct: 2.42,
     alphaPct: 3.18,
     maxDrawdownPct: -0.74,
@@ -122,12 +124,18 @@ export const useTrainingStore = create<TrainingStoreState>((set, get) => ({
       id: 'trn_' + no.replace(/\D/g, ''),
       no,
       title: mandate.title,
+      titleParams: {
+        range: `${mandate.from.slice(5)}~${mandate.to.slice(5)}`,
+        universeId: mandate.universeId,
+        count: mandate.team.length,
+      },
       team: mandate.team,
       from: mandate.from,
       to: mandate.to,
       day: Math.min(17, mandate.days),
       days: mandate.days,
       universe: mandate.universeLabel,
+      universeId: mandate.universeId,
       status: 'running',
     }
     set((prev) => ({

@@ -1,4 +1,5 @@
 import { useState, type ComponentType } from 'react'
+import { useTranslation } from 'react-i18next'
 import { Link, NavLink, useLocation, useNavigate } from 'react-router-dom'
 import {
   Activity,
@@ -17,9 +18,10 @@ import {
 import { Dialog as DialogPrimitive } from 'radix-ui'
 
 import { PRIMARY_NAV, REFERENCE_NAV, titleOf } from '../../nav'
+import { formatTask } from '../../i18n/helpers'
 import { useLocale } from '../../store/LocaleProvider'
 import { useTraining } from '../../store/TrainingProvider'
-import { TRAINING_STATUS_TEXT, TRAINING_STATUS_TEXT_EN } from '../../store/selectors'
+import { trainingStatusText } from '../../store/selectors'
 import type { TrainingTask } from '../../types'
 import { cn } from '../../lib/utils'
 
@@ -46,8 +48,8 @@ interface TaskListGroupProps {
 
 /** 单层任务列表（移除点击不换内容的假二级子会话，释放 900px 投影空间） */
 function TaskListGroup({ title, tasks, activeTaskId, onRoute, onOpenTask }: TaskListGroupProps) {
-  const { isEn } = useLocale()
-  const statusMap = isEn ? TRAINING_STATUS_TEXT_EN : TRAINING_STATUS_TEXT
+  const { lang } = useLocale()
+  const { t } = useTranslation()
   return (
     <div className="rail-group">
       <div className="rail-sec-hd">
@@ -58,6 +60,7 @@ function TaskListGroup({ title, tasks, activeTaskId, onRoute, onOpenTask }: Task
       <ul className="rail-tasks">
         {tasks.map((task) => {
           const active = task.id === activeTaskId && onRoute
+          const view = formatTask(task, t)
           return (
             <li className="rail-task" key={task.id}>
               <button
@@ -66,10 +69,10 @@ function TaskListGroup({ title, tasks, activeTaskId, onRoute, onOpenTask }: Task
                 aria-current={active ? 'page' : undefined}
                 onClick={() => onOpenTask(task.id)}
               >
-                <span className="rail-task-name">{task.name}</span>
+                <span className="rail-task-name">{view.name}</span>
                 <span className="rail-task-meta">
                   <i className={cn('rail-dot', task.status)} aria-hidden />
-                  {statusMap[task.status]}
+                  {trainingStatusText(task.status, lang)}
                 </span>
               </button>
             </li>
@@ -80,16 +83,10 @@ function TaskListGroup({ title, tasks, activeTaskId, onRoute, onOpenTask }: Task
   )
 }
 
-/**
- * 左侧栏内容（桌面常驻 + 移动端抽屉共用）：
- *   上 = 品牌（直达 01 Agent 库）
- *   中上 = 五步主流程（01 → 05 严格单向因果顺序）
- *   中下 = 训练任务（在上）+ 实战账户（在下）
- *   底 = 参考区（协议与 Skill / 产品说明）+ ZH/EN 与 暗色/亮色高对比演示开关
- */
 function RailBody({ onNavigate }: { onNavigate?: () => void }) {
   const { tasks, current, selectTask, liveTasks, liveCurrent, selectLiveTask } = useTraining()
-  const { lang, isEn, theme, marketColors, toggleLang, toggleTheme, toggleMarketColors, bi } = useLocale()
+  const { theme, marketColors, toggleLang, toggleTheme, toggleMarketColors } = useLocale()
+  const { t } = useTranslation()
   const { pathname } = useLocation()
   const navigate = useNavigate()
   const onTraining = pathname === '/training'
@@ -108,24 +105,22 @@ function RailBody({ onNavigate }: { onNavigate?: () => void }) {
           className="rail-brand"
           to="/connect"
           onClick={onNavigate}
-          aria-label={bi('openOutcry 首页', 'openOutcry Home')}
+          aria-label={t('nav.homeAria')}
         >
           <b>openOutcry</b>
           <s aria-hidden />
         </Link>
-        <p className="rail-tagline">
-          {bi('A 股投资 Agent 训战台', 'A-Share Agent Training & Live Desk')}
-        </p>
+        <p className="rail-tagline">{t('sidebar.tagline')}</p>
       </div>
 
-      <nav className="rail-nav" aria-label={bi('五步核心流程', 'Core 5-Step Workflow')}>
+      <nav className="rail-nav" aria-label={t('sidebar.workflowAria')}>
         {PRIMARY_NAV.map((item) => {
           const Icon = ICON[item.to] ?? SquarePen
           return (
             <NavLink key={item.to} to={item.to} onClick={onNavigate}>
               <span className="rail-step-no">{item.n}</span>
               <Icon size={16} aria-hidden />
-              <span className="truncate">{isEn ? item.sub : item.label}</span>
+              <span className="truncate">{t(item.labelKey)}</span>
             </NavLink>
           )
         })}
@@ -133,14 +128,14 @@ function RailBody({ onNavigate }: { onNavigate?: () => void }) {
 
       <div className="rail-sec">
         <TaskListGroup
-          title={bi('训练任务', 'Training Runs')}
+          title={t('sidebar.trainingRuns')}
           tasks={tasks}
           activeTaskId={current.id}
           onRoute={onTraining}
           onOpenTask={(id) => openGroupTask('/training', selectTask, onTraining, id)}
         />
         <TaskListGroup
-          title={bi('实战账户', 'Live Accounts')}
+          title={t('sidebar.liveAccounts')}
           tasks={liveTasks}
           activeTaskId={liveCurrent.id}
           onRoute={onLive}
@@ -148,15 +143,15 @@ function RailBody({ onNavigate }: { onNavigate?: () => void }) {
         />
       </div>
 
-      <div className="rail-ref" aria-label={bi('参考资料', 'Reference')}>
-        <div className="rail-ref-hd">{bi('参考', 'Reference')}</div>
+      <div className="rail-ref" aria-label={t('sidebar.referenceAria')}>
+        <div className="rail-ref-hd">{t('sidebar.reference')}</div>
         <div className="rail-ref-links">
           {REFERENCE_NAV.map((item) => {
             const Icon = ICON[item.to] ?? BookOpen
             return (
               <NavLink key={item.to} to={item.to} onClick={onNavigate}>
                 <Icon size={15} aria-hidden />
-                <span className="truncate">{isEn ? item.sub : item.label}</span>
+                <span className="truncate">{t(item.labelKey)}</span>
               </NavLink>
             )
           })}
@@ -168,34 +163,34 @@ function RailBody({ onNavigate }: { onNavigate?: () => void }) {
           type="button"
           className="rail-tool-btn"
           onClick={toggleLang}
-          aria-label={bi('切换中英文', 'Switch Language')}
+          aria-label={t('sidebar.switchLangAria')}
         >
           <Globe size={15} aria-hidden />
-          <span>{lang === 'zh' ? 'EN' : '中文'}</span>
+          <span>{t('sidebar.switchLangLabel')}</span>
         </button>
         <button
           type="button"
           className="rail-tool-btn"
           onClick={toggleTheme}
-          aria-label={bi('切换暗色/亮色演示主题', 'Toggle Dark/Light Theme')}
+          aria-label={t('sidebar.toggleThemeAria')}
         >
           {theme === 'dark' ? <Sun size={15} aria-hidden /> : <Moon size={15} aria-hidden />}
-          <span>{theme === 'dark' ? bi('亮色投影', 'Light') : bi('暗色仪器', 'Dark')}</span>
+          <span>{theme === 'dark' ? t('sidebar.themeLight') : t('sidebar.themeDark')}</span>
         </button>
       </div>
 
       <div className="rail-foot justify-between">
         <span className="inline-flex items-center gap-2">
           <span className="rail-foot-dot" aria-hidden />
-          <span>{bi('交互原型 · 虚构数据', 'Prototype · Mock')}</span>
+          <span>{t('sidebar.prototypeMock')}</span>
         </span>
         <button
           type="button"
           onClick={toggleMarketColors}
           className="font-mono text-micro text-[var(--fg-1)] underline decoration-dotted underline-offset-2 hover:text-[var(--fg-0)]"
-          title={bi('切换涨跌配色习惯（红涨绿跌 / 绿涨红跌）', 'Toggle PnL color convention')}
+          title={t('sidebar.toggleMarketColorsTitle')}
         >
-          {marketColors === 'cn' ? bi('红涨绿跌', 'Red ↑') : bi('绿涨红跌', 'Green ↑')}
+          {marketColors === 'cn' ? t('sidebar.colorsCn') : t('sidebar.colorsIntl')}
         </button>
       </div>
     </>
@@ -205,12 +200,13 @@ function RailBody({ onNavigate }: { onNavigate?: () => void }) {
 /** 桌面常驻左栏 + 移动端抽屉：一套内容，两种容器 */
 export function Sidebar() {
   const { pathname } = useLocation()
-  const { lang, bi } = useLocale()
+  const { lang } = useLocale()
+  const { t } = useTranslation()
   const [drawerOpen, setDrawerOpen] = useState(false)
 
   return (
     <>
-      <aside className="rail" aria-label={bi('站点导航', 'Site Navigation')}>
+      <aside className="rail" aria-label={t('sidebar.siteNavAria')}>
         <RailBody />
       </aside>
 
@@ -219,7 +215,7 @@ export function Sidebar() {
           type="button"
           className="rail-mobile-btn"
           onClick={() => setDrawerOpen(true)}
-          aria-label={bi('打开导航', 'Open Navigation')}
+          aria-label={t('sidebar.openNavAria')}
           aria-haspopup="dialog"
         >
           <Menu size={18} aria-hidden />
@@ -232,20 +228,20 @@ export function Sidebar() {
           <DialogPrimitive.Overlay className="rail-drawer-overlay" />
           <DialogPrimitive.Content
             className="rail-drawer-panel"
-            aria-label={bi('站点导航抽屉', 'Navigation Drawer')}
+            aria-label={t('sidebar.navDrawerAria')}
           >
             <DialogPrimitive.Title className="sr-only">
-              {bi('站点导航', 'Site Navigation')}
+              {t('sidebar.siteNavAria')}
             </DialogPrimitive.Title>
             <DialogPrimitive.Description className="sr-only">
-              {bi('切换页面、训练任务、语言与主题', 'Switch pages, runs, language and theme')}
+              {t('sidebar.navDrawerDesc')}
             </DialogPrimitive.Description>
             <div className="rail-drawer-close">
               <button
                 type="button"
                 className="rail-mobile-btn"
                 onClick={() => setDrawerOpen(false)}
-                aria-label={bi('关闭导航', 'Close Navigation')}
+                aria-label={t('sidebar.closeNavAria')}
               >
                 <X size={18} aria-hidden />
               </button>

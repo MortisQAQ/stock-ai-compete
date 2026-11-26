@@ -1,10 +1,11 @@
 import { useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import { useNavigate } from 'react-router-dom'
 import { ArrowRight, Code2, Plus, Shield, SlidersHorizontal } from 'lucide-react'
 
-import { AGENTS, AGENT_ORDER, cardJsonOf, cardPathOf } from '../data/agents'
+import { AGENT_ORDER, cardPathOf } from '../data/agents'
+import { formatAgent, formatAgentCardJson } from '../i18n/helpers'
 import { useDialog } from '../store/DialogProvider'
-import { useLocale } from '../store/LocaleProvider'
 import { useRun } from '../store/RunProvider'
 import { useTraining } from '../store/TrainingProvider'
 import { Badge } from '../components/ui/Badge'
@@ -31,20 +32,19 @@ function KV({ k, v, last = false }: { k: string; v: string; last?: boolean }) {
 
 /**
  * Step 01 · Agent 库（主从一屏布局）：
- * 左侧列表扫清「内置只读模板 + 本地外部 Agent」，右侧即刻审查 Agent 卡配置与 JSON，
- * 选定后直接带着该 Agent 进入 Step 02 训练委托台；接入新 Agent 收进弹窗避免长页滚屏。
  */
 export function ConnectPage() {
   const { state } = useRun('training')
   const { records, setDraftAgent } = useTraining()
   const { open } = useDialog()
-  const { isEn, bi } = useLocale()
+  const { t } = useTranslation()
   const navigate = useNavigate()
 
   const [selected, setSelected] = useState<AgentId>(state.agent)
   const [inspectTab, setInspectTab] = useState<'card' | 'json'>('card')
 
-  const card = AGENTS[selected]
+  const card = formatAgent(selected, t)
+  const cardJson = formatAgentCardJson(selected, t)
   const quotes = records.filter((r) => r.team.includes(selected)).map((r) => r.no)
 
   const goToMandate = () => {
@@ -61,44 +61,39 @@ export function ConnectPage() {
       <div className="pagehead">
         <div>
           <div className="flex flex-wrap items-center gap-2.5">
-            <span className="label">{bi('01 — Agent 库', '01 — Agent Roster')}</span>
+            <span className="label">{t('connect.kicker')}</span>
             <Stamp tone="slate" size="sm">
-              {bi('密钥不出本机 · 统一 Agent 卡', 'Keys Stay Local · Unified Agent Card')}
+              {t('connect.stamp')}
             </Stamp>
           </div>
-          <h1>{bi('挑一个内置模板，或把你自己的 Agent 接进来。', 'Pick a built-in template or plug in your own Agent.')}</h1>
-          <p className="deck">
-            {bi(
-              '平台不绑死单一模型，而是用一张透明的 Agent 卡声明人格、风险上限与受控工具白名单；卡里未上报的字段绝不瞎猜。',
-              'Model-agnostic by design: every built-in or local agent is described by a transparent Agent Card declaring persona, risk caps, and tool whitelist.',
-            )}
-          </p>
+          <h1>{t('connect.title')}</h1>
+          <p className="deck">{t('connect.deck')}</p>
         </div>
         <div className="pagehead-actions">
           <Button variant="outline" size="sm" onClick={() => open({ kind: 'onboard' })}>
             <Plus size={15} aria-hidden />
-            {bi('接入新 Agent', 'Connect New Agent')}
+            {t('connect.btnConnectNew')}
           </Button>
           <Button variant="solid" size="sm" onClick={goToMandate}>
-            {bi('去开具委托单', 'Create Mandate')}
+            {t('connect.btnCreateMandate')}
             <ArrowRight size={15} aria-hidden />
           </Button>
         </div>
       </div>
 
       <div className="grid grid-cols-1 gap-5 lg:grid-cols-[minmax(0,380px)_minmax(0,1fr)]">
-        <section aria-label={bi('我的 Agent 列表', 'My Agents')} className="flex min-w-0 flex-col gap-2.5">
+        <section aria-label={t('connect.listAria')} className="flex min-w-0 flex-col gap-2.5">
           <div className="flex items-baseline justify-between px-1">
             <span className="label">
-              {bi(`已登记 Agent（${AGENT_ORDER.length}）`, `Registered Agents (${AGENT_ORDER.length})`)}
+              {t('connect.registeredCount', { count: AGENT_ORDER.length })}
             </span>
             <span className="font-mono text-micro text-[var(--fg-2)]">
-              {bi('内置 1 · 本地 3', '1 Built-in · 3 Local')}
+              {t('connect.countBreakdown')}
             </span>
           </div>
 
           {AGENT_ORDER.map((id) => {
-            const meta = AGENTS[id]
+            const meta = formatAgent(id, t)
             const active = selected === id
             const inUse = state.agent === id
             return (
@@ -118,11 +113,11 @@ export function ConnectPage() {
                       {meta.name}
                     </span>
                     <span className="flex items-center gap-1.5">
-                      {inUse ? <Badge variant="pine">{bi('当前在跑', 'Active')}</Badge> : null}
+                      {inUse ? <Badge variant="pine">{t('connect.activeBadge')}</Badge> : null}
                       <Badge variant={meta.cardOrigin === 'builtin' ? 'pine' : 'outline'}>
                         {meta.cardOrigin === 'builtin'
-                          ? bi('内置只读', 'Built-in')
-                          : bi('本地 ACP', 'Local ACP')}
+                          ? t('connect.builtinBadge')
+                          : t('connect.localAcpBadge')}
                       </Badge>
                     </span>
                   </div>
@@ -132,10 +127,10 @@ export function ConnectPage() {
                   </p>
 
                   <div className="mt-2.5 flex flex-wrap gap-x-3 gap-y-1 border-t border-[var(--line-soft)] pt-2 font-mono text-micro text-[var(--fg-1)]">
-                    <span>{bi('模型', 'Model')}: {meta.model}</span>
-                    <span>{bi('风险', 'Risk')}: {meta.riskProfile}</span>
-                    <span>{bi('单票上限', 'Cap')}: {meta.maxPositionPct}%</span>
-                    <span>{bi('工具', 'Tools')}: {meta.tools}</span>
+                    <span>{t('connect.metaModel')}: {meta.model}</span>
+                    <span>{t('connect.metaRisk')}: {meta.riskProfile}</span>
+                    <span>{t('connect.metaCap')}: {meta.maxPositionPct}%</span>
+                    <span>{t('connect.metaTools')}: {meta.tools}</span>
                   </div>
                 </CardContent>
               </Card>
@@ -148,11 +143,11 @@ export function ConnectPage() {
             className="flex items-center justify-center gap-2 rounded-lg border border-dashed border-[var(--line-strong)] bg-[var(--bg-1)] px-4 py-3 text-note font-medium text-[var(--fg-1)] transition-colors hover:border-[var(--lime)] hover:text-[var(--fg-0)]"
           >
             <Plus size={16} aria-hidden className="text-[var(--lime)]" />
-            {bi('接入本地新 Agent（Prompt / CLI 三步握手）', 'Connect Local Agent (Prompt / CLI 3-Step)')}
+            {t('connect.btnConnectLocal')}
           </button>
         </section>
 
-        <section aria-label={bi('Agent 卡详情', 'Agent Card Inspector')} className="min-w-0">
+        <section aria-label={t('connect.inspectorAria')} className="min-w-0">
           <Card className="h-full">
             <CardHeader className="flex-wrap gap-2">
               <div className="flex min-w-0 flex-wrap items-center gap-2">
@@ -171,7 +166,7 @@ export function ConnectPage() {
                   )}
                 >
                   <SlidersHorizontal size={13} aria-hidden />
-                  {bi('结构化配置', 'Spec')}
+                  {t('connect.tabSpec')}
                 </button>
                 <button
                   type="button"
@@ -184,20 +179,20 @@ export function ConnectPage() {
                   )}
                 >
                   <Code2 size={13} aria-hidden />
-                  JSON
+                  {t('connect.tabJson')}
                 </button>
               </div>
             </CardHeader>
 
             <CardContent className="flex flex-col gap-4 py-4">
               <div className="flex flex-wrap items-center gap-2">
-                <Stamp tone={card.qualification.startsWith('受控') ? 'pine' : 'slate'} size="sm">
+                <Stamp tone={card.builtin ? 'pine' : 'slate'} size="sm">
                   {card.qualification}
                 </Stamp>
                 <Badge variant="outline">
                   {card.cardOrigin === 'builtin'
-                    ? bi('内置卡 · 只读模板', 'Built-in · Read-only')
-                    : bi('本地卡 · 可覆盖同名内置卡', 'Local Card · Overrides Built-in')}
+                    ? t('connect.originBuiltin')
+                    : t('connect.originLocal')}
                 </Badge>
                 {card.strategyTags.map((tag) => (
                   <Badge key={tag} variant="outline">
@@ -211,62 +206,63 @@ export function ConnectPage() {
                   <div className="min-w-0">
                     <div className="mb-3 rounded-lg bg-[var(--bg-2)] p-3.5">
                       <div className="font-mono text-micro text-[var(--fg-2)]">
-                        {bi('人格与策略指令（Persona）', 'Persona & Strategy Prompt')}
+                        {t('connect.personaTitle')}
                       </div>
                       <p className="mt-1.5 text-note leading-relaxed text-[var(--fg-0)]">
-                        {card.persona || bi('尚未填写人格说明', 'No persona configured yet')}
+                        {card.persona || t('connect.personaEmpty')}
                       </p>
                     </div>
-                    <KV k={bi('来源与版本', 'Source & Version')} v={`${card.source} · ${card.version}`} />
-                    <KV k={bi('声明模型', 'Declared Model')} v={card.model} />
-                    <KV k={bi('风险档与周期', 'Risk & Holding')} v={`${card.riskProfile} · ${card.holdingPeriod}`} />
+                    <KV k={t('connect.kvSourceVersion')} v={`${card.source} · ${card.version}`} />
+                    <KV k={t('connect.kvModel')} v={card.model} />
+                    <KV k={t('connect.kvRiskHolding')} v={`${card.riskProfile} · ${card.holdingPeriod}`} />
                     <KV
-                      k={bi('建议初始资金', 'Default Capital')}
-                      v={money(card.initialCash) + bi('（以委托单为准）', ' (mandate overrides)')}
+                      k={t('connect.kvDefaultCapital')}
+                      v={money(card.initialCash) + t('connect.mandateOverrides')}
                     />
                     <KV
-                      k={bi('风控上限', 'Position Limits')}
-                      v={bi(`最多 ${card.maxPositions} 只 · 单票 ≤ ${card.maxPositionPct}%`, `Max ${card.maxPositions} pos · ≤ ${card.maxPositionPct}% each`)}
+                      k={t('connect.kvPositionLimits')}
+                      v={t('connect.positionLimitsVal', {
+                        maxPositions: card.maxPositions,
+                        maxPositionPct: card.maxPositionPct,
+                      })}
                     />
                     <KV
-                      k={bi('受控工具白名单', 'MCP Tool Whitelist')}
+                      k={t('connect.kvToolWhitelist')}
                       v={
                         card.tools === 0
-                          ? bi('未声明（不可运行）', 'Undeclared (blocked)')
-                          : bi(`${card.tools} 个受控只读/下单工具`, `${card.tools} sandboxed MCP tools`)
+                          ? t('connect.toolsUndeclared')
+                          : t('connect.toolsCount', { count: card.tools })
                       }
                     />
                     <KV
-                      k={bi('历史委托引用', 'Referenced Runs')}
-                      v={quotes.length === 0 ? bi('暂未被训练引用', 'None yet') : quotes.join(' · ')}
+                      k={t('connect.kvReferencedRuns')}
+                      v={quotes.length === 0 ? t('connect.runsNone') : quotes.join(' · ')}
                       last
                     />
                   </div>
 
                   <div className="min-w-0">
                     <div className="mb-1.5 font-mono text-micro text-[var(--fg-2)]">
-                      {bi('平台读取的原始 Agent 卡', 'Raw Agent Card JSON')}
+                      {t('connect.rawJsonTitle')}
                     </div>
-                    <pre className="code max-w-full overflow-x-auto">{cardJsonOf(card)}</pre>
+                    <pre className="code max-w-full overflow-x-auto">{cardJson}</pre>
                   </div>
                 </div>
               ) : (
-                <pre className="code max-w-full overflow-x-auto">{cardJsonOf(card)}</pre>
+                <pre className="code max-w-full overflow-x-auto">{cardJson}</pre>
               )}
 
               <div className="flex flex-wrap items-center justify-between gap-3 border-t border-[var(--line-soft)] pt-3.5">
                 <span className="flex items-center gap-2 text-note text-[var(--fg-2)]">
                   <Shield size={15} aria-hidden className="text-[var(--lime)]" />
-                  {isEn
-                    ? 'Research tools, portfolio view, and order gateway are injected by the arena at runtime.'
-                    : '研究工具、账户视图与唯一下单网关均由训练场按实验快照注入，Agent 无法直接改账。'}
+                  {t('connect.securityNote')}
                 </span>
                 <div className="flex flex-wrap items-center gap-2">
                   <Button variant="ghost" size="sm" onClick={() => open({ kind: 'agent', agentId: selected })}>
-                    {bi('查看/微调草稿', 'Inspect / Edit Draft')}
+                    {t('connect.btnEditDraft')}
                   </Button>
                   <Button variant="solid" size="sm" onClick={goToMandate}>
-                    {bi(`用「${card.name.split(' · ')[0]}」开具委托单 →`, `Create Mandate with ${card.name.split(' · ')[0]} →`)}
+                    {t('connect.btnCreateWith', { name: card.shortName })}
                   </Button>
                 </div>
               </div>

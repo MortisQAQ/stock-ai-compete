@@ -1,7 +1,10 @@
-import { useCallback, useMemo } from 'react'
+import { useMemo } from 'react'
 import { create } from 'zustand'
 
-export type Lang = 'zh' | 'en'
+import { detectInitialLang, readQueryParam, type Lang } from '../i18n/detectLang'
+import { syncI18nLanguage } from '../i18n'
+
+export type { Lang }
 export type ThemeMode = 'dark' | 'light'
 export type MarketColors = 'cn' | 'intl'
 
@@ -16,8 +19,6 @@ export interface LocaleContextValue {
   toggleTheme: () => void
   setMarketColors: (next: MarketColors) => void
   toggleMarketColors: () => void
-  /** Concise inline bilingual helper */
-  bi: (zh: string, en: string) => string
 }
 
 interface LocaleStoreState {
@@ -32,28 +33,6 @@ interface LocaleStoreState {
   toggleMarketColors: () => void
 }
 
-function readQueryParam(key: string): string | null {
-  if (typeof window === 'undefined') return null
-  const fromSearch = new URLSearchParams(window.location.search).get(key)
-  if (fromSearch) return fromSearch
-  const hash = window.location.hash
-  const qIndex = hash.indexOf('?')
-  if (qIndex >= 0) {
-    return new URLSearchParams(hash.slice(qIndex + 1)).get(key)
-  }
-  return null
-}
-
-function initialLang(): Lang {
-  const q = readQueryParam('lang')
-  if (q === 'en' || q === 'zh') return q
-  if (typeof window !== 'undefined') {
-    const saved = window.localStorage.getItem('openoutcry.lang')
-    if (saved === 'en' || saved === 'zh') return saved
-  }
-  return 'zh'
-}
-
 function initialTheme(): ThemeMode {
   const q = readQueryParam('theme')
   if (q === 'light' || q === 'dark') return q
@@ -64,7 +43,7 @@ function initialTheme(): ThemeMode {
   return 'dark'
 }
 
-const bootLang = initialLang()
+const bootLang = detectInitialLang()
 
 export const useLocaleStore = create<LocaleStoreState>((set, get) => ({
   lang: bootLang,
@@ -72,6 +51,7 @@ export const useLocaleStore = create<LocaleStoreState>((set, get) => ({
   marketColors: bootLang === 'en' ? 'intl' : 'cn',
 
   setLang: (next: Lang) => {
+    syncI18nLanguage(next)
     set({
       lang: next,
       marketColors: next === 'en' ? 'intl' : 'cn',
@@ -106,8 +86,9 @@ export const useLocaleStore = create<LocaleStoreState>((set, get) => ({
 }))
 
 export function syncLocaleDom(): void {
-  if (typeof document === 'undefined') return
   const { lang, theme, marketColors } = useLocaleStore.getState()
+  syncI18nLanguage(lang)
+  if (typeof document === 'undefined') return
   document.documentElement.lang = lang === 'en' ? 'en' : 'zh-CN'
   document.documentElement.dataset.theme = theme
   document.documentElement.dataset.marketColors = marketColors
@@ -121,7 +102,6 @@ syncLocaleDom()
 
 export function useLocale(): LocaleContextValue {
   const store = useLocaleStore()
-  const bi = useCallback((zh: string, en: string) => (store.lang === 'en' ? en : zh), [store.lang])
 
   return useMemo<LocaleContextValue>(
     () => ({
@@ -135,8 +115,7 @@ export function useLocale(): LocaleContextValue {
       toggleTheme: store.toggleTheme,
       setMarketColors: store.setMarketColors,
       toggleMarketColors: store.toggleMarketColors,
-      bi,
     }),
-    [store, bi],
+    [store],
   )
 }

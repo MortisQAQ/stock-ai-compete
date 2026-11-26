@@ -45,12 +45,12 @@ function TabsTrigger({ className, ...props }: React.ComponentProps<typeof TabsPr
     <TabsPrimitive.Trigger
       data-slot="tabs-trigger"
       className={cn(
-        'inline-flex select-none items-center justify-center gap-1.5 whitespace-nowrap font-mono text-micro font-semibold uppercase tracking-[0.14em] transition-[color,background-color,border-color,box-shadow] duration-150 ease-[var(--ease-out-quart)] disabled:pointer-events-none disabled:opacity-40',
+        'inline-flex select-none items-center justify-center gap-1.5 whitespace-nowrap font-mono text-note font-semibold uppercase tracking-[0.06em] transition-[color,background-color,border-color,box-shadow] duration-150 ease-[var(--ease-out-quart)] disabled:pointer-events-none disabled:opacity-40',
         // line
-        'relative h-9 px-3 text-muted-foreground hover:text-foreground',
+        'relative h-10 px-3 text-muted-foreground hover:text-foreground',
         'after:absolute after:inset-x-0 after:bottom-[-1px] after:h-[2px] after:bg-transparent after:transition-colors',
         'data-[state=active]:text-foreground data-[state=active]:after:bg-ver',
-        'group-data-[variant=segmented]/tabs-list:h-[26px] group-data-[variant=segmented]/tabs-list:rounded-xs group-data-[variant=segmented]/tabs-list:px-2.5 group-data-[variant=segmented]/tabs-list:after:hidden',
+        'group-data-[variant=segmented]/tabs-list:h-8 group-data-[variant=segmented]/tabs-list:rounded-xs group-data-[variant=segmented]/tabs-list:px-2.5 group-data-[variant=segmented]/tabs-list:text-micro group-data-[variant=segmented]/tabs-list:after:hidden',
         'group-data-[variant=segmented]/tabs-list:data-[state=active]:bg-card group-data-[variant=segmented]/tabs-list:data-[state=active]:shadow-press',
         "[&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-3.5",
         className,

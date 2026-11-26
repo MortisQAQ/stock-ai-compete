@@ -1,41 +1,37 @@
 import { useEffect, useId, useRef, useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import { ArrowDown, ArrowUp, Check, Copy, Pause, Play, Plus, ShieldAlert } from 'lucide-react'
 
-import { agentOf } from '../../data/agents'
+import {
+  formatAgent,
+  formatConversation,
+  formatEvent,
+  formatEvidence,
+} from '../../i18n/helpers'
 import { seq } from '../../lib/format'
 import { cn } from '../../lib/utils'
 import { useDialog } from '../../store/DialogProvider'
-import { useLocale } from '../../store/LocaleProvider'
 import { useRun, useWorkspaceKind } from '../../store/RunProvider'
 import { useActiveWorkbenchTask } from '../../store/TrainingProvider'
-import type { EventKind } from '../../types'
+import type { EventKind, TranslationKey } from '../../types'
 
-const KIND_LABEL_ZH: Record<EventKind, string> = {
-  agent: '思考',
-  tool: '工具',
-  order: '提案',
-  user: '我',
-  error: '异常',
-  system: '系统',
-}
-
-const KIND_LABEL_EN: Record<EventKind, string> = {
-  agent: 'Think',
-  tool: 'Tool',
-  order: 'Order',
-  user: 'You',
-  error: 'Error',
-  system: 'System',
+const KIND_KEY: Record<EventKind, TranslationKey> = {
+  agent: 'training.conv.kinds.agent',
+  tool: 'training.conv.kinds.tool',
+  order: 'training.conv.kinds.order',
+  user: 'training.conv.kinds.user',
+  error: 'training.conv.kinds.error',
+  system: 'training.conv.kinds.system',
 }
 
 type FilterId = 'all' | 'agent' | 'tool' | 'order' | 'user'
 
-const FILTERS: Array<{ id: FilterId; zh: string; en: string }> = [
-  { id: 'all', zh: '全部', en: 'All' },
-  { id: 'agent', zh: '思考', en: 'Think' },
-  { id: 'tool', zh: '工具', en: 'Tools' },
-  { id: 'order', zh: '提案', en: 'Orders' },
-  { id: 'user', zh: '人工', en: 'Human' },
+const FILTERS: ReadonlyArray<{ id: FilterId; labelKey: TranslationKey }> = [
+  { id: 'all', labelKey: 'training.conv.filters.all' },
+  { id: 'agent', labelKey: 'training.conv.filters.agent' },
+  { id: 'tool', labelKey: 'training.conv.filters.tool' },
+  { id: 'order', labelKey: 'training.conv.filters.order' },
+  { id: 'user', labelKey: 'training.conv.filters.user' },
 ]
 
 interface Props {
@@ -43,17 +39,14 @@ interface Props {
   hideHeader?: boolean
 }
 
-/**
- * 左栏 = 阶段化可审计轨迹流（对话 + 证据工具卡 + 阶段分隔条 + 人工插话）：
- * 历史训练场与实战工作台共用同一骨架，但通过 system 提示条与 PIT 证据卡清晰区分语义。
- */
 export function ConversationPane({ className, hideHeader = false }: Props) {
   const kind = useWorkspaceKind()
   const { state, actions } = useRun()
-  const { conversation } = useActiveWorkbenchTask()
+  const { task, conversation } = useActiveWorkbenchTask()
   const { open } = useDialog()
-  const { isEn, bi } = useLocale()
-  const agent = agentOf(state.agent)
+  const { t } = useTranslation()
+  const agent = formatAgent(state.agent, t)
+  const convView = formatConversation(task, conversation, t)
 
   const [text, setText] = useState('')
   const [filter, setFilter] = useState<FilterId>('all')
@@ -69,9 +62,9 @@ export function ConversationPane({ className, hideHeader = false }: Props) {
   const isLive = state.kind === 'live'
   const aborted = state.status === 'aborted'
   const last = state.events[state.events.length - 1]
+  const lastView = last ? formatEvent(last, t) : null
   const waitingHuman = state.status === 'active' && state.proposal.status === 'pending'
   const connected = state.status !== 'disconnected'
-  const kindLabel = isEn ? KIND_LABEL_EN : KIND_LABEL_ZH
 
   const visibleEvents = state.events.filter((e) => {
     if (filter === 'all') return true
@@ -129,24 +122,24 @@ export function ConversationPane({ className, hideHeader = false }: Props) {
   }
 
   return (
-    <section aria-label={bi('Agent 决策轨迹流', 'Agent Decision Trace')} className={cn('conv-pane', className)}>
+    <section aria-label={t('training.conv.paneAria')} className={cn('conv-pane', className)}>
       {hideHeader ? null : (
         <header className="conv-hd">
           <span aria-hidden className="conv-avatar">
             {agent.name.replace(/[^A-Za-z\u4e00-\u9fa5]/g, '').slice(0, 2)}
           </span>
           <div className="conv-hd-main">
-            <h2 className="conv-title">{conversation.name}</h2>
+            <h2 className="conv-title">{convView.name}</h2>
             <p className="conv-sub">
               <i aria-hidden className="conv-dot" data-on={connected ? 'y' : 'n'} />
               {isLive ? (
                 <>
-                  {agent.name} · {bi('实时辅助 · 仅给建议不代下单', 'Live Advisory · No Auto-Order')}
+                  {agent.name} · {t('training.conv.liveSub')}
                 </>
               ) : (
                 <>
-                  {agent.name} · {connected ? bi('在线', 'Online') : bi('断开', 'Offline')} ·{' '}
-                  {state.mode === 'goal' ? bi('/goal 自主推进', '/goal Autonomous') : bi('逐案确认', 'HITL Approval')}
+                  {agent.name} · {connected ? t('training.conv.online') : t('training.conv.offline')} ·{' '}
+                  {state.mode === 'goal' ? t('training.conv.goalMode') : t('training.conv.hitlMode')}
                 </>
               )}
             </p>
@@ -154,9 +147,9 @@ export function ConversationPane({ className, hideHeader = false }: Props) {
         </header>
       )}
 
-      {/* 轻量事件筛选 + 暂停滚动开关（借鉴 TraderHarness 控制室） */}
+      {/* 轻量事件筛选 + 暂停滚动开关 */}
       <div className="flex flex-wrap items-center justify-between gap-2 border-b border-[var(--line-soft)] px-4 py-2">
-        <div className="flex flex-wrap items-center gap-1" role="group" aria-label={bi('筛选轨迹事件', 'Filter trace events')}>
+        <div className="flex flex-wrap items-center gap-1" role="group" aria-label={t('training.conv.filterAria')}>
           {FILTERS.map((f) => (
             <button
               key={f.id}
@@ -170,7 +163,7 @@ export function ConversationPane({ className, hideHeader = false }: Props) {
                   : 'text-[var(--fg-2)] hover:text-[var(--fg-0)]',
               )}
             >
-              {isEn ? f.en : f.zh}
+              {t(f.labelKey)}
             </button>
           ))}
         </div>
@@ -184,12 +177,12 @@ export function ConversationPane({ className, hideHeader = false }: Props) {
           )}
         >
           {pauseScroll ? <Play size={12} aria-hidden /> : <Pause size={12} aria-hidden />}
-          {pauseScroll ? bi('已暂停滚动', 'Paused') : bi('自动跟随', 'Follow')}
+          {pauseScroll ? t('training.conv.paused') : t('training.conv.follow')}
         </button>
       </div>
 
       <p className="sr-only" aria-live="polite">
-        {last ? `第 ${seq(last.id)} 条：${last.title}` : ''}
+        {last && lastView ? t('training.conv.srLatest', { seq: seq(last.id), title: lastView.title }) : ''}
       </p>
 
       <div
@@ -202,7 +195,7 @@ export function ConversationPane({ className, hideHeader = false }: Props) {
       >
         {visibleEvents.length === 0 ? (
           <p className="py-8 text-center text-note leading-relaxed text-[var(--ink-2)]">
-            {bi('当前筛选条件下暂无事件。', 'No events under this filter.')}
+            {t('training.conv.emptyFiltered')}
           </p>
         ) : null}
 
@@ -212,35 +205,34 @@ export function ConversationPane({ className, hideHeader = false }: Props) {
           const isOrder = e.kind === 'order'
           const isSystem = e.kind === 'system'
           const openBody = expanded[e.id] ?? false
+          const view = formatEvent(e, t)
 
           return (
             <div key={e.id} className="space-y-3">
-              {/* 交易日 / 阶段分隔条 */}
-              {e.divider ? (
+              {view.divider ? (
                 <div className="flex items-center gap-2 py-1">
                   <span className="h-px flex-1 bg-[var(--line)]" aria-hidden />
                   <span className="rounded bg-[var(--bg-2)] px-2.5 py-0.5 font-mono text-micro text-[var(--fg-1)]">
-                    {e.divider}
+                    {view.divider}
                   </span>
                   <span className="h-px flex-1 bg-[var(--line)]" aria-hidden />
                 </div>
               ) : null}
 
-              {/* 系统状态提示条（不再冒充用户气泡） */}
               {isSystem ? (
                 <div className="rounded-lg border border-[var(--line)] bg-[var(--bg-2)] px-3.5 py-2.5">
                   <div className="flex items-center justify-between gap-2 font-mono text-micro text-[var(--lime)]">
-                    <span>{e.title}</span>
-                    <span className="text-[var(--fg-2)]">{e.at}</span>
+                    <span>{view.title}</span>
+                    <span className="text-[var(--fg-2)]">{view.at}</span>
                   </div>
-                  {e.body ? <p className="mt-1 text-note leading-relaxed text-[var(--fg-1)]">{e.body}</p> : null}
+                  {view.body ? <p className="mt-1 text-note leading-relaxed text-[var(--fg-1)]">{view.body}</p> : null}
                 </div>
               ) : isMine ? (
                 <div className="flex flex-col items-end gap-1">
                   <div className="max-w-[88%] rounded-[16px] rounded-br-[6px] bg-[var(--bg-3)] px-3.5 py-2.5 text-body leading-[1.6] text-[var(--ink)]">
-                    {e.body || e.title}
+                    {view.body || view.title}
                   </div>
-                  <span className="pr-1 font-mono text-micro tabular-nums text-[var(--ink-2)]">{e.at}</span>
+                  <span className="pr-1 font-mono text-micro tabular-nums text-[var(--ink-2)]">{view.at}</span>
                 </div>
               ) : isTool || isOrder ? (
                 <div className="space-y-1.5">
@@ -260,45 +252,50 @@ export function ConversationPane({ className, hideHeader = false }: Props) {
                         isOrder ? 'bg-[var(--ver)] text-[var(--bg-1)]' : 'bg-[var(--brass-hi)] text-[var(--bg-0)]',
                       )}
                     >
-                      {isOrder ? (isLive ? '建' : '提') : '工'}
+                      {isOrder
+                        ? isLive
+                          ? t('training.conv.glyphOrderLive')
+                          : t('training.conv.glyphOrderSim')
+                        : t('training.conv.glyphTool')}
                     </span>
-                    <span className="min-w-0 flex-1 truncate text-note font-medium text-[var(--ink)]">{e.title}</span>
+                    <span className="min-w-0 flex-1 truncate text-note font-medium text-[var(--ink)]">{view.title}</span>
                     <span className="shrink-0 font-mono text-micro tracking-[0.04em] text-[var(--ink-2)]">
-                      {isOrder && isLive ? bi('建议', 'Adv') : kindLabel[e.kind]} · {e.at}
+                      {isOrder && isLive ? t('training.conv.advisoryShort') : t(KIND_KEY[e.kind])} · {view.at}
                     </span>
                   </button>
 
                   {openBody ? (
                     <div className="space-y-2 rounded-[10px] border border-[var(--line)] bg-[var(--bg-1)] p-3">
-                      {e.body ? <p className="whitespace-pre-wrap text-note leading-relaxed text-[var(--ink-2)]">{e.body}</p> : null}
+                      {view.body ? <p className="whitespace-pre-wrap text-note leading-relaxed text-[var(--ink-2)]">{view.body}</p> : null}
 
-                      {/* PIT 证据卡片列表 */}
                       {e.evidenceItems && e.evidenceItems.length > 0 ? (
                         <div className="space-y-2 pt-1">
-                          {e.evidenceItems.map((ev) => (
-                            <div
-                              key={ev.id}
-                              className="rounded-md border border-[var(--line-soft)] bg-[var(--bg-2)] px-3 py-2"
-                            >
-                              <div className="flex flex-wrap items-center justify-between gap-2 font-mono text-micro">
-                                <span className="font-semibold text-[var(--fg-0)]">
-                                  {ev.id} · {ev.title}
-                                </span>
-                                <span className="text-[var(--lime)]">
-                                  {ev.publishedAt} · {ev.pitPass ? bi('✓ PIT 合格', '✓ PIT Pass') : bi('受限', 'Blocked')}
-                                </span>
+                          {e.evidenceItems.map((ev) => {
+                            const evView = formatEvidence(ev, t)
+                            return (
+                              <div
+                                key={ev.id}
+                                className="rounded-md border border-[var(--line-soft)] bg-[var(--bg-2)] px-3 py-2"
+                              >
+                                <div className="flex flex-wrap items-center justify-between gap-2 font-mono text-micro">
+                                  <span className="font-semibold text-[var(--fg-0)]">
+                                    {ev.id} · {evView.title}
+                                  </span>
+                                  <span className="text-[var(--lime)]">
+                                    {ev.publishedAt} · {ev.pitPass ? t('training.conv.pitPass') : t('training.conv.pitBlocked')}
+                                  </span>
+                                </div>
+                                <p className="mt-1 text-note leading-relaxed text-[var(--fg-1)]">{evView.summary}</p>
                               </div>
-                              <p className="mt-1 text-note leading-relaxed text-[var(--fg-1)]">{ev.summary}</p>
-                            </div>
-                          ))}
+                            )
+                          })}
                         </div>
                       ) : null}
 
-                      {/* 时点闸门拦截提示 */}
-                      {e.interceptedNote ? (
+                      {view.interceptedNote ? (
                         <div className="flex items-start gap-2 rounded-md bg-[var(--warn-soft)] px-3 py-2 font-mono text-micro text-[var(--warn)]">
                           <ShieldAlert size={15} aria-hidden className="mt-0.5 shrink-0" />
-                          <span>{e.interceptedNote}</span>
+                          <span>{view.interceptedNote}</span>
                         </div>
                       ) : null}
                     </div>
@@ -313,15 +310,15 @@ export function ConversationPane({ className, hideHeader = false }: Props) {
                       style={{ background: e.kind === 'error' ? 'var(--ver)' : 'var(--lime)' }}
                     />
                     <span className="font-mono text-micro font-semibold tracking-[0.04em] text-[var(--ink-2)]">
-                      {e.speakerRole ?? agent.name.split(' · ')[0]}
+                      {view.speakerRole ?? agent.shortName}
                     </span>
                     <span className="font-mono text-micro tabular-nums tracking-[0.04em] text-[var(--ink-2)]">
-                      {e.at}
+                      {view.at}
                     </span>
                     <button
                       type="button"
-                      onClick={() => copy(e.id, e.title + '\n' + e.body)}
-                      aria-label={bi('复制这条消息', 'Copy message')}
+                      onClick={() => copy(e.id, view.title + '\n' + view.body)}
+                      aria-label={t('training.conv.copyMessage')}
                       className="ml-auto rounded p-0.5 text-[var(--ink-2)] opacity-0 transition-opacity hover:text-[var(--ink)] focus-visible:opacity-100 group-hover:opacity-100"
                     >
                       {copied === e.id ? <Check size={14} /> : <Copy size={14} />}
@@ -333,9 +330,9 @@ export function ConversationPane({ className, hideHeader = false }: Props) {
                       e.kind === 'error' && 'text-[var(--ver)]',
                     )}
                   >
-                    {e.title}
+                    {view.title}
                   </p>
-                  {e.body ? <p className="whitespace-pre-wrap text-body leading-[1.7] text-[var(--ink-2)]">{e.body}</p> : null}
+                  {view.body ? <p className="whitespace-pre-wrap text-body leading-[1.7] text-[var(--ink-2)]">{view.body}</p> : null}
                 </div>
               )}
             </div>
@@ -345,18 +342,10 @@ export function ConversationPane({ className, hideHeader = false }: Props) {
         {waitingHuman ? (
           <div className="rounded-[12px] bg-[var(--warn-soft)] px-3.5 py-3">
             <span className="font-mono text-micro font-semibold uppercase tracking-[0.14em] text-[var(--warn)]">
-              {isLive ? bi('等待你的实盘决策', 'Awaiting Your Live Decision') : bi('等待人工核验与审批', 'Awaiting Human Approval')}
+              {isLive ? t('training.conv.waitingLiveTitle') : t('training.conv.waitingSimTitle')}
             </span>
             <p className="mt-1.5 text-note leading-relaxed text-[var(--fg-0)]">
-              {isLive
-                ? bi(
-                    '调仓建议单已在右侧就绪：请自行去券商端决定是否下单，完成后回来记账或标记暂不采纳。',
-                    'Advisory ready on the right: decide in your own broker, then log the fill or ignore here.',
-                  )
-                : bi(
-                    '待审提案已在右侧完成 A 股规则预检。你可以在右侧批准、改量或拒绝，也可以在下方插话要求 Agent 重新评估。',
-                    'Proposal passed deterministic A-share pre-checks on the right. Approve, modify, or reject there, or send guidance below.',
-                  )}
+              {isLive ? t('training.conv.waitingLiveBody') : t('training.conv.waitingSimBody')}
             </p>
           </div>
         ) : null}
@@ -369,7 +358,7 @@ export function ConversationPane({ className, hideHeader = false }: Props) {
               className="flex items-center gap-1 rounded-full border border-[var(--line)] bg-[var(--bg-1)] px-2.5 py-1 font-mono text-micro uppercase tracking-[0.1em] text-[var(--ink-2)]"
             >
               <ArrowDown size={13} />
-              {bi('最新', 'Latest')}
+              {t('training.conv.latest')}
             </button>
           </div>
         ) : null}
@@ -384,7 +373,7 @@ export function ConversationPane({ className, hideHeader = false }: Props) {
       >
         <div className="conv-input">
           <label htmlFor={inputId} className="sr-only">
-            {isLive ? bi('实盘追问或说明', 'Live follow-up') : bi('人工插话指导', 'Human guidance')}
+            {isLive ? t('training.conv.inputLiveAria') : t('training.conv.inputSimAria')}
           </label>
           <textarea
             id={inputId}
@@ -401,10 +390,10 @@ export function ConversationPane({ className, hideHeader = false }: Props) {
             disabled={aborted}
             placeholder={
               aborted
-                ? bi('本次运行已中止。', 'This run has been aborted.')
+                ? t('training.conv.placeholderAborted')
                 : isLive
-                  ? bi('追问持仓、实时行情或记录实盘想法…', 'Ask about holdings or live market…')
-                  : bi('插话指导，或输入 /goal 切入自主推进…', 'Send guidance, or type /goal for autonomous mode…')
+                  ? t('training.conv.placeholderLive')
+                  : t('training.conv.placeholderSim')
             }
           />
           <div className="conv-bar">
@@ -413,8 +402,8 @@ export function ConversationPane({ className, hideHeader = false }: Props) {
                 type="button"
                 className="conv-plus"
                 onClick={() => open({ kind: 'editHolding', scope: kind })}
-                aria-label={bi('维护镜像持仓', 'Edit Mirror Holdings')}
-                title={bi('手动新增或调整实盘镜像持仓', 'Edit mirror holdings')}
+                aria-label={t('training.conv.editHoldingsAria')}
+                title={t('training.conv.editHoldingsTitle')}
               >
                 <Plus size={16} aria-hidden />
               </button>
@@ -424,8 +413,8 @@ export function ConversationPane({ className, hideHeader = false }: Props) {
                 className="conv-plus"
                 disabled={aborted}
                 onClick={() => open({ kind: 'goal', scope: kind })}
-                aria-label={bi('切换 /goal 自主推进', 'Switch to /goal autonomous mode')}
-                title={bi('切入 /goal 自主推进模式', 'Enter /goal autonomous mode')}
+                aria-label={t('training.conv.goalAria')}
+                title={t('training.conv.goalTitle')}
               >
                 <Plus size={16} aria-hidden />
               </button>
@@ -434,7 +423,7 @@ export function ConversationPane({ className, hideHeader = false }: Props) {
               type="submit"
               className="conv-send"
               disabled={aborted || !text.trim()}
-              aria-label={bi('发送', 'Send')}
+              aria-label={t('training.conv.sendAria')}
             >
               <ArrowUp size={16} aria-hidden />
             </button>
