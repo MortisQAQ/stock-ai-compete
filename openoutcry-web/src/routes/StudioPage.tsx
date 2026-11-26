@@ -1,106 +1,75 @@
 import { useNavigate } from 'react-router-dom'
+import { ArrowRight } from 'lucide-react'
 
-import { useRun } from '../store/RunProvider'
 import { agentOf } from '../data/agents'
-import { TRAINING_SEED } from '../data/trainings'
+import { useLocale } from '../store/LocaleProvider'
+import { useRun } from '../store/RunProvider'
+import { useTraining } from '../store/TrainingProvider'
 import { Button } from '../components/ui/Button'
-import { Card, CardContent, CardHeader } from '../components/ui/Card'
 import { MandateTicket } from '../components/studio/MandateTicket'
 import { TrainingLedger } from '../components/studio/TrainingLedger'
 import { money, signedPct } from '../lib/format'
 
 /**
- * 新建训练 = 委托台。
- * 以「训练」为单位：一次训练委托一段时间、一篮子标的、一队 Agent。
- * Agent 退到团队字段里，不再是一个人一张卡片的主语。
+ * Step 02 · 训练委托台（首屏压实布局）：
+ * 压缩旧版半屏大 Hero 为紧凑状态带，确保下方 2×2「开具委托单」表单与提交按钮
+ * 完整落在 1440×900 首屏内，直接开单后真传参进入 Step 03 历史训练场。
  */
 export function StudioPage() {
-  const { state, totals } = useRun()
+  const { state, totals } = useRun('training')
+  const { records } = useTraining()
+  const { bi } = useLocale()
   const navigate = useNavigate()
-  const netPct = (totals.net / state.initial) * 100
 
-  const current = TRAINING_SEED.find((t) => t.status === 'running') ?? TRAINING_SEED[0]
-  const pct = Math.round((current.day / current.days) * 100)
+  const netPct = state.initial ? (totals.net / state.initial) * 100 : 0
+  const current = records.find((t) => t.status === 'running') ?? records[0]
+  const teamNames = (state.team ?? [state.agent]).map((id) => agentOf(id).name.split(' · ')[0]).join(' + ')
 
   return (
     <>
-      {/* 竖排铭牌：只在 ≥1440 显示，给页面右上角一枚「设备编号」 */}
       <div className="vlabel page-vlabel" aria-hidden="true">
-        OPENOUTCRY / TRAINING DESK / 2026
+        OPENOUTCRY / 02 TRAINING DESK / 2026
       </div>
 
-      <header className="hero hero-slim frame">
-        <div className="hero-grid">
-          <div>
-            <span className="label">№ 01 — Training Desk</span>
-            <h1>委托一次训练。</h1>
-            <p className="deck">
-              选一段时间、一篮子标的、一队 Agent。研究、成交与复盘都落在同一张委托单上，
-              结束后按同一口径比较。
-            </p>
-          </div>
-
-          {/* 规则 5：这里只是 5 行数字，不是数据视窗 —— 回到纸面 */}
-          <Card variant="default">
-            <CardHeader>
-              <span className="min-w-0 truncate">当前训练 {current.no}</span>
-            </CardHeader>
-            <CardContent className="py-5">
-              <div className="run-grid">
-                <div className="run-cell">
-                  <span>团队</span>
-                  <b>{current.team.map((id) => agentOf(id).name.split(' · ')[0]).join(' + ')}</b>
-                </div>
-                <div className="run-cell">
-                  <span>模拟时钟</span>
-                  <b>{state.clock.slice(5)}</b>
-                </div>
-                <div className="run-cell">
-                  <span>账户净值</span>
-                  <b className="acc">{money(totals.equity)}</b>
-                </div>
-                <div className="run-cell">
-                  <span>累计净收益</span>
-                  <b className={totals.net >= 0 ? 'pos' : 'neg'}>{signedPct(netPct)}</b>
-                </div>
-              </div>
-              <div className="mt-4 flex items-baseline justify-between border-t border-[var(--line-soft)] pt-3.5">
-                <span className="cond text-micro text-[var(--fg-2)]">进度</span>
-                <b className="font-mono text-micro text-[var(--fg-0)]">
-                  {current.day} / {current.days} 交易日
-                </b>
-              </div>
-              {/* 进度 = 系统在跑（结构色），不是可点的东西；轨道走圆角无框 */}
-              <div className="mt-2 h-[6px] w-full overflow-hidden rounded-full bg-[var(--bg-3)]">
-                <div className="h-full bg-[var(--lime)]" style={{ width: pct + '%' }} />
-              </div>
-            </CardContent>
-          </Card>
+      <div className="pagehead">
+        <div>
+          <span className="label">{bi('02 — 训练委托', '02 — Training Desk')}</span>
+          <h1>{bi('开一张不可变委托单，锁死考场口径。', 'Issue an immutable mandate to lock the test rules.')}</h1>
+          <p className="deck">
+            {bi(
+              '一次训练委托单 = 历史时段 × 标的池漏斗 × 单执行者团队 × 资金与日频三阶段规则。开具后口径冻结，方便同条件对照复测。',
+              'One Training Mandate = Historical Window × Universe Funnel × Single-Executor Team × Rules & Cadence. Frozen on issue for fair A/B reruns.',
+            )}
+          </p>
         </div>
-      </header>
+
+        <div className="flex flex-wrap items-center gap-3 rounded-lg border border-[var(--line)] bg-[var(--bg-1)] px-4 py-2.5">
+          <div className="flex flex-col">
+            <span className="font-mono text-micro text-[var(--fg-2)]">
+              {bi('当前在跑', 'Active Run')} {state.mandateNo ?? current.no}
+            </span>
+            <span className="font-mono text-note font-semibold text-[var(--fg-0)]">
+              {teamNames} · {money(totals.equity)}{' '}
+              <em className={totals.net >= 0 ? 'not-italic text-[var(--up)]' : 'not-italic text-[var(--down)]'}>
+                ({signedPct(netPct)})
+              </em>
+            </span>
+          </div>
+          <Button variant="outline" size="sm" onClick={() => navigate('/training')}>
+            {bi('进入当前训练', 'Open Arena')}
+            <ArrowRight size={14} aria-hidden />
+          </Button>
+        </div>
+      </div>
 
       <MandateTicket />
       <TrainingLedger />
 
-      <div className="mt-12 flex flex-wrap items-center justify-between gap-4 border-t border-[var(--rule)] pt-6">
-        <p className="max-w-[68ch] text-note leading-relaxed text-[var(--fg-2)]">
-          Agent 在「连接 Agent」里维护；一条训练可指派 1–3 位，角色按委托顺序分配（交易 / 研究 / 风控）。
-        </p>
-        <div className="flex items-center gap-2">
-          <Button variant="ghost" size="sm" onClick={() => navigate('/connect')}>
-            维护 Agent
-          </Button>
-          <Button variant="outline" size="sm" onClick={() => navigate('/protocol')}>
-            查看委托规则
-          </Button>
-        </div>
-      </div>
-
       <div className="foot">
         <span>
-          <b>openOutcry</b> — 受控历史市场 / 确定性回放 / 人机协同审批
+          <b>openOutcry</b> — {bi('受控历史市场 / 确定性回放 / 人机协同审批', 'Controlled Historical Arena / Deterministic Replay / HITL Approval')}
         </span>
-        <span>Prototype v3 · 2026-10</span>
+        <span>v2.0 · 2026-11</span>
       </div>
     </>
   )

@@ -1,19 +1,20 @@
-import { useRef, useState } from 'react'
+import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { ArrowRight, Code2, Plus, Shield, SlidersHorizontal } from 'lucide-react'
 
+import { AGENTS, AGENT_ORDER, cardJsonOf, cardPathOf } from '../data/agents'
+import { useDialog } from '../store/DialogProvider'
+import { useLocale } from '../store/LocaleProvider'
 import { useRun } from '../store/RunProvider'
-import { useToast } from '../store/ToastProvider'
-import { AGENTS, AGENT_ORDER, agentOf, cardJsonOf, cardPathOf, isAgentId } from '../data/agents'
-import { TRAINING_SEED } from '../data/trainings'
+import { useTraining } from '../store/TrainingProvider'
 import { Badge } from '../components/ui/Badge'
 import { Button } from '../components/ui/Button'
 import { Card, CardContent, CardHeader } from '../components/ui/Card'
-import { Select } from '../components/ui/Select'
 import { Stamp } from '../components/ui/Stamp'
-import type { AgentId, AgentMeta } from '../types'
 import { money } from '../lib/format'
+import { cn } from '../lib/utils'
+import type { AgentId } from '../types'
 
-/** 卡内键值行：左侧字段名，右侧值。最后一行去底线。 */
 function KV({ k, v, last = false }: { k: string; v: string; last?: boolean }) {
   return (
     <div
@@ -23,328 +24,255 @@ function KV({ k, v, last = false }: { k: string; v: string; last?: boolean }) {
       }
     >
       <span className="text-note text-muted-foreground">{k}</span>
-      <b className="text-right font-mono text-note font-semibold text-foreground">
-        {v}
-      </b>
+      <b className="text-right font-mono text-note font-semibold text-foreground">{v}</b>
     </div>
   )
 }
 
-/** 注册表里的一张 Agent 卡 */
-function AgentTile({
-  meta,
-  quotes,
-  active,
-  inUse,
-  onSelect,
-}: {
-  meta: AgentMeta
-  quotes: string[]
-  active: boolean
-  inUse: boolean
-  onSelect: () => void
-}) {
-  return (
-    <Card
-      interactive
-      onClick={onSelect}
-      aria-pressed={active}
-      className={
-        active
-          ? 'shadow-[inset_2px_0_0_var(--lime),inset_0_0_0_1px_var(--line-lime)]'
-          : ''
-      }
-    >
-      <CardHeader className="flex-wrap">
-        <span>{meta.id}</span>
-        <span className="flex flex-wrap items-center gap-1.5">
-          {inUse && <Badge variant="outline">当前使用</Badge>}
-          {/* 内置卡 = 结构色；外部卡只做中性描边 —— 黄留给「待确认」，不当分类色用 */}
-          <Badge variant={meta.cardOrigin === 'builtin' ? 'pine' : 'outline'}>{meta.tag}</Badge>
-        </span>
-      </CardHeader>
-      <CardContent className="py-3">
-        <div className="font-sans text-body font-semibold leading-snug tracking-[-0.02em]">
-          {meta.name}
-        </div>
-        <p className="mt-1 mb-2.5 text-note leading-relaxed text-muted-foreground">
-          {meta.description}
-        </p>
-        <KV k="模型" v={meta.model} />
-        <KV k="工具" v={meta.tools === 0 ? '未声明' : meta.tools + ' 个受控工具'} />
-        <KV k="风险档" v={meta.riskProfile + ' · ' + meta.holdingPeriod} />
-        <KV k="预算" v={meta.budgetUsed + ' / ' + meta.budgetTotal + ' 次'} />
-        <KV k="最近会话" v={meta.lastSession} />
-        <KV
-          k="被引用"
-          v={quotes.length === 0 ? '未被任何训练引用' : quotes.join(' · ')}
-          last
-        />
-        <div className="mt-2.5 flex items-center gap-2">
-          <Stamp tone={meta.qualification.startsWith('受控') ? 'pine' : 'slate'} size="sm">
-            {meta.qualification}
-          </Stamp>
-          <span className="text-micro tracking-[0.06em] text-muted-foreground">
-            {meta.cardOrigin === 'builtin' ? '内置卡 · 只读' : '本地卡 · 可覆盖'}
-          </span>
-        </div>
-      </CardContent>
-    </Card>
-  )
-}
-
+/**
+ * Step 01 · Agent 库（主从一屏布局）：
+ * 左侧列表扫清「内置只读模板 + 本地外部 Agent」，右侧即刻审查 Agent 卡配置与 JSON，
+ * 选定后直接带着该 Agent 进入 Step 02 训练委托台；接入新 Agent 收进弹窗避免长页滚屏。
+ */
 export function ConnectPage() {
-  const { state, actions } = useRun()
-  const { notify } = useToast()
+  const { state } = useRun('training')
+  const { records, setDraftAgent } = useTraining()
+  const { open } = useDialog()
+  const { isEn, bi } = useLocale()
   const navigate = useNavigate()
-  const intakeRef = useRef<HTMLDivElement>(null)
 
   const [selected, setSelected] = useState<AgentId>(state.agent)
-  const [source, setSource] = useState<AgentId>('codex')
-  const [connected, setConnected] = useState(false)
-  const [message, setMessage] = useState('')
+  const [inspectTab, setInspectTab] = useState<'card' | 'json'>('card')
 
   const card = AGENTS[selected]
+  const quotes = records.filter((r) => r.team.includes(selected)).map((r) => r.no)
 
-  const connect = () => {
-    setConnected(true)
-    setMessage('模拟连接完成。未启动进程，未执行真实授权，严格评测资格仍未验证。')
-    notify('握手完成（演示）', 'success')
+  const goToMandate = () => {
+    setDraftAgent(selected)
+    navigate('/studio')
   }
-
-  const copySkill = async () => {
-    try {
-      await navigator.clipboard.writeText('/install openoutcry-skill')
-      notify('已复制安装示例', 'success')
-    } catch {
-      notify('剪贴板不可用：/install openoutcry-skill', 'warn')
-    }
-  }
-
-  const enter = () => {
-    if (state.agent !== source) actions.switchAgent(source)
-    navigate('/training')
-  }
-
-  const toIntake = () => intakeRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })
 
   return (
     <>
       <div className="vlabel page-vlabel" aria-hidden="true">
-        OPENOUTCRY / AGENT INTAKE / 2026
+        OPENOUTCRY / 01 AGENT ROSTER / 2026
       </div>
 
       <div className="pagehead">
         <div>
           <div className="flex flex-wrap items-center gap-2.5">
-            <span className="label">№ 04 — Connect</span>
-            <Stamp tone="slate">设计稿 · 未执行真实授权</Stamp>
+            <span className="label">{bi('01 — Agent 库', '01 — Agent Roster')}</span>
+            <Stamp tone="slate" size="sm">
+              {bi('密钥不出本机 · 统一 Agent 卡', 'Keys Stay Local · Unified Agent Card')}
+            </Stamp>
           </div>
-          <h1>把熟悉的 Agent 带进来。</h1>
+          <h1>{bi('挑一个内置模板，或把你自己的 Agent 接进来。', 'Pick a built-in template or plug in your own Agent.')}</h1>
           <p className="deck">
-            平台只认一张 Agent 卡：人格、模型、资金上限与工具白名单都写在卡里。下面是已有的卡，
-            以及把新卡接进来的三步。
+            {bi(
+              '平台不绑死单一模型，而是用一张透明的 Agent 卡声明人格、风险上限与受控工具白名单；卡里未上报的字段绝不瞎猜。',
+              'Model-agnostic by design: every built-in or local agent is described by a transparent Agent Card declaring persona, risk caps, and tool whitelist.',
+            )}
           </p>
         </div>
-      </div>
-
-      <div className="section-hd">
-        <h2>我的 Agent</h2>
-        <div className="section-hd-side">
-          <span className="count">
-            {AGENT_ORDER.length} 张已接入 · 内置 {AGENT_ORDER.filter((id) => AGENTS[id].cardOrigin === 'builtin').length}
-          </span>
-          <Button variant="ghost" size="sm" onClick={toIntake}>
-            接入新 Agent
+        <div className="pagehead-actions">
+          <Button variant="outline" size="sm" onClick={() => open({ kind: 'onboard' })}>
+            <Plus size={15} aria-hidden />
+            {bi('接入新 Agent', 'Connect New Agent')}
+          </Button>
+          <Button variant="solid" size="sm" onClick={goToMandate}>
+            {bi('去开具委托单', 'Create Mandate')}
+            <ArrowRight size={15} aria-hidden />
           </Button>
         </div>
       </div>
 
-      {/* 接入步骤：三步一组，共用同一档底色 */}
-      <div className="grid grid-cols-1 gap-3 [&>*]:min-w-0 md:grid-cols-2">
-        {AGENT_ORDER.map((id) => (
-          <AgentTile
-            key={id}
-            meta={AGENTS[id]}
-            quotes={TRAINING_SEED.filter((t) => t.team.includes(id)).map((t) => t.no)}
-            active={selected === id}
-            inUse={state.agent === id}
-            onSelect={() => setSelected(id)}
-          />
-        ))}
-
-        <Card variant="dashed" interactive className="agent-add" onClick={toIntake}>
-          <CardHeader>
-            <span>new card</span>
-            <Badge variant="outline">+</Badge>
-          </CardHeader>
-          <CardContent className="py-3">
-            <div className="font-sans text-body font-semibold leading-snug tracking-[-0.02em]">
-              接入新 Agent
-            </div>
-            <p className="mt-1 text-note leading-relaxed text-muted-foreground">
-              三步：安装 Skill → 启动本地 Runner → 握手与预检。凭据留在你本机，卡进入
-              {' '}
-              <span className="mono">~/.openoutcry/agents/</span>。
-            </p>
-            <KV k="接入方式" v="Skill · MCP · 本地 Runner" />
-            <KV k="预检项" v="协议版本 · 动作格式 · 工具白名单" />
-            <KV k="资格" v="通过预检前一律为探索组" last />
-          </CardContent>
-        </Card>
-      </div>
-
-      <p className="note mt-3">
-        内置卡随平台发布且只读；本地卡与内置卡同名时，本地卡覆盖内置卡（与 TraderHarness 的
-        {' '}
-        <span className="mono">agents/&lt;id&gt;.json</span> 规则一致）。卡里没有的字段不会被猜出来——
-        模型未上报的 Agent 一律进探索组。
-      </p>
-
-      <div className="section-hd">
-        <h2>Agent 卡 · {card.name}</h2>
-        <div className="section-hd-side">
-          <span className="count mono">{cardPathOf(selected)}</span>
-        </div>
-      </div>
-
-      <Card>
-        <CardHeader>
-          <span>Agent Card</span>
-          <span className="normal-case tracking-[0.06em]">
-            {card.cardOrigin === 'builtin' ? '内置 · 只读' : '本地 · 可覆盖'}
-          </span>
-        </CardHeader>
-        <CardContent className="grid grid-cols-1 gap-6 py-4 md:grid-cols-[minmax(0,1fr)_360px]">
-          <div className="min-w-0">
-            <KV k="来源" v={card.source + ' · ' + card.version} />
-            <div className="border-b border-[var(--line-soft)] py-2">
-              <div className="text-note text-muted-foreground">人格 persona</div>
-              <p className="mt-1 text-note leading-relaxed text-foreground">
-                {card.persona || '未填写'}
-              </p>
-            </div>
-            <KV k="策略标签" v={card.strategyTags.join(' / ') || '未设置'} />
-            <KV k="风险档" v={card.riskProfile} />
-            <KV k="持仓周期" v={card.holdingPeriod} />
-            <KV k="初始资金" v={money(card.initialCash)} />
-            <KV k="最大持仓数" v={card.maxPositions + ' 只'} />
-            <KV k="单票上限" v={card.maxPositionPct + '%'} />
-            <KV k="工具白名单" v={card.tools === 0 ? '未声明（不可运行）' : card.tools + ' 个'} />
-            <KV k="评测资格" v={card.qualification} last />
-          </div>
-          <div className="min-w-0">
-            <pre className="code max-w-full">{cardJsonOf(card)}</pre>
-            <p className="note mt-2">
-              这就是平台看到的全部配置。研究工具、账户视图与下单入口都不在卡里，
-              由训练场按当时的实验快照注入。
-            </p>
-          </div>
-        </CardContent>
-      </Card>
-
-      <div className="section-hd" ref={intakeRef}>
-        <h2>接入新 Agent</h2>
-        <div className="section-hd-side">
-          <span className="count">Skill / Runner / Preflight</span>
-        </div>
-      </div>
-
-      <div className="steps">
-        <Card className="step">
-          <div className="step-no" aria-hidden="true">01</div>
-          <h3>安装 Skill</h3>
-          <p>在你的 Agent 环境里安装 openOutcry Skill，它负责发现训练场、读取受控资料并提供标准动作格式。</p>
-          <pre className="code">
-            {'$ '}
-            <span className="k">openoutcry</span> skill install{'\n'}
-            <span className="s">{'# 仅注册能力，不上传凭据'}</span>
-          </pre>
-          <Button variant="ghost" size="sm" onClick={copySkill}>
-            复制安装命令
-          </Button>
-        </Card>
-
-        <Card className="step">
-          <div className="step-no" aria-hidden="true">02</div>
-          <h3>启动本地 Runner</h3>
-          <p>Runner 在你的机器上持有模型凭据并驱动 Agent；平台只接收观察结果与动作意图，不接触密钥。</p>
-          <pre className="code">
-            {'$ '}
-            <span className="k">npx</span> openoutcry-runner --port 7431{'\n'}
-            <span className="s">{'# 启动后写入 agents/<id>.json'}</span>
-          </pre>
-          <div className="flex flex-col gap-1.5">
-            <span className="text-micro uppercase tracking-[0.14em] text-muted-foreground">
-              卡的来源
+      <div className="grid grid-cols-1 gap-5 lg:grid-cols-[minmax(0,380px)_minmax(0,1fr)]">
+        <section aria-label={bi('我的 Agent 列表', 'My Agents')} className="flex min-w-0 flex-col gap-2.5">
+          <div className="flex items-baseline justify-between px-1">
+            <span className="label">
+              {bi(`已登记 Agent（${AGENT_ORDER.length}）`, `Registered Agents (${AGENT_ORDER.length})`)}
             </span>
-            <Select
-              value={source}
-              onChange={(e) => {
-                if (isAgentId(e.target.value)) setSource(e.target.value)
-              }}
-            >
-              {AGENT_ORDER.map((id) => (
-                <option key={id} value={id}>
-                  {AGENTS[id].name}
-                  {AGENTS[id].cardOrigin === 'builtin' ? '（内置）' : '（本地）'}
-                </option>
-              ))}
-            </Select>
+            <span className="font-mono text-micro text-[var(--fg-2)]">
+              {bi('内置 1 · 本地 3', '1 Built-in · 3 Local')}
+            </span>
           </div>
-        </Card>
 
-        <Card className="step">
-          <div className="step-no" aria-hidden="true">03</div>
-          <h3>握手与预检</h3>
-          <p>
-            平台检查协议版本、动作格式与工具白名单，并核对卡里声明的模型与工具数。预检不通过时说明阻断原因，
-            不会静默切换模型，也不会把缺字段补成默认值。
-          </p>
-          <Button variant="ver" wide onClick={connect}>
-            模拟连接
-          </Button>
-          <p
-            className={
-              'min-h-9 text-note leading-relaxed ' + (connected ? 'text-pine' : 'text-ink-3')
-            }
+          {AGENT_ORDER.map((id) => {
+            const meta = AGENTS[id]
+            const active = selected === id
+            const inUse = state.agent === id
+            return (
+              <Card
+                key={id}
+                interactive
+                onClick={() => setSelected(id)}
+                aria-pressed={active}
+                className={cn(
+                  'transition-colors',
+                  active && 'shadow-[inset_3px_0_0_var(--lime),inset_0_0_0_1px_var(--line-lime)]',
+                )}
+              >
+                <CardContent className="py-3.5">
+                  <div className="flex flex-wrap items-center justify-between gap-2">
+                    <span className="font-sans text-body font-semibold text-[var(--fg-0)]">
+                      {meta.name}
+                    </span>
+                    <span className="flex items-center gap-1.5">
+                      {inUse ? <Badge variant="pine">{bi('当前在跑', 'Active')}</Badge> : null}
+                      <Badge variant={meta.cardOrigin === 'builtin' ? 'pine' : 'outline'}>
+                        {meta.cardOrigin === 'builtin'
+                          ? bi('内置只读', 'Built-in')
+                          : bi('本地 ACP', 'Local ACP')}
+                      </Badge>
+                    </span>
+                  </div>
+
+                  <p className="mt-1.5 line-clamp-2 text-note leading-relaxed text-[var(--fg-2)]">
+                    {meta.description}
+                  </p>
+
+                  <div className="mt-2.5 flex flex-wrap gap-x-3 gap-y-1 border-t border-[var(--line-soft)] pt-2 font-mono text-micro text-[var(--fg-1)]">
+                    <span>{bi('模型', 'Model')}: {meta.model}</span>
+                    <span>{bi('风险', 'Risk')}: {meta.riskProfile}</span>
+                    <span>{bi('单票上限', 'Cap')}: {meta.maxPositionPct}%</span>
+                    <span>{bi('工具', 'Tools')}: {meta.tools}</span>
+                  </div>
+                </CardContent>
+              </Card>
+            )
+          })}
+
+          <button
+            type="button"
+            onClick={() => open({ kind: 'onboard' })}
+            className="flex items-center justify-center gap-2 rounded-lg border border-dashed border-[var(--line-strong)] bg-[var(--bg-1)] px-4 py-3 text-note font-medium text-[var(--fg-1)] transition-colors hover:border-[var(--lime)] hover:text-[var(--fg-0)]"
           >
-            {message}
-          </p>
-          <Button variant="solid" wide onClick={enter} disabled={!connected}>
-            进入训练场 · {agentOf(source).name}
-          </Button>
-        </Card>
-      </div>
+            <Plus size={16} aria-hidden className="text-[var(--lime)]" />
+            {bi('接入本地新 Agent（Prompt / CLI 三步握手）', 'Connect Local Agent (Prompt / CLI 3-Step)')}
+          </button>
+        </section>
 
-      <Card className="mt-6">
-        <CardHeader>
-          <span className="label">Boundary</span>
-          <span className="normal-case tracking-[0.06em]">接入边界</span>
-        </CardHeader>
-        <CardContent className="cols">
-          <p>
-            <strong>Agent 卡</strong> 只描述这个 Agent 是谁、能拿多少钱、能用哪些工具；
-            它不描述市场，也不描述规则。
-          </p>
-          <p>
-            <strong>Skill</strong> 负责发现并使用训练场；<strong>MCP</strong> 只暴露当前实验允许的研究工具。
-          </p>
-          <p>
-            <strong>训练场协议</strong> 负责 observation / action；<strong>规则引擎</strong> 负责校验、拒单、撮合与账户变更。
-          </p>
-          <p>
-            外部 Agent 只能提出动作，不能直接成交；断线、心跳超时或动作解析失败时暂停运行并说明原因，
-            凭据与长期密钥不写入轨迹。
-          </p>
-        </CardContent>
-      </Card>
+        <section aria-label={bi('Agent 卡详情', 'Agent Card Inspector')} className="min-w-0">
+          <Card className="h-full">
+            <CardHeader className="flex-wrap gap-2">
+              <div className="flex min-w-0 flex-wrap items-center gap-2">
+                <span>{card.name}</span>
+                <span className="font-mono text-micro text-[var(--fg-2)]">{cardPathOf(selected)}</span>
+              </div>
+              <div className="flex items-center gap-1 rounded-md bg-[var(--bg-2)] p-0.5">
+                <button
+                  type="button"
+                  onClick={() => setInspectTab('card')}
+                  className={cn(
+                    'flex items-center gap-1 rounded px-2.5 py-1 font-mono text-micro',
+                    inspectTab === 'card'
+                      ? 'bg-[var(--lime-soft)] font-semibold text-[var(--fg-0)]'
+                      : 'text-[var(--fg-2)]',
+                  )}
+                >
+                  <SlidersHorizontal size={13} aria-hidden />
+                  {bi('结构化配置', 'Spec')}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setInspectTab('json')}
+                  className={cn(
+                    'flex items-center gap-1 rounded px-2.5 py-1 font-mono text-micro',
+                    inspectTab === 'json'
+                      ? 'bg-[var(--lime-soft)] font-semibold text-[var(--fg-0)]'
+                      : 'text-[var(--fg-2)]',
+                  )}
+                >
+                  <Code2 size={13} aria-hidden />
+                  JSON
+                </button>
+              </div>
+            </CardHeader>
 
-      <div className="foot">
-        <span>
-          <b>Connect</b> — Agent Card / Skill / Runner / Preflight
-        </span>
-        <span>设计稿</span>
+            <CardContent className="flex flex-col gap-4 py-4">
+              <div className="flex flex-wrap items-center gap-2">
+                <Stamp tone={card.qualification.startsWith('受控') ? 'pine' : 'slate'} size="sm">
+                  {card.qualification}
+                </Stamp>
+                <Badge variant="outline">
+                  {card.cardOrigin === 'builtin'
+                    ? bi('内置卡 · 只读模板', 'Built-in · Read-only')
+                    : bi('本地卡 · 可覆盖同名内置卡', 'Local Card · Overrides Built-in')}
+                </Badge>
+                {card.strategyTags.map((tag) => (
+                  <Badge key={tag} variant="outline">
+                    {tag}
+                  </Badge>
+                ))}
+              </div>
+
+              {inspectTab === 'card' ? (
+                <div className="grid grid-cols-1 gap-5 xl:grid-cols-[minmax(0,1fr)_minmax(0,320px)]">
+                  <div className="min-w-0">
+                    <div className="mb-3 rounded-lg bg-[var(--bg-2)] p-3.5">
+                      <div className="font-mono text-micro text-[var(--fg-2)]">
+                        {bi('人格与策略指令（Persona）', 'Persona & Strategy Prompt')}
+                      </div>
+                      <p className="mt-1.5 text-note leading-relaxed text-[var(--fg-0)]">
+                        {card.persona || bi('尚未填写人格说明', 'No persona configured yet')}
+                      </p>
+                    </div>
+                    <KV k={bi('来源与版本', 'Source & Version')} v={`${card.source} · ${card.version}`} />
+                    <KV k={bi('声明模型', 'Declared Model')} v={card.model} />
+                    <KV k={bi('风险档与周期', 'Risk & Holding')} v={`${card.riskProfile} · ${card.holdingPeriod}`} />
+                    <KV
+                      k={bi('建议初始资金', 'Default Capital')}
+                      v={money(card.initialCash) + bi('（以委托单为准）', ' (mandate overrides)')}
+                    />
+                    <KV
+                      k={bi('风控上限', 'Position Limits')}
+                      v={bi(`最多 ${card.maxPositions} 只 · 单票 ≤ ${card.maxPositionPct}%`, `Max ${card.maxPositions} pos · ≤ ${card.maxPositionPct}% each`)}
+                    />
+                    <KV
+                      k={bi('受控工具白名单', 'MCP Tool Whitelist')}
+                      v={
+                        card.tools === 0
+                          ? bi('未声明（不可运行）', 'Undeclared (blocked)')
+                          : bi(`${card.tools} 个受控只读/下单工具`, `${card.tools} sandboxed MCP tools`)
+                      }
+                    />
+                    <KV
+                      k={bi('历史委托引用', 'Referenced Runs')}
+                      v={quotes.length === 0 ? bi('暂未被训练引用', 'None yet') : quotes.join(' · ')}
+                      last
+                    />
+                  </div>
+
+                  <div className="min-w-0">
+                    <div className="mb-1.5 font-mono text-micro text-[var(--fg-2)]">
+                      {bi('平台读取的原始 Agent 卡', 'Raw Agent Card JSON')}
+                    </div>
+                    <pre className="code max-w-full overflow-x-auto">{cardJsonOf(card)}</pre>
+                  </div>
+                </div>
+              ) : (
+                <pre className="code max-w-full overflow-x-auto">{cardJsonOf(card)}</pre>
+              )}
+
+              <div className="flex flex-wrap items-center justify-between gap-3 border-t border-[var(--line-soft)] pt-3.5">
+                <span className="flex items-center gap-2 text-note text-[var(--fg-2)]">
+                  <Shield size={15} aria-hidden className="text-[var(--lime)]" />
+                  {isEn
+                    ? 'Research tools, portfolio view, and order gateway are injected by the arena at runtime.'
+                    : '研究工具、账户视图与唯一下单网关均由训练场按实验快照注入，Agent 无法直接改账。'}
+                </span>
+                <div className="flex flex-wrap items-center gap-2">
+                  <Button variant="ghost" size="sm" onClick={() => open({ kind: 'agent', agentId: selected })}>
+                    {bi('查看/微调草稿', 'Inspect / Edit Draft')}
+                  </Button>
+                  <Button variant="solid" size="sm" onClick={goToMandate}>
+                    {bi(`用「${card.name.split(' · ')[0]}」开具委托单 →`, `Create Mandate with ${card.name.split(' · ')[0]} →`)}
+                  </Button>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </section>
       </div>
     </>
   )

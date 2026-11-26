@@ -1,18 +1,20 @@
 import { createContext, useCallback, useContext, useMemo, useRef, useState } from 'react'
 import type { ReactNode } from 'react'
 
-import type { AgentId } from '../types'
+import type { AgentId, WorkspaceKind } from '../types'
 
 export type DialogState =
   | { kind: 'none' }
-  | { kind: 'snapshot' }
-  | { kind: 'replay' }
-  | { kind: 'detail'; id: string }
-  | { kind: 'abort' }
-  | { kind: 'goal' }
-  | { kind: 'modify' }
-  | { kind: 'agent'; agentId: AgentId }
-  | { kind: 'switchAgent'; agentId: AgentId }
+  | { kind: 'snapshot'; scope?: WorkspaceKind }
+  | { kind: 'replay'; scope?: WorkspaceKind }
+  | { kind: 'detail'; id: string; scope?: WorkspaceKind }
+  | { kind: 'abort'; scope?: WorkspaceKind }
+  | { kind: 'goal'; scope?: WorkspaceKind }
+  | { kind: 'modify'; scope?: WorkspaceKind }
+  | { kind: 'editHolding'; name?: string; scope?: WorkspaceKind }
+  | { kind: 'agent'; agentId: AgentId; scope?: WorkspaceKind }
+  | { kind: 'switchAgent'; agentId: AgentId; scope?: WorkspaceKind }
+  | { kind: 'onboard'; scope?: WorkspaceKind }
 
 interface DialogContextValue {
   dialog: DialogState
