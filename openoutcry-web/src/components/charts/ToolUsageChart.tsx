@@ -48,8 +48,9 @@ function ToolUsageChartInner({ data }: Props) {
 }
 
 export function ToolUsageChart(props: Props) {
+  const { t } = useTranslation()
   return (
-    <WidgetErrorBoundary title="工具调用图渲染异常">
+    <WidgetErrorBoundary title={t('common.widgetError.toolUsageTitle')}>
       <ToolUsageChartInner {...props} />
     </WidgetErrorBoundary>
   )

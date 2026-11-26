@@ -3,6 +3,7 @@ import { create } from 'zustand'
 
 import { detectInitialLang, readQueryParam, type Lang } from '../i18n/detectLang'
 import { syncI18nLanguage } from '../i18n'
+import { safeGetStorage, safeSetStorage } from '../lib/storage'
 
 export type { Lang }
 export type ThemeMode = 'dark' | 'light'
@@ -36,10 +37,8 @@ interface LocaleStoreState {
 function initialTheme(): ThemeMode {
   const q = readQueryParam('theme')
   if (q === 'light' || q === 'dark') return q
-  if (typeof window !== 'undefined') {
-    const saved = window.localStorage.getItem('openoutcry.theme')
-    if (saved === 'light' || saved === 'dark') return saved
-  }
+  const saved = safeGetStorage('openoutcry.theme')
+  if (saved === 'light' || saved === 'dark') return saved
   return 'dark'
 }
 
@@ -56,9 +55,7 @@ export const useLocaleStore = create<LocaleStoreState>((set, get) => ({
       lang: next,
       marketColors: next === 'en' ? 'intl' : 'cn',
     })
-    if (typeof window !== 'undefined') {
-      window.localStorage.setItem('openoutcry.lang', next)
-    }
+    safeSetStorage('openoutcry.lang', next)
   },
 
   toggleLang: () => {
@@ -67,9 +64,7 @@ export const useLocaleStore = create<LocaleStoreState>((set, get) => ({
 
   setTheme: (next: ThemeMode) => {
     set({ theme: next })
-    if (typeof window !== 'undefined') {
-      window.localStorage.setItem('openoutcry.theme', next)
-    }
+    safeSetStorage('openoutcry.theme', next)
   },
 
   toggleTheme: () => {

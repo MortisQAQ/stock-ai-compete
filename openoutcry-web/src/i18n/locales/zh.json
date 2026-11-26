@@ -1148,6 +1148,14 @@
       "notFoundTitle": "这里没有页面。",
       "notFoundDeck": "链接可能已经过期，或者这个入口还没做。",
       "backToStudio": "回到 Agent 库"
+    },
+    "widgetError": {
+      "defaultTitle": "图表渲染异常",
+      "defaultMessage": "该组件数据暂时无法正常渲染，页面其余模块不受影响。",
+      "retry": "重试",
+      "equityTitle": "净值曲线渲染异常",
+      "drawdownTitle": "回撤曲线渲染异常",
+      "toolUsageTitle": "工具调用图渲染异常"
     }
   }
 }

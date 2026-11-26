@@ -1148,6 +1148,14 @@
       "notFoundTitle": "Page not found.",
       "notFoundDeck": "This link may be outdated or the route does not exist yet.",
       "backToStudio": "Back to Agent Roster"
+    },
+    "widgetError": {
+      "defaultTitle": "Chart render error",
+      "defaultMessage": "This widget could not be rendered. Other modules remain unaffected.",
+      "retry": "Retry",
+      "equityTitle": "Equity curve render error",
+      "drawdownTitle": "Drawdown chart render error",
+      "toolUsageTitle": "Tool usage chart render error"
     }
   }
 }

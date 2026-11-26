@@ -1,5 +1,7 @@
 import { Component, type ReactNode } from 'react'
 
+import i18n from '../../i18n'
+
 export interface WidgetErrorBoundaryProps {
   title?: string
   fallbackMessage?: string
@@ -44,8 +46,8 @@ export class WidgetErrorBoundary extends Component<
     }
 
     const {
-      title = '图表渲染异常',
-      fallbackMessage = '该组件数据暂时无法正常渲染，页面其余模块不受影响。',
+      title = i18n.t('common.widgetError.defaultTitle'),
+      fallbackMessage = i18n.t('common.widgetError.defaultMessage'),
     } = this.props
 
     return (
@@ -73,7 +75,7 @@ export class WidgetErrorBoundary extends Component<
           onClick={this.handleReset}
           className="mt-1 inline-flex items-center rounded border border-[var(--line-strong)] bg-[var(--bg-2)] px-3 py-1.5 font-mono text-micro font-semibold text-[var(--fg-0)] transition-colors hover:border-[var(--accent)] hover:text-[var(--accent)]"
         >
-          重试 / Retry
+          {i18n.t('common.widgetError.retry')}
         </button>
       </div>
     )

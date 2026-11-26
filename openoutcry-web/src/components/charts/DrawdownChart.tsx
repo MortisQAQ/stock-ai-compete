@@ -63,8 +63,9 @@ function DrawdownChartInner({ nav, height = 250 }: Props) {
 }
 
 export function DrawdownChart(props: Props) {
+  const { t } = useTranslation()
   return (
-    <WidgetErrorBoundary title="回撤曲线渲染异常">
+    <WidgetErrorBoundary title={t('common.widgetError.drawdownTitle')}>
       <DrawdownChartInner {...props} />
     </WidgetErrorBoundary>
   )

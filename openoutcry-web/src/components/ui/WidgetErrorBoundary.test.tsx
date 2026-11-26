@@ -36,7 +36,7 @@ describe('WidgetErrorBoundary', () => {
     expect(fallbackHtml).toContain('净值曲线渲染异常')
     expect(fallbackHtml).toContain('序列数据损坏')
     expect(fallbackHtml).toContain('Invalid NAV series')
-    expect(fallbackHtml).toContain('重试 / Retry')
+    expect(fallbackHtml).toMatch(/重试|Retry/)
     expect(fallbackHtml).not.toContain('Healthy Child')
   })
 

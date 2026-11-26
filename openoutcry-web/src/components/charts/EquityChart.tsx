@@ -74,8 +74,9 @@ function EquityChartInner({
  * 净值 vs 基准。配色在 review.css 的 .chart-* 里，色值来自 tokens.css。
  */
 export function EquityChart(props: Props) {
+  const { t } = useTranslation()
   return (
-    <WidgetErrorBoundary title="净值曲线渲染异常">
+    <WidgetErrorBoundary title={t('common.widgetError.equityTitle')}>
       <EquityChartInner {...props} />
     </WidgetErrorBoundary>
   )

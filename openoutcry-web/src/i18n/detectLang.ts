@@ -1,3 +1,5 @@
+import { safeGetStorage } from '../lib/storage'
+
 export type Lang = 'zh' | 'en'
 
 export function readQueryParam(key: string): string | null {
@@ -15,9 +17,7 @@ export function readQueryParam(key: string): string | null {
 export function detectInitialLang(): Lang {
   const q = readQueryParam('lang')
   if (q === 'en' || q === 'zh') return q
-  if (typeof window !== 'undefined') {
-    const saved = window.localStorage.getItem('openoutcry.lang')
-    if (saved === 'en' || saved === 'zh') return saved
-  }
+  const saved = safeGetStorage('openoutcry.lang')
+  if (saved === 'en' || saved === 'zh') return saved
   return 'zh'
 }
