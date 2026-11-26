@@ -53,9 +53,96 @@
 .rail-top {
   display: flex;
   flex-direction: column;
-  gap: var(--sp-4);
-  padding: 20px 16px 14px;
+  gap: 6px;
+  padding: 18px 16px 12px;
   flex: 0 0 auto;
+}
+
+.rail-tagline {
+  margin: 0;
+  padding: 0 4px;
+  font: 500 var(--fs-micro) / 1.35 var(--mono);
+  color: var(--fg-2);
+}
+
+.rail-step-no {
+  font: 600 var(--fs-micro) / 1 var(--mono);
+  color: var(--fg-2);
+  flex: 0 0 auto;
+  min-width: 22px;
+}
+
+.rail-nav a[aria-current='page'] .rail-step-no {
+  color: var(--lime);
+}
+
+.rail-ref {
+  flex: 0 0 auto;
+  padding: 8px 10px 6px;
+  border-top: 1px solid var(--line-soft);
+}
+
+.rail-ref-hd {
+  padding: 2px 8px 6px;
+  font: 600 var(--fs-micro) / 1 var(--cond);
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--fg-2);
+}
+
+.rail-ref-links {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+
+.rail-ref-links a {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  height: 34px;
+  padding: 0 8px;
+  border: 0;
+  border-radius: var(--radius-md);
+  color: var(--fg-2);
+  font-size: var(--fs-sm);
+  transition: background 0.14s ease, color 0.14s ease;
+}
+
+.rail-ref-links a:hover,
+.rail-ref-links a[aria-current='page'] {
+  background: var(--bg-2);
+  color: var(--fg-0);
+}
+
+.rail-tools {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 6px;
+  padding: 8px 12px;
+  border-top: 1px solid var(--line-soft);
+  flex: 0 0 auto;
+}
+
+.rail-tool-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  height: 34px;
+  padding: 0 8px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-md);
+  background: var(--bg-2);
+  color: var(--fg-1);
+  font: 600 var(--fs-micro) / 1 var(--mono);
+  cursor: pointer;
+  transition: border-color 0.14s ease, color 0.14s ease, background 0.14s ease;
+}
+
+.rail-tool-btn:hover {
+  border-color: var(--lime);
+  color: var(--fg-0);
 }
 
 .rail-brand {
@@ -90,7 +177,7 @@
   align-items: center;
   justify-content: center;
   gap: 8px;
-  height: 36px;
+  height: var(--control-h-md);
   border-radius: var(--radius-lg);
   background: var(--bg-3);
   color: var(--fg-0);
@@ -120,7 +207,7 @@
   display: flex;
   align-items: center;
   gap: 10px;
-  height: 34px;
+  height: 38px;
   padding: 0 10px;
   border: 0;
   border-radius: var(--radius-md);
@@ -156,13 +243,21 @@
   color: var(--lime);
 }
 
-/* ---------- 训练任务树 ---------- */
+/* ---------- 实战账户 & 训练任务树 ---------- */
 .rail-sec {
   display: flex;
   flex-direction: column;
   min-height: 0;
   flex: 1 1 auto;
   margin-top: 6px;
+  border-top: 1px solid var(--line-soft);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding-bottom: 12px;
+}
+
+.rail-group + .rail-group {
+  margin-top: 4px;
   border-top: 1px solid var(--line-soft);
 }
 
@@ -171,7 +266,7 @@
   align-items: center;
   justify-content: space-between;
   gap: 8px;
-  padding: 16px 18px 8px;
+  padding: 14px 18px 8px;
   flex: 0 0 auto;
   font: 600 var(--fs-micro) / 1 var(--cond);
   letter-spacing: 0.2em;
@@ -187,10 +282,7 @@
 }
 
 .rail-tasks {
-  min-height: 0;
-  overflow-y: auto;
-  overscroll-behavior: contain;
-  padding: 0 10px 16px;
+  padding: 0 10px 6px;
 }
 
 .rail-task + .rail-task {
@@ -353,7 +445,7 @@
   display: none;
   align-items: center;
   gap: 12px;
-  height: 52px;
+  height: 56px;
   padding: 0 14px;
   background: rgba(6, 9, 7, 0.9);
   backdrop-filter: blur(16px) saturate(1.1);
@@ -385,7 +477,7 @@
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-  font-size: var(--fs-sm);
+  font-size: var(--fs-body);
   font-weight: 600;
   color: var(--fg-0);
 }

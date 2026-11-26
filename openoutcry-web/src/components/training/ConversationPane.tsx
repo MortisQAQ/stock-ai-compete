@@ -1,8 +1,8 @@
 import { useEffect, useId, useRef, useState } from 'react'
 import { ArrowDown, ArrowUp, Check, Copy, Plus } from 'lucide-react'
 
-import { useRun } from '../../store/RunProvider'
-import { useTraining } from '../../store/TrainingProvider'
+import { useRun, useWorkspaceKind } from '../../store/RunProvider'
+import { useActiveWorkbenchTask } from '../../store/TrainingProvider'
 import { useDialog } from '../../store/DialogProvider'
 import { agentOf } from '../../data/agents'
 import { seq } from '../../lib/format'
@@ -15,6 +15,7 @@ const KIND_LABEL: Record<EventKind, string> = {
   order: '提案',
   user: '我',
   error: '异常',
+  system: '系统',
 }
 
 interface Props {
@@ -28,10 +29,13 @@ interface Props {
  * 我的插话靠右、圆角气泡；Agent 的话不装盒子，直接在纸上写；
  * 工具调用和提案各占一行小圆角条，点了才展开。
  * 输入区是一个大连圆角框，左侧「+」、右下圆形发送键，框内不出现滚动条。
+ *
+ * 历史训练场与实战工作台完全共用本组件。
  */
 export function ConversationPane({ className, hideHeader = false }: Props) {
+  const kind = useWorkspaceKind()
   const { state, actions } = useRun()
-  const { conversation } = useTraining()
+  const { conversation } = useActiveWorkbenchTask()
   const { open } = useDialog()
   const agent = agentOf(state.agent)
   const [text, setText] = useState('')
@@ -42,6 +46,7 @@ export function ConversationPane({ className, hideHeader = false }: Props) {
   const inputRef = useRef<HTMLTextAreaElement>(null)
   const prevCount = useRef(state.events.length)
   const inputId = useId()
+  const isLive = state.kind === 'live'
   const aborted = state.status === 'aborted'
   const last = state.events[state.events.length - 1]
   const waitingHuman = state.status === 'active' && state.proposal.status === 'pending'
@@ -75,7 +80,11 @@ export function ConversationPane({ className, hideHeader = false }: Props) {
     if (!value || aborted) return
     if (value === '/goal') {
       setText('')
-      open({ kind: 'goal' })
+      if (isLive) {
+        actions.enterGoalMode()
+        return
+      }
+      open({ kind: 'goal', scope: kind })
       return
     }
     actions.sendGuidance(value)
@@ -104,8 +113,16 @@ export function ConversationPane({ className, hideHeader = false }: Props) {
             <h2 className="conv-title">{conversation.name}</h2>
             <p className="conv-sub">
               <i aria-hidden className="conv-dot" data-on={connected ? 'y' : 'n'} />
-              {agent.name} · {connected ? '在线' : '断开'} ·{' '}
-              {state.mode === 'goal' ? '自主推进' : '逐案确认'}
+              {isLive ? (
+                <>
+                  {agent.name} · 实时辅助 · 仅给建议不代下单
+                </>
+              ) : (
+                <>
+                  {agent.name} · {connected ? '在线' : '断开'} ·{' '}
+                  {state.mode === 'goal' ? '自主推进' : '逐案确认'}
+                </>
+              )}
             </p>
           </div>
         </header>
@@ -125,7 +142,7 @@ export function ConversationPane({ className, hideHeader = false }: Props) {
       >
         {state.events.length === 0 ? (
           <p className="py-8 text-center text-note leading-relaxed text-[var(--ink-2)]">
-            还没有对话。写下第一条插话，Agent 会从这里开始。
+            还没有对话。写下第一条消息，Agent 会从这里开始。
           </p>
         ) : null}
 
@@ -165,17 +182,17 @@ export function ConversationPane({ className, hideHeader = false }: Props) {
                   <span
                     aria-hidden
                     className={cn(
-                      'grid size-[18px] shrink-0 place-items-center rounded-full font-mono text-micro font-bold',
+                      'grid size-6 shrink-0 place-items-center rounded-full font-mono text-micro font-bold',
                       isOrder ? 'bg-[var(--ver)] text-[var(--bg-1)]' : 'bg-[var(--brass-hi)] text-[var(--ink)]',
                     )}
                   >
-                    {isOrder ? '提' : '工'}
+                    {isOrder ? (isLive ? '建' : '提') : '工'}
                   </span>
                   <span className="min-w-0 flex-1 truncate text-note font-medium text-[var(--ink)]">
                     {e.title}
                   </span>
                   <span className="shrink-0 font-mono text-micro tracking-[0.04em] text-[var(--ink-2)]">
-                    {KIND_LABEL[e.kind]} · {e.at}
+                    {isOrder && isLive ? '建议' : KIND_LABEL[e.kind]} · {e.at}
                   </span>
                 </button>
                 {openBody && e.body ? (
@@ -206,7 +223,7 @@ export function ConversationPane({ className, hideHeader = false }: Props) {
                   aria-label="复制这条消息"
                   className="ml-auto rounded p-0.5 text-[var(--ink-2)] opacity-0 transition-opacity hover:text-[var(--ink)] focus-visible:opacity-100 group-hover:opacity-100"
                 >
-                  {copied === e.id ? <Check size={11} /> : <Copy size={11} />}
+                  {copied === e.id ? <Check size={14} /> : <Copy size={14} />}
                 </button>
               </div>
               <p
@@ -227,10 +244,12 @@ export function ConversationPane({ className, hideHeader = false }: Props) {
         {waitingHuman ? (
           <div className="rounded-[12px] bg-[var(--warn-soft)] px-3.5 py-3">
             <span className="font-mono text-micro font-semibold uppercase tracking-[0.14em] text-[var(--warn)]">
-              等待人工确认
+              {isLive ? '等待你的决策' : '等待人工确认'}
             </span>
             <p className="mt-1.5 text-note leading-relaxed text-[var(--fg-1)]">
-              提案在右侧工作台等待批准或拒绝，这里不再重复放按钮。
+              {isLive
+                ? '调仓建议单在右侧工作台等待你的确认：自行下单后可录入实盘成交，或暂不采纳。'
+                : '提案在右侧工作台等待批准或拒绝，这里不再重复放按钮。'}
             </p>
           </div>
         ) : null}
@@ -242,7 +261,7 @@ export function ConversationPane({ className, hideHeader = false }: Props) {
               onClick={() => scrollToBottom()}
               className="flex items-center gap-1 rounded-full border border-[var(--line)] bg-[var(--bg-1)] px-2.5 py-1 font-mono text-micro uppercase tracking-[0.1em] text-[var(--ink-2)]"
             >
-              <ArrowDown size={10} />
+              <ArrowDown size={13} />
               最新
             </button>
           </div>
@@ -259,7 +278,7 @@ export function ConversationPane({ className, hideHeader = false }: Props) {
       >
         <div className="conv-input">
           <label htmlFor={inputId} className="sr-only">
-            人工插话
+            {isLive ? '实盘追问或说明' : '人工插话'}
           </label>
           <textarea
             id={inputId}
@@ -274,26 +293,36 @@ export function ConversationPane({ className, hideHeader = false }: Props) {
             }}
             rows={1}
             disabled={aborted}
-            placeholder={aborted ? '本次运行已中止。' : '插话指导…'}
+            placeholder={
+              aborted
+                ? '本次运行已中止。'
+                : isLive
+                  ? '追问持仓、实时行情或记录想法…'
+                  : '插话指导…'
+            }
             className="block max-h-[120px] w-full resize-none overflow-y-auto border-0 bg-transparent px-1.5 py-0.5 font-sans text-body leading-[1.6] text-[var(--ink)] placeholder:text-[var(--ink-3)] focus:outline-none disabled:opacity-60 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
           />
 
           <div className="mt-2 flex items-center gap-2">
             <button
               type="button"
-              onClick={() => open({ kind: 'goal' })}
-              aria-label="切到自主推进"
+              onClick={() =>
+                isLive
+                  ? open({ kind: 'editHolding', scope: kind })
+                  : open({ kind: 'goal', scope: kind })
+              }
+              aria-label={isLive ? '新增或调整镜像持仓' : '切到自主推进'}
               className="grid size-7 shrink-0 place-items-center rounded-full bg-[var(--bg-2)] text-[var(--fg-2)] transition-colors hover:bg-[var(--bg-3)] hover:text-[var(--fg-0)]"
             >
               <Plus size={14} />
             </button>
             <span className="min-w-0 flex-1 truncate font-mono text-micro tracking-[0.04em] text-[var(--ink-2)]">
-              /goal 自主推进 · Enter 发送
+              {isLive ? '+ 维护镜像持仓 · Enter 发送' : '/goal 自主推进 · Enter 发送'}
             </span>
             <button
               type="submit"
               disabled={aborted || !text.trim()}
-              aria-label="发送插话"
+              aria-label={isLive ? '发送消息' : '发送插话'}
               className="grid size-8 shrink-0 place-items-center rounded-full bg-[var(--accent)] text-[#04070d] transition-opacity hover:opacity-90 disabled:opacity-30"
             >
               <ArrowUp size={15} />

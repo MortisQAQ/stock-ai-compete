@@ -1,24 +1,32 @@
-import { APP_ROUTES } from './app/routes'
+import { APP_ROUTES, type RouteGroup } from './app/routes'
 
 export interface NavItem {
   to: string
+  group: RouteGroup
   n: string
   label: string
   sub: string
   short: string
+  shortEn: string
 }
 
 /**
  * 导航与路由同源：APP_ROUTES 是唯一声明，这里只做形状转换。
- * 之前 NAV、路由表、移动端短标签各自维护一份，加一个页面要改三处。
  */
-export const NAV: NavItem[] = APP_ROUTES.map(({ path, nav }) => ({
+export const NAV: NavItem[] = APP_ROUTES.map(({ path, group, nav }) => ({
   to: path,
+  group,
   n: nav.n,
   label: nav.label,
   sub: nav.sub,
   short: nav.short,
+  shortEn: nav.shortEn,
 }))
 
-export const titleOf = (pathname: string): string =>
-  APP_ROUTES.find((route) => route.path === pathname)?.nav.label ?? APP_ROUTES[0].nav.label
+export const PRIMARY_NAV: NavItem[] = NAV.filter((item) => item.group === 'primary')
+export const REFERENCE_NAV: NavItem[] = NAV.filter((item) => item.group === 'reference')
+
+export const titleOf = (pathname: string, lang: 'zh' | 'en' = 'zh'): string => {
+  const hit = APP_ROUTES.find((route) => route.path === pathname) ?? APP_ROUTES[0]
+  return lang === 'en' ? hit.nav.sub : hit.nav.label
+}

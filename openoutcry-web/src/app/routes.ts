@@ -12,55 +12,73 @@ import { lazyPage } from './lazyPage'
  * 页面用 `lazyPage` 做路由级代码分割：首屏只加载当前路由的 chunk，
  * 其余页面等用户真正导航过去再拉取。
  */
+export type RouteGroup = 'primary' | 'reference'
+
 export interface AppRoute {
   /** 路由路径，同时作为导航的 to */
   path: string
+  /** 分组：primary 为五步核心闭环，reference 为侧栏底部参考页 */
+  group: RouteGroup
   /** 导航与标题文案 */
   nav: {
-    /** 侧边栏序号 */
+    /** 侧边栏序号（参考页为空） */
     n: string
-    /** 页面标题 / 导航主文案 */
+    /** 中文导航主文案 */
     label: string
-    /** 英文副标题 */
+    /** 英文导航主文案 / 副标题 */
     sub: string
-    /** 移动端底栏用的短标签 */
+    /** 移动端底栏短标签 */
     short: string
+    /** 英文短标签 */
+    shortEn: string
   }
   lazy: () => Promise<{ Component: ComponentType }>
 }
 
 export const APP_ROUTES: AppRoute[] = [
   {
+    path: '/connect',
+    group: 'primary',
+    nav: { n: '01', label: 'Agent 库', sub: 'Agent Roster', short: 'Agent 库', shortEn: 'Agents' },
+    lazy: lazyPage(() => import('../routes/ConnectPage'), 'ConnectPage'),
+  },
+  {
     path: '/studio',
-    nav: { n: '01', label: '委托台', sub: 'Training Desk', short: '委托台' },
+    group: 'primary',
+    nav: { n: '02', label: '训练委托', sub: 'Training Desk', short: '委托', shortEn: 'Desk' },
     lazy: lazyPage(() => import('../routes/StudioPage'), 'StudioPage'),
   },
   {
     path: '/training',
-    nav: { n: '02', label: '训练场', sub: 'Training Ground', short: '训练场' },
+    group: 'primary',
+    nav: { n: '03', label: '历史训练场', sub: 'Training Ground', short: '训练场', shortEn: 'Arena' },
     lazy: lazyPage(() => import('../routes/TrainingPage'), 'TrainingPage'),
   },
   {
     path: '/review',
-    nav: { n: '03', label: '结果与复盘', sub: 'Review', short: '复盘' },
+    group: 'primary',
+    nav: { n: '04', label: '复盘与对照', sub: 'Review & Compare', short: '复盘', shortEn: 'Review' },
     lazy: lazyPage(() => import('../routes/ReviewPage'), 'ReviewPage'),
   },
   {
-    path: '/connect',
-    nav: { n: '04', label: '连接 Agent', sub: 'Connect', short: '接入' },
-    lazy: lazyPage(() => import('../routes/ConnectPage'), 'ConnectPage'),
+    path: '/live',
+    group: 'primary',
+    nav: { n: '05', label: '实战工作台', sub: 'Live Workbench', short: '实战', shortEn: 'Live' },
+    lazy: lazyPage(() => import('../routes/LiveWorkbenchPage'), 'LiveWorkbenchPage'),
   },
   {
     path: '/protocol',
-    nav: { n: '05', label: '协议与 Skill', sub: 'Protocol', short: '协议' },
+    group: 'reference',
+    nav: { n: '', label: '协议与 Skill', sub: 'Protocol & Skills', short: '协议', shortEn: 'Protocol' },
     lazy: lazyPage(() => import('../routes/ProtocolPage'), 'ProtocolPage'),
   },
   {
     path: '/guide',
-    nav: { n: '06', label: '产品说明', sub: 'Brief', short: '说明' },
+    group: 'reference',
+    nav: { n: '', label: '产品说明', sub: 'Product Brief', short: '说明', shortEn: 'Brief' },
     lazy: lazyPage(() => import('../routes/GuidePage'), 'GuidePage'),
   },
 ]
 
-/** 默认落点：第一个路由 */
+/** 默认落点：五步闭环第 1 步（Agent 库） */
 export const HOME_PATH = APP_ROUTES[0].path

@@ -11,24 +11,20 @@ import type { ReactNode } from 'react'
 
 import type { ToastMessage } from '../types'
 
-/**
- * 全站提示队列。
- *
- * 之前 toast 挂在 RunProvider 里：任何页面想提示一句，都得先依赖「运行状态」。
- * 运行状态将来换成服务端数据源时，toast 也要跟着搬家。现在它是独立的一层，
- * 放在 RunProvider 外层，两者只通过 useToast() 通信。
- *
- * 定时器集中管理：组件卸载时统一清掉，不会在卸载后 setState。
- */
 type ToastKind = ToastMessage['kind']
+
+export interface ToastOptions {
+  actionLabel?: string
+  onAction?: () => void
+  durationMs?: number
+}
 
 interface ToastContextValue {
   toasts: ToastMessage[]
-  notify: (text: string, kind?: ToastKind) => void
+  notify: (text: string, kind?: ToastKind, options?: ToastOptions) => void
   dismiss: (id: number) => void
 }
 
-/** 同时最多显示三条，新的挤掉最旧的 */
 const MAX_VISIBLE = 3
 const LIFETIME_MS = 3600
 
@@ -49,12 +45,16 @@ export function ToastProvider({ children }: { children: ReactNode }) {
   }, [])
 
   const notify = useCallback(
-    (text: string, kind: ToastKind = 'info') => {
+    (text: string, kind: ToastKind = 'info', options?: ToastOptions) => {
       const id = ++seq.current
-      setToasts((list) => [...list.slice(-(MAX_VISIBLE - 1)), { id, kind, text }])
+      const lifetime = options?.durationMs ?? (options?.onAction ? 4200 : LIFETIME_MS)
+      setToasts((list) => [
+        ...list.slice(-(MAX_VISIBLE - 1)),
+        { id, kind, text, actionLabel: options?.actionLabel, onAction: options?.onAction },
+      ])
       timers.current.set(
         id,
-        window.setTimeout(() => dismiss(id), LIFETIME_MS),
+        window.setTimeout(() => dismiss(id), lifetime),
       )
     },
     [dismiss],

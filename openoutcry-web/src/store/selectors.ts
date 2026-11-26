@@ -17,21 +17,52 @@ export const TRAINING_STATUS_TEXT = {
   done: '已结束',
 } as const
 
+export const TRAINING_STATUS_TEXT_EN = {
+  running: 'Running',
+  pending: 'Pending',
+  done: 'Completed',
+} as const
+
 /* ---------------- 账户表头 ---------------- */
 
 export function accountBandItems(state: RunState, totals: Totals): BandItem[] {
+  const cashPct = totals.equity ? ((state.cash / totals.equity) * 100).toFixed(1) : '0.0'
+  const netPct = state.initial ? ((totals.net / state.initial) * 100).toFixed(2) : '0.00'
+
+  if (state.kind === 'live') {
+    return [
+      { label: '总资产（估算）', value: money(totals.equity), note: state.syncLabel ?? '手动维护' },
+      {
+        label: '累计净收益',
+        value: signed(totals.net),
+        note: netPct + '% · 已扣费用',
+        tone: totals.net >= 0 ? 'up' : 'dn',
+      },
+      {
+        label: '可用现金',
+        value: money(state.cash),
+        note: '占总资产 ' + cashPct + '%',
+      },
+      {
+        label: '持仓市值',
+        value: money(totals.market),
+        note: state.holdings.length + ' 个标的 · 实时参考',
+      },
+    ]
+  }
+
   return [
     { label: '账户净值', value: money(totals.equity), note: '初始资金 ' + money(state.initial) },
     {
       label: '累计净收益',
       value: signed(totals.net),
-      note: ((totals.net / state.initial) * 100).toFixed(2) + '% · 已扣费用',
+      note: netPct + '% · 已扣费用',
       tone: totals.net >= 0 ? 'up' : 'dn',
     },
     {
       label: '可用现金',
       value: money(state.cash),
-      note: '占总资产 ' + ((state.cash / totals.equity) * 100).toFixed(1) + '%',
+      note: '占总资产 ' + cashPct + '%',
     },
     { label: '持仓市值', value: money(totals.market), note: state.holdings.length + ' 个标的 · 当前估值' },
   ]
@@ -41,12 +72,13 @@ export function accountBandItems(state: RunState, totals: Totals): BandItem[] {
 export function archiveBandItems(task: TrainingTask): BandItem[] {
   const archive = task.archive
   if (!archive) return []
+  const liveArchive = task.kind === 'live'
   return [
-    { label: '账户净值', value: money(archive.equity), note: '任务结束时冻结' },
+    { label: liveArchive ? '总资产快照' : '账户净值', value: money(archive.equity), note: liveArchive ? '归档时镜像' : '任务结束时冻结' },
     {
       label: '累计净收益',
       value: signed(archive.net),
-      note: '已扣费用 · 含全部平仓',
+      note: liveArchive ? '已扣费用 · 实盘记录' : '已扣费用 · 含全部平仓',
       tone: archive.net >= 0 ? 'up' : 'dn',
     },
     { label: '可用现金', value: money(archive.cash), note: '结束时快照' },
