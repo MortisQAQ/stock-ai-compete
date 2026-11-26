@@ -1,5 +1,6 @@
 import { useMemo } from 'react'
 import { create } from 'zustand'
+import { useShallow } from 'zustand/react/shallow'
 
 import { TRAINING_SEED, type TrainingRecord } from '../data/trainings'
 import { useRunStore, useWorkspaceKind } from './RunProvider'
@@ -189,63 +190,128 @@ export const useTrainingStore = create<TrainingStoreState>((set, get) => ({
 export function useTraining(): TrainingCtxValue {
   const trainingState = useRunStore((s) => s.training)
   const liveState = useRunStore((s) => s.live)
-  const store = useTrainingStore()
+  const {
+    records,
+    draftAgent,
+    compareRuns,
+    taskId,
+    convId,
+    liveTaskId,
+    liveConvId,
+    setDraftAgent,
+    issueMandate,
+    addCompareVariant,
+    selectTask,
+    selectConversation,
+    selectLiveTask,
+    selectLiveConversation,
+  } = useTrainingStore(
+    useShallow((s) => ({
+      records: s.records,
+      draftAgent: s.draftAgent,
+      compareRuns: s.compareRuns,
+      taskId: s.taskId,
+      convId: s.convId,
+      liveTaskId: s.liveTaskId,
+      liveConvId: s.liveConvId,
+      setDraftAgent: s.setDraftAgent,
+      issueMandate: s.issueMandate,
+      addCompareVariant: s.addCompareVariant,
+      selectTask: s.selectTask,
+      selectConversation: s.selectConversation,
+      selectLiveTask: s.selectLiveTask,
+      selectLiveConversation: s.selectLiveConversation,
+    })),
+  )
 
   const tasks = useMemo(() => trainingTasksOf(trainingState), [trainingState])
   const liveTasks = useMemo(() => liveTasksOf(liveState), [liveState])
 
-  const nextMandateNo = useMemo(() => nextMandateNoOf(store.records), [store.records])
+  const nextMandateNo = useMemo(() => nextMandateNoOf(records), [records])
 
   const current = useMemo(
-    () => tasks.find((task) => task.id === store.taskId) ?? tasks[0],
-    [tasks, store.taskId],
+    () => tasks.find((task) => task.id === taskId) ?? tasks[0],
+    [tasks, taskId],
   )
   const conversation = useMemo(
-    () => current.conversations.find((item) => item.id === store.convId) ?? current.conversations[0],
-    [current, store.convId],
+    () => current.conversations.find((item) => item.id === convId) ?? current.conversations[0],
+    [current, convId],
   )
 
   const liveCurrent = useMemo(
-    () => liveTasks.find((task) => task.id === store.liveTaskId) ?? liveTasks[0],
-    [liveTasks, store.liveTaskId],
+    () => liveTasks.find((task) => task.id === liveTaskId) ?? liveTasks[0],
+    [liveTasks, liveTaskId],
   )
   const liveConversation = useMemo(
-    () => liveCurrent.conversations.find((item) => item.id === store.liveConvId) ?? liveCurrent.conversations[0],
-    [liveCurrent, store.liveConvId],
+    () => liveCurrent.conversations.find((item) => item.id === liveConvId) ?? liveCurrent.conversations[0],
+    [liveCurrent, liveConvId],
   )
 
   return useMemo<TrainingCtxValue>(
     () => ({
-      records: store.records,
+      records,
       nextMandateNo,
-      draftAgent: store.draftAgent,
-      setDraftAgent: store.setDraftAgent,
-      issueMandate: store.issueMandate,
-      compareRuns: store.compareRuns,
-      addCompareVariant: store.addCompareVariant,
+      draftAgent,
+      setDraftAgent,
+      issueMandate,
+      compareRuns,
+      addCompareVariant,
       tasks,
       current,
       conversation,
-      selectTask: store.selectTask,
-      selectConversation: store.selectConversation,
+      selectTask,
+      selectConversation,
       liveTasks,
       liveCurrent,
       liveConversation,
-      selectLiveTask: store.selectLiveTask,
-      selectLiveConversation: store.selectLiveConversation,
+      selectLiveTask,
+      selectLiveConversation,
     }),
-    [store, nextMandateNo, tasks, current, conversation, liveTasks, liveCurrent, liveConversation],
+    [
+      records,
+      nextMandateNo,
+      draftAgent,
+      setDraftAgent,
+      issueMandate,
+      compareRuns,
+      addCompareVariant,
+      tasks,
+      current,
+      conversation,
+      selectTask,
+      selectConversation,
+      liveTasks,
+      liveCurrent,
+      liveConversation,
+      selectLiveTask,
+      selectLiveConversation,
+    ],
   )
 }
 
 export function useActiveWorkbenchTask(): { task: TrainingTask; conversation: TrainingConversation } {
   const kind = useWorkspaceKind()
-  const { current, conversation, liveCurrent, liveConversation } = useTraining()
-  return useMemo(
-    () =>
+  const runState = useRunStore((s) => (kind === 'live' ? s.live : s.training))
+  const { activeTaskId, activeConvId } = useTrainingStore(
+    useShallow((s) =>
       kind === 'live'
-        ? { task: liveCurrent, conversation: liveConversation }
-        : { task: current, conversation },
-    [kind, current, conversation, liveCurrent, liveConversation],
+        ? { activeTaskId: s.liveTaskId, activeConvId: s.liveConvId }
+        : { activeTaskId: s.taskId, activeConvId: s.convId },
+    ),
   )
+
+  const tasks = useMemo(
+    () => (kind === 'live' ? liveTasksOf(runState) : trainingTasksOf(runState)),
+    [kind, runState],
+  )
+  const task = useMemo(
+    () => tasks.find((item) => item.id === activeTaskId) ?? tasks[0],
+    [tasks, activeTaskId],
+  )
+  const conversation = useMemo(
+    () => task.conversations.find((item) => item.id === activeConvId) ?? task.conversations[0],
+    [task, activeConvId],
+  )
+
+  return useMemo(() => ({ task, conversation }), [task, conversation])
 }

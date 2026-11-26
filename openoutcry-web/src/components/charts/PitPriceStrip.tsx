@@ -1,3 +1,5 @@
+import { useId } from 'react'
+
 import { PIT_PRICE_HISTORY, PIT_REVEALED_OPEN } from '../../data/run'
 import { useLocale } from '../../store/LocaleProvider'
 import type { TrainingPhase } from '../../types'
@@ -18,6 +20,7 @@ interface PitPriceStripProps {
  * 所有文字标签均使用 HTML 令牌（>=14px），严格满足 check-type-floor 约束。
  */
 export function PitPriceStrip({ asset, costBasis, limitPrice, phase, filled }: PitPriceStripProps) {
+  const hatchId = 'pit-mask-hatch-' + useId().replace(/:/g, '')
   const { bi } = useLocale()
   const revealed = phase !== 'pre_market' || filled
   const settled = phase === 'close_settle'
@@ -85,7 +88,7 @@ export function PitPriceStrip({ asset, costBasis, limitPrice, phase, filled }: P
           aria-label={bi('标的 PIT 截断走势图', 'PIT truncated price chart')}
         >
           <defs>
-            <pattern id="pit-mask-hatch" width="8" height="8" patternUnits="userSpaceOnUse" patternTransform="rotate(35)">
+            <pattern id={hatchId} width="8" height="8" patternUnits="userSpaceOnUse" patternTransform="rotate(35)">
               <line x1="0" y1="0" x2="0" y2="8" stroke="var(--warn)" strokeOpacity="0.22" strokeWidth="2" />
             </pattern>
           </defs>
@@ -122,7 +125,7 @@ export function PitPriceStrip({ asset, costBasis, limitPrice, phase, filled }: P
               y={0}
               width={W - cutoffX}
               height={H}
-              fill="url(#pit-mask-hatch)"
+              fill={`url(#${hatchId})`}
             />
           ) : (
             <>

@@ -1,3 +1,5 @@
+import { WidgetErrorBoundary } from '../ui/WidgetErrorBoundary'
+
 interface Props {
   data: Array<{ label: string; count: number }>
 }
@@ -6,7 +8,7 @@ const W = 420
 const ROW = 38
 const P = { l: 108, r: 34, t: 14 }
 
-export function ToolUsageChart({ data }: Props) {
+function ToolUsageChartInner({ data }: Props) {
   const H = P.t + data.length * ROW + 12
   const max = Math.max(...data.map((d) => d.count), 1)
   const trackWidth = W - P.l - P.r
@@ -40,5 +42,13 @@ export function ToolUsageChart({ data }: Props) {
         )
       })}
     </svg>
+  )
+}
+
+export function ToolUsageChart(props: Props) {
+  return (
+    <WidgetErrorBoundary title="工具调用图渲染异常">
+      <ToolUsageChartInner {...props} />
+    </WidgetErrorBoundary>
   )
 }

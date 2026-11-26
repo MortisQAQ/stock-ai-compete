@@ -1,4 +1,5 @@
 import { areaPath, drawdownSeries, linePath, project } from '../../lib/chart'
+import { WidgetErrorBoundary } from '../ui/WidgetErrorBoundary'
 
 interface Props {
   nav: number[]
@@ -7,7 +8,7 @@ interface Props {
 
 const W = 420
 
-export function DrawdownChart({ nav, height = 250 }: Props) {
+function DrawdownChartInner({ nav, height = 250 }: Props) {
   const H = height
   const P = { l: 56, r: 16, t: 16, b: 26 }
   const dd = drawdownSeries(nav)
@@ -56,5 +57,13 @@ export function DrawdownChart({ nav, height = 250 }: Props) {
         {nav.length} 交易日
       </text>
     </svg>
+  )
+}
+
+export function DrawdownChart(props: Props) {
+  return (
+    <WidgetErrorBoundary title="回撤曲线渲染异常">
+      <DrawdownChartInner {...props} />
+    </WidgetErrorBoundary>
   )
 }

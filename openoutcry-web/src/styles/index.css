@@ -10,10 +10,8 @@
 /* Tailwind 只取 theme + utilities 两层：跳过 preflight，
    避免重置本项目已有的版式基础样式。 */
 @import 'tailwindcss/theme.css' layer(theme);
-@import 'tailwindcss/utilities.css' layer(utilities);
+@import 'tailwindcss/utilities.css' layer(utilities) source('../');
 @import 'tw-animate-css';
-
-@source '../';
 
 @import './tokens.css' layer(theme);
 @import './base.css' layer(base);
